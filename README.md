@@ -1,4 +1,4 @@
-# pocket_kitchen
+# Pocket Kitchen
 
 Pocket Kitchen is a grocery tracking application that enables users to scan grocery items into their inventory while grocery shopping, and remove an item after consuming. Pocket Kitchen automatically populates a grocery list with inventory items that have been consumed. It provides meal recipes to users for specific cuisines, as well as if the needed ingredients are available in their inventory. Users may create their own or join other user’s inventories, with each user granted a 3 inventory maximum.
 
