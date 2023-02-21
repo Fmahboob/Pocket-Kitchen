@@ -5,8 +5,15 @@ class CuisinesView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Text('Cuisines'),
+    return Scaffold(
+        appBar: AppBar(
+            centerTitle: true,
+            backgroundColor: const Color(0xff459657),
+            title: const Text('Recipes'),
+        ),
+        body: Container(
+
+        )
     );
   }
 }

@@ -17,11 +17,6 @@ class PocketKitchen extends StatelessWidget {
       home: DefaultTabController(
           length: 3,
           child: Scaffold(
-              appBar: AppBar(
-                centerTitle: true,
-                backgroundColor: const Color(0xff459657),
-                title: const Text('Pocket Kitchen'),
-              ),
               bottomNavigationBar: tabBarMenu(),
               body: const TabBarView(
                 children: [
