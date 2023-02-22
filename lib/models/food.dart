@@ -7,7 +7,7 @@ class Food {
   String? imgUrl;
   String? category;
   String? desc;
-  Float? weight;
+  double? weight;
   bool? ownUnit;
   String? barcode;
 

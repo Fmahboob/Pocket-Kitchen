@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/views/cuisines_view.dart';
-import 'package:pocket_kitchen/views/grocery_list_view.dart';
+import 'package:pocket_kitchen/views/grocery_list_views/grocery_list_view.dart';
 import 'package:pocket_kitchen/views/pantry_view.dart';
 
 void main() {
@@ -18,11 +18,11 @@ class PocketKitchen extends StatelessWidget {
           length: 3,
           child: Scaffold(
               bottomNavigationBar: tabBarMenu(),
-              body: const TabBarView(
+              body: TabBarView(
                 children: [
-                  PantryView(),
+                  const PantryView(),
                   GroceryListView(),
-                  CuisinesView()
+                  const CuisinesView()
                 ],
               )
           )
