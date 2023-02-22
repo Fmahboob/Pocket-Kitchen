@@ -1,9 +1,8 @@
 import 'dart:ffi';
-import 'package:mysql1/mysql1.dart';
 
 class PantryFood {
   int? id;
-  Float? amount;
+  double? amount;
   int? pantryId;
   int? foodId;
 
