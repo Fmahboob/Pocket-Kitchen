@@ -22,9 +22,6 @@ class GroceryListState extends State<GroceryList> {
         final pantryFood = widget.groceryList[index];
         return GroceryListItem(
           pantryFood: pantryFood,
-          onTap: () {
-
-          },
           onLongPress: () {
 
           },

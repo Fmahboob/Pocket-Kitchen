@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
-import '../../models/food.dart';
 import '../../models/pantry_food.dart';
 import 'grocery_list_listview.dart';
 
-class GroceryListView extends StatelessWidget {
-
-  GroceryListView({Key? key}) : super (key: key);
-  final groceryList = [PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1)];
-  String searchTerm = "";
+class GroceryListView extends StatefulWidget {
+  const GroceryListView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  GroceryListViewState createState() => GroceryListViewState();
+}
+class GroceryListViewState extends State<GroceryListView> {
+  List<PantryFood> groceryList = [PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1)];
+  String searchTerm = "";
+  bool isChecked = false;
+
+  @override
+  Widget build(BuildContext context) =>
+    Scaffold(
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: const Color(0xff459657),
           title: const Text('Pocket Kitchen'),
           leading: IconButton(
             onPressed: () {
-
+              foodEntryDialog();
             },
             icon: const Icon(Icons.edit),
             tooltip: 'Manually enter food items to your pantry',
@@ -28,7 +32,7 @@ class GroceryListView extends StatelessWidget {
               onPressed: () {
 
               },
-              icon: const Icon(Icons.document_scanner_outlined),
+              icon: const Icon(Icons.qr_code_scanner),
               tooltip: 'Scan food items to your pantry',
             )
           ]
@@ -46,7 +50,6 @@ class GroceryListView extends StatelessWidget {
                         children: [
                           TextField(
                             enabled: true,
-
                             onChanged: (String input) {
                               searchTerm = input;
                             },
@@ -82,5 +85,97 @@ class GroceryListView extends StatelessWidget {
               )
       ),
     );
-  }
+
+  Future foodEntryDialog() => showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) =>
+          AlertDialog(
+            title:
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: const [
+                Text(
+                    "Food Entry",
+                    style: TextStyle(
+                        fontSize: 32,
+                        color: Color(0xff7B7777),
+                        fontWeight: FontWeight.w400
+                    )
+                ),
+              ],
+            ),
+            content:
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  enabled: true,
+                  onChanged: (String input) {
+                    //foodName = input;
+                  },
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
+                    ),
+                    hintText: "Food Name",
+                    contentPadding: EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
+                  ),
+                ),
+                CheckboxListTile(
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: const Text (
+                    'Doesn\'t require units (ex. apples)',
+                    style: TextStyle(
+                        color: Color(0xff7B7777),
+                    ),
+                  ),
+                  value: isChecked,
+                  onChanged: (isChecked) =>
+                      setState(() => this.isChecked = isChecked!),
+                ),
+                TextField(
+                  enabled: true,
+                  onChanged: (String input) {
+                    //foodName = input;
+                  },
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(
+                        borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
+                    ),
+                    hintText: isChecked ? 'Food Amount' : 'Food Weight(lbs.)',
+                    contentPadding: const EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      //adding food code
+                      Navigator.pop(context);
+                    },
+                    style: const ButtonStyle(
+                      backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
+                    ),
+                    child:
+                    const Text(
+                      "Add",
+                      style: TextStyle(
+                          fontSize: 32,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          )
+        )
+      );
 }

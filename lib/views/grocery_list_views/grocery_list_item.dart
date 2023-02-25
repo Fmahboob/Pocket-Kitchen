@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 
 class GroceryListItem extends StatefulWidget {
   final PantryFood pantryFood;
-  final VoidCallback onTap;
   final VoidCallback onLongPress;
 
   const GroceryListItem({
     Key? key,
     required this.pantryFood,
-    required this.onTap,
     required this.onLongPress
   }) : super(key: key);
 
@@ -20,11 +18,16 @@ class GroceryListItem extends StatefulWidget {
 class GroceryListItemState extends State<GroceryListItem> {
 
   get pantryFood => widget.pantryFood;
+  bool isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: () {
+        setState(() {
+          isExpanded = !isExpanded;
+        });
+      },
       onLongPress: widget.onLongPress,
       child:
           Padding(
@@ -35,12 +38,13 @@ class GroceryListItemState extends State<GroceryListItem> {
                 Expanded(
                     flex: 1,
                     child:
-                    Container(
-                      height: 30,
+                    AnimatedContainer(
                         decoration: const BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(5)),
                           color: Color(0xff7B7777),
                         ),
+                        duration: const Duration(milliseconds: 100),
+                        height: isExpanded ? 175 : 30,
                         child:
                             Padding(
                               padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
