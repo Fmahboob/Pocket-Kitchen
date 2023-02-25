@@ -129,6 +129,7 @@ class GroceryListViewState extends State<GroceryListView> {
                     'Doesn\'t require units (ex. apples)',
                     style: TextStyle(
                         color: Color(0xff7B7777),
+                        fontWeight: FontWeight.w400
                     ),
                   ),
                   value: isChecked,

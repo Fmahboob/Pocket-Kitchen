@@ -134,7 +134,7 @@ class GroceryListItemState extends State<GroceryListItem> {
                                                     color: const Color(0xff459657),
                                                     tooltip: 'Manually restock this item',
                                                     onPressed: () {
-                                                      //manual restock logic
+                                                      manualRestockDialog();
                                                     },
                                                   ),
                                                 ),
@@ -152,4 +152,47 @@ class GroceryListItemState extends State<GroceryListItem> {
           ),
     );
   }
+
+  Future manualRestockDialog() => showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+          builder: (context, setState) =>
+              AlertDialog(
+                content:
+                const Text(
+                  "Are you sure you want to manually restock this item?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xff7B7777),
+                      fontWeight: FontWeight.w400
+                  ),
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          //restocking food logic
+                          Navigator.pop(context);
+                        },
+                        style: const ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
+                        ),
+                        child:
+                        const Text(
+                          "Restock",
+                          style: TextStyle(
+                              fontSize: 32,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+      )
+  );
 }
