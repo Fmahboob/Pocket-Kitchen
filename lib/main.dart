@@ -18,11 +18,11 @@ class PocketKitchen extends StatelessWidget {
           length: 3,
           child: Scaffold(
               bottomNavigationBar: tabBarMenu(),
-              body: TabBarView(
+              body: const TabBarView(
                 children: [
-                  const PantryView(),
+                  PantryView(),
                   GroceryListView(),
-                  const CuisinesView()
+                  CuisinesView()
                 ],
               )
           )

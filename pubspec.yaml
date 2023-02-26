@@ -1,4 +1,4 @@
-name: pocket_kitchen
+name: Pocket Kitchen
 description: Pocket Kitchen is a grocery tracking application that enables users to scan grocery items into their inventory while grocery shopping, and remove an item after consuming. Pocket Kitchen automatically populates a grocery list with inventory items that have been consumed. It provides meal recipes to users for specific cuisines, as well as if the needed ingredients are available in their inventory. Users may create their own or join other user’s inventories, with each user granted a 3 inventory maximum.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -34,6 +34,7 @@ dependencies:
   http: ^0.13.5
   mysql1: ^0.17.1
   outline_search_bar: ^2.3.0
+  flutter_barcode_scanner: any
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
