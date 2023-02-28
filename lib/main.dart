@@ -20,7 +20,7 @@ class PocketKitchen extends StatelessWidget {
               bottomNavigationBar: tabBarMenu(),
               body: const TabBarView(
                 children: [
-                  PantryView(),
+                  PantryListView(),
                   GroceryListView(),
                   CuisinesView()
                 ],

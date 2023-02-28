@@ -1,16 +1,20 @@
+
+
 import 'package:flutter/material.dart';
 
-class PantryListItem extends StatefulWidget {
-  final VoidCallback onLongPress;
+class UnavailablePantryItem extends StatefulWidget {
+  const UnavailablePantryItem({super.key});
 
-  const PantryListItem({super.key, required this.onLongPress});
   @override
-  State<StatefulWidget> createState() => PantryListItemState();
+  State<StatefulWidget> createState() => UnavailablePantryItemState();
 
 }
 
-class PantryListItemState extends State<PantryListItem> {
+class UnavailablePantryItemState extends State<UnavailablePantryItem> {
+
+
   bool isExpanded = false;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -19,7 +23,7 @@ class PantryListItemState extends State<PantryListItem> {
           isExpanded = !isExpanded;
         });
       },
-      onLongPress: widget.onLongPress,
+
       child:
       Padding(
         padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
@@ -32,10 +36,10 @@ class PantryListItemState extends State<PantryListItem> {
                 AnimatedContainer(
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(5)),
-                    color: Color(0xff459657),
+                    color: Color(0xff9E4848),
                   ),
                   duration: const Duration(milliseconds: 100),
-                  height: isExpanded ? 250 : 40,
+                  height: isExpanded ? 175 : 40,
                   child:
                   Padding(
                     padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
@@ -61,8 +65,7 @@ class PantryListItemState extends State<PantryListItem> {
                           flex: 4,
                           child:
                           Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
                                 constraints: BoxConstraints(
@@ -80,9 +83,10 @@ class PantryListItemState extends State<PantryListItem> {
                                   overflow: isExpanded ? TextOverflow.ellipsis: TextOverflow.fade,
                                 ),
                               ),
-
-
-
+                              Visibility(
+                                visible: isExpanded,
+                                child: const Spacer(),
+                              ),
                               Visibility(
                                 visible: isExpanded,
                                 child: const Padding(
@@ -100,66 +104,39 @@ class PantryListItemState extends State<PantryListItem> {
                                   ),
                                 ),
                               ),
-                              Visibility(
-                                visible: isExpanded,
-                                child:  const Padding(
-                                  padding: EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
-                                  child: Text(
-                                    "Percentage Left",
-                                    textAlign: TextAlign.right,
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500
-                                    ),
-                                  ),
-                                ),
-
-                              ),
-                              Visibility(
-                                visible: isExpanded,
-                                child:   Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                SizedBox(
-                                  height: 30,
-                                  width: 50,
-
-                                  child: TextField(
-                                    enabled: true,
-                                    onChanged: (String input) {
-                                    },
-                                    keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide.none
-                                      )
-                                    ),
-                                  ),
-                                ),
-
-                    TextButton(
-                                      onPressed: () {},
-                                      child: Container(
-                                        color: Colors.white,
-                                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                                        child: const Text(
-                                          'Apply',
-                                          style: TextStyle(color: Color(0xff459657), fontSize: 13.0),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                              ),
-
                             ],
                           ),
                         ),
-
+                        Expanded(
+                          flex: isExpanded ? 1 : 0,
+                          child: Column(
+                            children: [
+                              Visibility(
+                                visible: isExpanded,
+                                child: const Spacer(),
+                              ),
+                              Visibility(
+                                visible: isExpanded,
+                                child: Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                                    color: Colors.white,
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.check),
+                                    color: const Color(0xff459657),
+                                    tooltip: 'Manually restock this item',
+                                    onPressed: () {
+                                      manualRestockDialog();
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -171,4 +148,46 @@ class PantryListItemState extends State<PantryListItem> {
     );
   }
 
+  Future manualRestockDialog() => showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+          builder: (context, setState) =>
+              AlertDialog(
+                content:
+                const Text(
+                  "Are you sure you want to manually restock this item?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Color(0xff7B7777),
+                      fontWeight: FontWeight.w400
+                  ),
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          //restocking food logic
+                          Navigator.pop(context);
+                        },
+                        style: const ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
+                        ),
+                        child:
+                        const Text(
+                          "Restock",
+                          style: TextStyle(
+                              fontSize: 32,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+      )
+  );
 }

@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_item.dart';
+import 'package:pocket_kitchen/views/pantry_list_views/unavailable_pantry_item.dart';
 
+class PantryListView extends StatefulWidget {
+  const PantryListView({super.key});
 
-class PantryView extends StatelessWidget {
-  const PantryView({Key? key,}) : super (key: key);
+  @override
+  State<StatefulWidget> createState() => PantryListViewState();
+
+}
+class PantryListViewState extends State<PantryListView> {
   static const drawerIcon = Color(0xff459657);
   static const drawerStyle = TextStyle(fontSize: 20, color: Color(0xff459657));
 
@@ -26,29 +32,40 @@ class PantryView extends StatelessWidget {
     ]
         ),
         body: Column(
+
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget> [
-           TextField(
-             onChanged: (value){
+           Padding(
+             padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+             child: TextField(
+               onChanged: (value){
 
-             },
-             controller: TextEditingController(),
-             decoration: const InputDecoration(
-                 hintText: "Search",
-                 prefixIcon: Icon(Icons.search, color: Colors.black38,),
-                 enabledBorder: OutlineInputBorder(
-                   borderSide: BorderSide(
-                     width: 2.0,
-                     color: Colors.grey,
+               },
+               controller: TextEditingController(),
+
+               decoration: const InputDecoration(
+                 filled: true,
+                   fillColor: Colors.white,
+                   hintText: "Search",
+                   prefixIcon: Icon(Icons.search, color: Colors.black38,),
+                   enabledBorder: OutlineInputBorder(
+                     borderSide: BorderSide(
+                       width: 1.0,
+                       color: Colors.grey,
+                     ),
                    ),
-                 ),
 
-               focusedBorder: OutlineInputBorder(
-                 borderSide: BorderSide(width: 2.0, color: Colors.black38,)
-               )
+                 focusedBorder: OutlineInputBorder(
+                   borderSide: BorderSide(width: 2.0, color: Colors.black38,)
+                 )
 
+               ),
              ),
            ),
-            const Text("Available", style: TextStyle(fontSize: 15, color: Color(0xff459657)),textAlign: TextAlign.start,),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+              child: Text("Available", style: TextStyle(fontSize: 15, color: Color(0xff459657)),),
+            ),
             Expanded(child: ListView.builder(itemBuilder: (context, index){
               return PantryListItem(onLongPress: () {
 
@@ -56,11 +73,13 @@ class PantryView extends StatelessWidget {
             }
             )
             ),
-            const Text("Unavailable"),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+              child: Text("Unavailable", style: TextStyle(fontSize: 15, color: Color(0xff9E4848)),),
+            ),
+            
             Expanded(child: ListView.builder(itemBuilder: (context, index){
-              return const Card(
-
-              );
+              return const UnavailablePantryItem();
             }
             )
             )
