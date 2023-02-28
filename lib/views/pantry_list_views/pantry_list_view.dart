@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_item.dart';
 
 
 class PantryView extends StatelessWidget {
@@ -49,9 +50,9 @@ class PantryView extends StatelessWidget {
            ),
             const Text("Available", style: TextStyle(fontSize: 15, color: Color(0xff459657)),textAlign: TextAlign.start,),
             Expanded(child: ListView.builder(itemBuilder: (context, index){
-              return const Card(
+              return PantryListItem(onLongPress: () {
 
-              );
+              });
             }
             )
             ),
