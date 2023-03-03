@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pocket_kitchen/views/create_join_pantry_screen.dart';
 
 
 class PantryView extends StatelessWidget {
@@ -80,7 +81,8 @@ class PantryView extends StatelessWidget {
                       ListTile(
                         title: const Text('Create Pantry', style: drawerStyle,),
                         leading: const Icon(Icons.add_circle_outline, color: drawerIcon,),
-                        onTap: () {},
+                        onTap: () {
+                        },
                       ),
                       ListTile(
                         title: const Text('Join Pantry', style: drawerStyle,),
