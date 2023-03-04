@@ -21,9 +21,10 @@ class Food {
     this.ownUnit,
     this.barcode
   });
-
+  /*
   Food getFood(int id) {
     String query = "SELECT * FROM foods WHERE id=" + id;
     result = mysqli_query();
   }
+   */
 }
