@@ -2,12 +2,12 @@ import 'dart:ffi';
 import 'package:mysql1/mysql1.dart';
 
 class Food {
-  int? id;
+  String? id;
   String? name;
   String? imgUrl;
   String? category;
   String? desc;
-  double? weight;
+  String? weight;
   bool? ownUnit;
   String? barcode;
 
@@ -21,10 +21,17 @@ class Food {
     this.ownUnit,
     this.barcode
   });
-  /*
-  Food getFood(int id) {
-    String query = "SELECT * FROM foods WHERE id=" + id;
-    result = mysqli_query();
+
+  factory Food.fromJson(Map<String, dynamic> json) {
+    return Food(
+        id: json['user_id'] as String,
+        name: json['name'] as String,
+        imgUrl: json['img_url'] as String,
+        category: json['category'] as String,
+        desc: json['description'] as String,
+        weight: json['weight'] as String,
+        ownUnit: json['own_unit'] as bool,
+        barcode: json['barcode'] as String
+    );
   }
-   */
 }

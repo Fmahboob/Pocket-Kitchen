@@ -13,20 +13,25 @@ class GroceryListView extends StatefulWidget {
 }
 class GroceryListViewState extends State<GroceryListView> {
   List<PantryFood> groceryList = [PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1), PantryFood(id: 1, amount: 5.55, pantryId: 0, foodId: 1)];
-  List<User> usersList = [];
-  User returnedUser = User();
   String searchTerm = "";
   bool isChecked = false;
   String barcodeNo = "";
+
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController amountController = TextEditingController();
 
   _scan() async{
     await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
   }
 
-  _createUser(String email, String password) {
-    Database.createUser(email, password);
+  _createFood(String name, String imgUrl, String category, String desc, String weight, bool ownUnit, barcode) {
+    Database.createFood(name, imgUrl, category, desc, weight, ownUnit, barcode);
   }
 
+  _createPantryFood(String amount, String pantryId, String foodId) {
+    Database.createPantryFood(amount, pantryId, foodId);
+  }
+/*
   _getAllUsers() {
     Database.getAllUsers().then((users){
       setState(() {
@@ -34,15 +39,7 @@ class GroceryListViewState extends State<GroceryListView> {
       });
     });
   }
-
-  _getUser(String id) {
-    Database.getUser(id).then((user){
-      setState(() {
-        returnedUser = user;
-      });
-    });
-  }
-
+*/
   @override
   Widget build(BuildContext context) =>
     Scaffold(
@@ -52,8 +49,7 @@ class GroceryListViewState extends State<GroceryListView> {
           title: const Text('Pocket Kitchen'),
           leading: IconButton(
             onPressed: () {
-              _getUser("3");
-              //foodEntryDialog();
+              foodEntryDialog();
             },
             icon: const Icon(Icons.edit),
             tooltip: 'Manually enter food items to your pantry',
@@ -140,10 +136,8 @@ class GroceryListViewState extends State<GroceryListView> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
+                  controller: nameController,
                   enabled: true,
-                  onChanged: (String input) {
-                    //foodName = input;
-                  },
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(
                         borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
@@ -167,9 +161,7 @@ class GroceryListViewState extends State<GroceryListView> {
                 ),
                 TextField(
                   enabled: true,
-                  onChanged: (String input) {
-                    //foodName = input;
-                  },
+                  controller: amountController,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(
                         borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
@@ -186,7 +178,9 @@ class GroceryListViewState extends State<GroceryListView> {
                 children: [
                   TextButton(
                     onPressed: () {
-                      //adding food code
+                      _createFood(nameController.text, "", "", "", amountController.text, isChecked, "");
+                      //get food to populate pantry food
+                      //_createPantryFood(amount, pantryId, foodId);
                       Navigator.pop(context);
                     },
                     style: const ButtonStyle(
