@@ -24,6 +24,11 @@ class Database {
   static const pantryFoodTable = 'PANTRY_FOODS';
   static const pantryUserTable = 'PANTRY_USERS';
 
+  //Qualifier options
+  static const barcodeQual = "BARCODE";
+  static const nameQual = "NAME";
+  static const idQual = "ID";
+
   //USER CRUD Methods
   //Create user
   static Future<void> createUser(String email, String password) async {
@@ -78,27 +83,25 @@ class Database {
   //Get one user
   static Future<User> getUser(String id) async {
     var user = User();
-    //try {
-    var bodyMap = <String, dynamic>{};
-    bodyMap["action"] = "$readOneAction";
-    bodyMap["table"] = "$userTable";
-    bodyMap["qualifier"] = "";
-    bodyMap["user_id"] = "$id";
-    bodyMap["email"] = "";
-    bodyMap["password"] = "";
+    try {
+      var bodyMap = <String, dynamic>{};
+      bodyMap["action"] = "$readOneAction";
+      bodyMap["table"] = "$userTable";
+      bodyMap["qualifier"] = "";
+      bodyMap["user_id"] = "$id";
+      bodyMap["email"] = "";
+      bodyMap["password"] = "";
 
-    final response = await post(root, body: bodyMap);
-    if (response.statusCode == 200) {
-      print(response.body);
-      user = parseResponse(response.body);
-      print("Successful");
-      print(user.email);
-      return user;
+      final response = await post(root, body: bodyMap);
+      if (response.statusCode == 200) {
+        user = parseUsersToList(response.body)[0];
+        print("Successful");
+        return user;
+      }
+    } catch (e) {
+     print("Unsuccessful");
+     return user;
     }
-    //} catch (e) {
-    // print("Unsuccessful");
-    // return user;
-    //}
     return user;
   }
 
@@ -215,8 +218,7 @@ class Database {
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
-        print(response.body);
-        pantry = parseResponse(response.body);
+        pantry = parsePantriesToList(response.body)[0];
         print("Successful");
         return pantry;
       }
@@ -336,14 +338,14 @@ class Database {
   }
 
   //Get one food
-  static Future<Food> getFood(String barcode, String name, String qualifier) async {
+  static Future<Food> getFood(String barcode, String name, String id, String qualifier) async {
     var food = Food();
     try {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readOneAction";
       bodyMap["table"] = "$pantryTable";
       bodyMap["qualifier"] = "$qualifier";
-      bodyMap["food_id"] = "";
+      bodyMap["food_id"] = "$id";
       bodyMap["name"] = "$name";
       bodyMap["img_url"] = "";
       bodyMap["category"] = "";
@@ -354,8 +356,7 @@ class Database {
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
-        print(response.body);
-        food = parseResponse(response.body);
+        food = parseFoodsToList(response.body)[0];
         print("Successful");
         return food;
       }
@@ -487,8 +488,7 @@ class Database {
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
-        print(response.body);
-        pantryUser = parseResponse(response.body);
+        pantryUser = parsePantryUsersToList(response.body)[0];
         print("Successful");
         return pantryUser;
       }
@@ -612,8 +612,7 @@ class Database {
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
-        print(response.body);
-        pantryFood = parseResponse(response.body);
+        pantryFood = parsePantryFoodsToList(response.body)[0];
         print("Successful");
         return pantryFood;
       }
@@ -679,27 +678,21 @@ class Database {
 
   static List<Pantry> parsePantriesToList (String responseBody) {
     final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
-    return parsed.map<Pantry>((json) => User.fromJson(json)).toList();
+    return parsed.map<Pantry>((json) => Pantry.fromJson(json)).toList();
   }
 
   static List<Food> parseFoodsToList (String responseBody) {
     final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
-    return parsed.map<Food>((json) => User.fromJson(json)).toList();
+    return parsed.map<Food>((json) => Food.fromJson(json)).toList();
   }
 
   static List<PantryUser> parsePantryUsersToList (String responseBody) {
     final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
-    return parsed.map<PantryUser>((json) => User.fromJson(json)).toList();
+    return parsed.map<PantryUser>((json) => PantryUser.fromJson(json)).toList();
   }
 
   static List<PantryFood> parsePantryFoodsToList (String responseBody) {
     final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
-    return parsed.map<PantryFood>((json) => User.fromJson(json)).toList();
-  }
-
-  //NOT WORKING, NEEDS FIXING
-  //Converts returned json to list of Users
-  static dynamic parseResponse (String responseBody) {
-    return User.fromJson(json.decode(responseBody));
+    return parsed.map<PantryFood>((json) => PantryFood.fromJson(json)).toList();
   }
 }

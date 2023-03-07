@@ -22,7 +22,7 @@ class GroceryListItemState extends State<GroceryListItem> {
   bool isExpanded = false;
 
   _getFood(String id) {
-    Database.getFood(id);
+    Database.getFood("", "", id, Database.idQual);
   }
 
   _updatePantryFood (String id, String amount, String pantryId, String foodId) {

@@ -16,7 +16,7 @@ class GroceryList extends StatefulWidget {
 class GroceryListState extends State<GroceryList> {
 
   _getFood(String id) {
-    Database.getFood(id);
+    Database.getFood("", "", id, Database.idQual);
   }
 
   _updatePantryFood (String id, String amount, String pantryId, String foodId) {

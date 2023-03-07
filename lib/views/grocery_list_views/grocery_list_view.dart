@@ -33,17 +33,17 @@ class GroceryListViewState extends State<GroceryListView> {
     });
     if (response.statusCode == 200) {
       scannedItem = json.decode(response.body);
-      Food checkFood = _getFood("BARCODE", "", barcodeNo) as Food;
+      Food checkFood = _getFood(barcodeNo, "", "", Database.barcodeQual) as Food;
       if (checkFood.barcode == barcodeNo) {
         PantryFood checkPantryFood = _getPantryFood(checkFood.id!);
-        if (checkPantryFood.foodId == checkFood.id && checkPantryFood.pantryId == pantryId) {
-          _updatePantryFood(checkPantryFood.id!, checkFood.weight!, checkPantryFood.pantryId!, checkPantryFood.foodId!)
-        } else {
+        //if (checkPantryFood.foodId == checkFood.id && checkPantryFood.pantryId == pantryId) {
+          _updatePantryFood(checkPantryFood.id!, checkFood.weight!, checkPantryFood.pantryId!, checkPantryFood.foodId!);
+        //} else {
           //_createPantryFood(amount, pantryId, foodId);
-        }
+        //}
       } else {
         //_createFood(name, imgUrl, category, desc, weight, ownUnit, barcode);
-        Food inputtedFood = _getFood("BARCODE", "", barcodeNo) as Food;
+        Food inputtedFood = _getFood(barcodeNo, "", "", Database.barcodeQual) as Food;
         //_createPantryFood(amount, pantryId, inputtedFood.id);
       }
     }
@@ -54,8 +54,8 @@ class GroceryListViewState extends State<GroceryListView> {
     Database.createFood(name, imgUrl, category, desc, weight, ownUnit, barcode);
   }
 
-  Future<Food> _getFood(String qualifier, String name, String barcode) {
-    return Database.getFood(qualifier, name, barcode);
+  Future<Food> _getFood(String barcode, String name, String id, String qualifier) {
+    return Database.getFood(barcode, name, id, qualifier);
   }
 
   //Pantry food methods
@@ -69,6 +69,10 @@ class GroceryListViewState extends State<GroceryListView> {
 
   _getPantryFood (String foodId) {
     Database.getPantryFood(foodId);
+  }
+
+  _getUser (String id) {
+    Database.getUser(id);
   }
 
 /*
@@ -89,7 +93,8 @@ class GroceryListViewState extends State<GroceryListView> {
           title: const Text('Pocket Kitchen'),
           leading: IconButton(
             onPressed: () {
-              foodEntryDialog();
+              //foodEntryDialog();
+              _getUser("3");
             },
             icon: const Icon(Icons.edit),
             tooltip: 'Manually enter food items to your pantry',
