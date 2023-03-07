@@ -31,6 +31,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$createAction";
       bodyMap["table"] = "$userTable";
+      bodyMap["qualifier"] = "";
       bodyMap["user_id"] = "";
       bodyMap["email"] = "$email";
       bodyMap["password"] = "$password";
@@ -54,6 +55,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readAllAction";
       bodyMap["table"] = "$userTable";
+      bodyMap["qualifier"] = "";
       bodyMap["user_id"] = "";
       bodyMap["email"] = "";
       bodyMap["password"] = "";
@@ -80,6 +82,7 @@ class Database {
     var bodyMap = <String, dynamic>{};
     bodyMap["action"] = "$readOneAction";
     bodyMap["table"] = "$userTable";
+    bodyMap["qualifier"] = "";
     bodyMap["user_id"] = "$id";
     bodyMap["email"] = "";
     bodyMap["password"] = "";
@@ -105,6 +108,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$updateAction";
       bodyMap["table"] = "$userTable";
+      bodyMap["qualifier"] = "";
       bodyMap["user_id"] = "$id";
       bodyMap["email"] = "$email";
       bodyMap["password"] = "$password";
@@ -126,6 +130,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$deleteAction";
       bodyMap["table"] = "$userTable";
+      bodyMap["qualifier"] = "";
       bodyMap["user_id"] = "$id";
       bodyMap["email"] = "";
       bodyMap["password"] = "";
@@ -149,6 +154,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$createAction";
       bodyMap["table"] = "$pantryTable";
+      bodyMap["qualifier"] = "";
       bodyMap["pantry_id"] = "";
       bodyMap["name"] = "$name";
       bodyMap["user_count"] = "1";
@@ -173,6 +179,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readAllAction";
       bodyMap["table"] = "$pantryTable";
+      bodyMap["qualifier"] = "";
       bodyMap["pantry_id"] = "";
       bodyMap["name"] = "";
       bodyMap["user_count"] = "";
@@ -200,6 +207,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readOneAction";
       bodyMap["table"] = "$pantryTable";
+      bodyMap["qualifier"] = "";
       bodyMap["pantry_id"] = "$id";
       bodyMap["name"] = "";
       bodyMap["user_count"] = "";
@@ -225,6 +233,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$updateAction";
       bodyMap["table"] = "$pantryTable";
+      bodyMap["qualifier"] = "";
       bodyMap["pantry_id"] = "$id";
       bodyMap["name"] = "$name";
       bodyMap["user_count"] = "$userCount";
@@ -247,6 +256,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$deleteAction";
       bodyMap["table"] = "$pantryTable";
+      bodyMap["qualifier"] = "";
       bodyMap["pantry_id"] = "$id";
       bodyMap["name"] = "";
       bodyMap["user_count"] = "";
@@ -271,6 +281,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$createAction";
       bodyMap["table"] = "$foodTable";
+      bodyMap["qualifier"] = "";
       bodyMap["food_id"] = "";
       bodyMap["name"] = "$name";
       bodyMap["img_url"] = "$imgUrl";
@@ -299,6 +310,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readAllAction";
       bodyMap["table"] = "$foodTable";
+      bodyMap["qualifier"] = "";
       bodyMap["food_id"] = "";
       bodyMap["name"] = "";
       bodyMap["img_url"] = "";
@@ -324,20 +336,21 @@ class Database {
   }
 
   //Get one food
-  static Future<Food> getFood(String id) async {
+  static Future<Food> getFood(String barcode, String name, String qualifier) async {
     var food = Food();
     try {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readOneAction";
       bodyMap["table"] = "$pantryTable";
-      bodyMap["food_id"] = "$id";
-      bodyMap["name"] = "";
+      bodyMap["qualifier"] = "$qualifier";
+      bodyMap["food_id"] = "";
+      bodyMap["name"] = "$name";
       bodyMap["img_url"] = "";
       bodyMap["category"] = "";
       bodyMap["description"] = "";
       bodyMap["weight"] = "";
       bodyMap["own_unit"] = "";
-      bodyMap["barcode"] = "";
+      bodyMap["barcode"] = "$barcode";
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
@@ -359,6 +372,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$updateAction";
       bodyMap["table"] = "$foodTable";
+      bodyMap["qualifier"] = "";
       bodyMap["food_id"] = "$id";
       bodyMap["name"] = "$name";
       bodyMap["img_url"] = "$imgUrl";
@@ -386,6 +400,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$deleteAction";
       bodyMap["table"] = "$foodTable";
+      bodyMap["qualifier"] = "";
       bodyMap["food_id"] = "$id";
       bodyMap["name"] = "";
       bodyMap["img_url"] = "";
@@ -414,6 +429,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$createAction";
       bodyMap["table"] = "$pantryUserTable";
+      bodyMap["qualifier"] = "";
       bodyMap["pantry_user_id"] = "";
       bodyMap["pantry_id"] = "$pantryId";
       bodyMap["user_id"] = "$userId";
@@ -437,6 +453,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readAllAction";
       bodyMap["table"] = "$pantryUserTable";
+      bodyMap["qualifier"] = "";
       bodyMap["pantry_user_id"] = "";
       bodyMap["pantry_id"] = "";
       bodyMap["user_id"] = "";
@@ -463,6 +480,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readOneAction";
       bodyMap["table"] = "$pantryUserTable";
+      bodyMap["qualifier"] = "";
       bodyMap["pantry_user_id"] = "$id";
       bodyMap["pantry_id"] = "";
       bodyMap["user_id"] = "";
@@ -487,6 +505,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$updateAction";
       bodyMap["table"] = "$pantryUserTable";
+      bodyMap["qualifier"] = "";
       bodyMap["pantry_user_id"] = "$id";
       bodyMap["pantry_id"] = "$pantryId";
       bodyMap["user_id"] = "$userId";
@@ -508,6 +527,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$deleteAction";
       bodyMap["table"] = "$userTable";
+      bodyMap["qualifier"] = "";
       bodyMap["pantry_user_id"] = "$id";
       bodyMap["pantry_id"] = "";
       bodyMap["user_id"] = "";
@@ -531,6 +551,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$createAction";
       bodyMap["table"] = "$pantryFoodTable";
+      bodyMap["qualifier"] = "";
       bodyMap["pantry_food_id"] = "";
       bodyMap["amount"] = "$amount";
       bodyMap["pantry_id"] = "$pantryId";
@@ -555,6 +576,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readAllAction";
       bodyMap["table"] = "$pantryFoodTable";
+      bodyMap["qualifier"] = "";
       bodyMap["pantry_food_id"] = "";
       bodyMap["amount"] = "";
       bodyMap["pantry_id"] = "";
@@ -576,16 +598,17 @@ class Database {
   }
 
   //Get one pantry_food
-  static Future<PantryFood> getPantryFood(String id) async {
+  static Future<PantryFood> getPantryFood(String foodId) async {
     var pantryFood = PantryFood();
     try {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readOneAction";
       bodyMap["table"] = "$pantryFoodTable";
-      bodyMap["pantry_food_id"] = "$id";
+      bodyMap["qualifier"] = "";
+      bodyMap["pantry_food_id"] = "";
       bodyMap["amount"] = "";
       bodyMap["pantry_id"] = "";
-      bodyMap["food_id"] = "";
+      bodyMap["food_id"] = "$foodId";
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
@@ -607,6 +630,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$updateAction";
       bodyMap["table"] = "$pantryFoodTable";
+      bodyMap["qualifier"] = "";
       bodyMap["pantry_food_id"] = "$id";
       bodyMap["amount"] = "$amount";
       bodyMap["pantry_id"] = "$pantryId";
@@ -629,6 +653,7 @@ class Database {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$deleteAction";
       bodyMap["table"] = "$pantryFoodTable";
+      bodyMap["qualifier"] = "";
       bodyMap["pantry_food_id"] = "$id";
       bodyMap["amount"] = "";
       bodyMap["pantry_id"] = "";
