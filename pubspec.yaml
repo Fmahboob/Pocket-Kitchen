@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  shared_preferences: ^2.0.15
+  shared_preferences: ^2.0.18
   http: ^0.13.5
   mysql1: ^0.17.1
   outline_search_bar: ^2.3.0

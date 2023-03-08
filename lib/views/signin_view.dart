@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/views/signup_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../database.dart';
+import '../models/user.dart';
 
 class SignInView extends StatefulWidget {
   const SignInView({super.key});
@@ -9,9 +13,23 @@ class SignInView extends StatefulWidget {
 }
 
 class SignInViewState extends State<SignInView> {
+  SharedPreferences prefs = SharedPreferences.getInstance() as SharedPreferences;
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confPasswordController = TextEditingController();
+
+  static const passwordMatchSnackBar = SnackBar(
+    content: Text("The passwords don't match.")
+  );
+
+  static const emailNonExistSnackBar = SnackBar(
+      content: Text("This account doesn't exist.")
+  );
+
+  _getUser(String email) {
+    Database.getUser(email);
+  }
 
   @override
   Widget build(BuildContext context) =>
@@ -84,7 +102,23 @@ class SignInViewState extends State<SignInView> {
                 child:
                 TextButton(
                   onPressed: () {
-                    //create account logic
+                    //check that password matches confirmed password
+                    if (passwordController.text == confPasswordController.text) {
+                      //get the user's account details
+                      User user = _getUser(emailController.text);
+
+                      //check that the email/account exists
+                      if (user.email != "" || user.email != " " || user.email != null) {
+                        //store user id in local storage
+                        prefs.setInt("userId", user.id! as int);
+                      //if the email doesn't exist
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(emailNonExistSnackBar);
+                      }
+                    //if passwords don't match
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(passwordMatchSnackBar);
+                    }
                   },
                   style: const ButtonStyle(
                     backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),

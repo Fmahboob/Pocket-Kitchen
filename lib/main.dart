@@ -23,10 +23,8 @@ class PocketKitchen extends StatelessWidget {
               body: const TabBarView(
                 children: [
                   PantryListView(),
-                  SignInView(),
-                  //GroceryListView(),
-                  //CuisinesView()
-                  SignUpView()
+                  GroceryListView(),
+                  CuisinesView()
                 ],
               )
           )

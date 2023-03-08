@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/views/signin_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../database.dart';
+import '../models/user.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -9,9 +13,27 @@ class SignUpView extends StatefulWidget {
 }
 
 class SignUpViewState extends State<SignUpView> {
+  SharedPreferences prefs = SharedPreferences.getInstance() as SharedPreferences;
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confPasswordController = TextEditingController();
+
+  static const passwordMatchSnackBar = SnackBar(
+      content: Text("The passwords don't match.")
+  );
+
+  static const emailExistsSnackBar = SnackBar(
+      content: Text("This account already exists.")
+  );
+
+  _createUser(String email, String password) {
+    Database.createUser(email, password);
+  }
+
+  _getUser(String email) {
+    Database.getUser(email);
+  }
 
   @override
   Widget build(BuildContext context) =>
@@ -84,7 +106,24 @@ class SignUpViewState extends State<SignUpView> {
                     child:
                     TextButton(
                       onPressed: () {
-                        //create account logic
+                        //check that password matches confirmed password
+                        if (passwordController.text == confPasswordController.text) {
+                          //check that the email doesn't already exist
+                          User user = _getUser(emailController.text);
+                          if (user.email != emailController.text) {
+                            _createUser(emailController.text, passwordController.text);
+                            //get new user's id
+                            User user = _getUser(emailController.text);
+                            //store id in local storage
+                            prefs.setInt("userId", user.id! as int);
+                          //if the email already exists
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(emailExistsSnackBar);
+                          }
+                        //if passwords don't match
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(passwordMatchSnackBar);
+                        }
                       },
                       style: const ButtonStyle(
                         backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
