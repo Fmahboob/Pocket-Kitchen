@@ -27,8 +27,8 @@ class SignInViewState extends State<SignInView> {
       content: Text("This account doesn't exist.")
   );
 
-  _getUser(String email) {
-    Database.getUser(email);
+  _getUser(String id, email, qualifier) {
+    Database.getUser(id, email, qualifier);
   }
 
   @override
@@ -105,7 +105,7 @@ class SignInViewState extends State<SignInView> {
                     //check that password matches confirmed password
                     if (passwordController.text == confPasswordController.text) {
                       //get the user's account details
-                      User user = _getUser(emailController.text);
+                      User user = _getUser("", emailController.text, Database.emailQual);
 
                       //check that the email/account exists
                       if (user.email != "" || user.email != " " || user.email != null) {

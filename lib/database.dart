@@ -28,6 +28,7 @@ class Database {
   static const barcodeQual = "BARCODE";
   static const nameQual = "NAME";
   static const idQual = "ID";
+  static const emailQual = "EMAIL";
 
   //USER CRUD Methods
   //Create user
@@ -81,15 +82,15 @@ class Database {
   }
 
   //Get one user
-  static Future<User> getUser(String id) async {
+  static Future<User> getUser(String id, String email, String qualifier) async {
     var user = User();
     try {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readOneAction";
       bodyMap["table"] = "$userTable";
-      bodyMap["qualifier"] = "";
+      bodyMap["qualifier"] = "$qualifier";
       bodyMap["user_id"] = "$id";
-      bodyMap["email"] = "";
+      bodyMap["email"] = "$email";
       bodyMap["password"] = "";
 
       final response = await post(root, body: bodyMap);

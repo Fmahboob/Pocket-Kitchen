@@ -31,8 +31,8 @@ class SignUpViewState extends State<SignUpView> {
     Database.createUser(email, password);
   }
 
-  _getUser(String email) {
-    Database.getUser(email);
+  _getUser(String id, String email, String qualifier) {
+    Database.getUser(id, email, qualifier);
   }
 
   @override
@@ -109,11 +109,11 @@ class SignUpViewState extends State<SignUpView> {
                         //check that password matches confirmed password
                         if (passwordController.text == confPasswordController.text) {
                           //check that the email doesn't already exist
-                          User user = _getUser(emailController.text);
+                          User user = _getUser("", emailController.text, Database.emailQual);
                           if (user.email != emailController.text) {
                             _createUser(emailController.text, passwordController.text);
                             //get new user's id
-                            User user = _getUser(emailController.text);
+                            User user = _getUser("", emailController.text, Database.emailQual);
                             //store id in local storage
                             prefs.setInt("userId", user.id! as int);
                           //if the email already exists
