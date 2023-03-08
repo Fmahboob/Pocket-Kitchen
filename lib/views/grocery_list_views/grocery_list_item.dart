@@ -1,3 +1,5 @@
+import '../../database.dart';
+import '../../models/food.dart';
 import '../../models/pantry_food.dart';
 import 'package:flutter/material.dart';
 
@@ -16,9 +18,16 @@ class GroceryListItem extends StatefulWidget {
 }
 
 class GroceryListItemState extends State<GroceryListItem> {
-
   get pantryFood => widget.pantryFood;
   bool isExpanded = false;
+
+  _getFood(String id) {
+    Database.getFood("", "", id, Database.idQual);
+  }
+
+  _updatePantryFood (String id, String amount, String pantryId, String foodId) {
+    Database.updatePantryFood(id, amount, pantryId, foodId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -173,7 +182,9 @@ class GroceryListItemState extends State<GroceryListItem> {
                     children: [
                       TextButton(
                         onPressed: () {
-                          //restocking food logic
+                          Food food = _getFood(pantryFood.foodId!);
+                          _updatePantryFood(pantryFood.id!, food.weight!, pantryFood.pantryId!, pantryFood.foodId!);
+
                           Navigator.pop(context);
                         },
                         style: const ButtonStyle(

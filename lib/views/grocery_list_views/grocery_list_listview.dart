@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../database.dart';
+import '../../models/food.dart';
 import '../../models/pantry_food.dart';
 import 'grocery_list_item.dart';
 
@@ -13,6 +15,14 @@ class GroceryList extends StatefulWidget {
 
 class GroceryListState extends State<GroceryList> {
 
+  _getFood(String id) {
+    Database.getFood("", "", id, Database.idQual);
+  }
+
+  _updatePantryFood (String id, String amount, String pantryId, String foodId) {
+    Database.updatePantryFood(id, amount, pantryId, foodId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -23,7 +33,8 @@ class GroceryListState extends State<GroceryList> {
         return GroceryListItem(
           pantryFood: pantryFood,
           onLongPress: () {
-
+            Food food = _getFood(pantryFood.foodId!);
+            _updatePantryFood(pantryFood.id!, food.weight!, pantryFood.pantryId!, pantryFood.foodId!);
           },
         );
       }

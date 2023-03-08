@@ -1,8 +1,8 @@
 class Pantry {
-  int? id;
+  String? id;
   String? name;
-  int? userCount;
-  int? ownerId;
+  String? userCount;
+  String? ownerId;
 
   Pantry({
     this.id,
@@ -10,4 +10,13 @@ class Pantry {
     this.userCount,
     this.ownerId
   });
+
+  factory Pantry.fromJson(Map<String, dynamic> json) {
+    return Pantry(
+        id: json['pantry_id'] as String,
+        name: json['name'] as String,
+        userCount: json['user_count'] as String,
+        ownerId: json['owner_id'] as String
+    );
+  }
 }

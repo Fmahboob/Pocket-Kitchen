@@ -1,14 +1,21 @@
 import 'dart:ffi';
-import 'package:mysql1/mysql1.dart';
 
 class User {
-  int? id;
-  int? pantryId;
-  int? userId;
+  String? id;
+  String? email;
+  String? password;
 
   User({
     this.id,
-    this.pantryId,
-    this.userId
+    this.email,
+    this.password
   });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['user_id'] as String,
+      email: json['email'] as String,
+      password: json['password'] as String
+    );
+  }
 }
