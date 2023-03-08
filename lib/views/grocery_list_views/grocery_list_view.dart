@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pocket_kitchen/models/go_upc_models/go_upc_item.dart';
 import '../../models/food.dart';
 import '../../models/pantry_food.dart';
 import 'grocery_list_listview.dart';
@@ -16,7 +17,7 @@ class GroceryListView extends StatefulWidget {
 class GroceryListViewState extends State<GroceryListView> {
   List<PantryFood> groceryList = [PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1")];
   List<Food> allFoods = [];
-  late Map scannedItem;
+  late GoUPCItem scannedItem;
 
   String searchTerm = "";
   bool isChecked = false;
@@ -24,30 +25,6 @@ class GroceryListViewState extends State<GroceryListView> {
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
-
-  Future _scan() async{
-    await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
-
-    Response response = await get(Uri.parse('https://go-upc.com/api/v1/code/$barcodeNo'), headers: {
-      'Authorization': 'Bearer 24a313ffbcb68c96a4c74cd11c17aaa60fc8f2efd7f2baeb203fe3cf97e2adab',
-    });
-    if (response.statusCode == 200) {
-      scannedItem = json.decode(response.body);
-      Food checkFood = _getFood(barcodeNo, "", "", Database.barcodeQual) as Food;
-      if (checkFood.barcode == barcodeNo) {
-        PantryFood checkPantryFood = _getPantryFood(checkFood.id!);
-        //if (checkPantryFood.foodId == checkFood.id && checkPantryFood.pantryId == pantryId) {
-          _updatePantryFood(checkPantryFood.id!, checkFood.weight!, checkPantryFood.pantryId!, checkPantryFood.foodId!);
-        //} else {
-          //_createPantryFood(amount, pantryId, foodId);
-        //}
-      } else {
-        //_createFood(name, imgUrl, category, desc, weight, ownUnit, barcode);
-        Food inputtedFood = _getFood(barcodeNo, "", "", Database.barcodeQual) as Food;
-        //_createPantryFood(amount, pantryId, inputtedFood.id);
-      }
-    }
-  }
 
   //Food methods
   _createFood(String name, String imgUrl, String category, String desc, String weight, bool ownUnit, barcode) {
@@ -71,10 +48,49 @@ class GroceryListViewState extends State<GroceryListView> {
     Database.getPantryFood(foodId);
   }
 
-  _getUser (String id) {
-    Database.getUser(id);
-  }
+  Future _scan() async{
+    //scans barcode and returns the barcode number
+    await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
 
+    //API call to Go-UPC with barcode number
+    Response response = await get(Uri.parse('https://go-upc.com/api/v1/code/$barcodeNo'), headers: {
+      'Authorization': 'Bearer 24a313ffbcb68c96a4c74cd11c17aaa60fc8f2efd7f2baeb203fe3cf97e2adab',
+    });
+
+    //if response succeeds
+    if (response.statusCode == 200) {
+
+      //store returned item values
+      scannedItem = GoUPCItem.fromJson(jsonDecode(response.body));
+
+      //query for food with same barcode to check if it already exists in the food table
+      Food checkFood = _getFood(barcodeNo, "", "", Database.barcodeQual) as Food;
+
+      //if the barcode does match and the food already exists
+      if (checkFood.barcode == barcodeNo) {
+
+        //query for pantry food with the same barcode to check if it already exists in the pantry food table
+        PantryFood checkPantryFood = _getPantryFood(checkFood.id!);
+
+        //if the barcode matches and its pantry id is the user's current pantry id, then it exists
+        if (checkPantryFood.foodId == checkFood.id /*&& checkPantryFood.pantryId == pantryId*/) {
+
+          //Therefore, the user is refilling the item's stock. Update the amount to full (equal to it's food's weight)
+          _updatePantryFood(checkPantryFood.id!, checkFood.weight!, checkPantryFood.pantryId!, checkPantryFood.foodId!);
+
+        //if the food doesn't exist in the user's pantry foods, create it
+        } else {
+          //_createPantryFood(scannedItem.product!.specs!["Liquid Volume"]!, pantryId, checkFood.id!);
+        }
+
+      //if the barcode doesn't match and the food isn't in the food's table, create a food and pantry food of it
+      } else {
+        _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl!, scannedItem.product!.category!, scannedItem.product!.description!, scannedItem.product!.specs!["Liquid Volume"]!, false, barcodeNo);
+        Food inputtedFood = _getFood(barcodeNo, "", "", Database.barcodeQual) as Food;
+        //_createPantryFood(scannedItem.product!.specs!["Liquid Volume"]!, pantryId, inputtedFood.id!);
+      }
+    }
+  }
 /*
   _getAllUsers() {
     Database.getAllUsers().then((users){
@@ -93,8 +109,7 @@ class GroceryListViewState extends State<GroceryListView> {
           title: const Text('Pocket Kitchen'),
           leading: IconButton(
             onPressed: () {
-              //foodEntryDialog();
-              _getUser("3");
+              foodEntryDialog();
             },
             icon: const Icon(Icons.edit),
             tooltip: 'Manually enter food items to your pantry',
