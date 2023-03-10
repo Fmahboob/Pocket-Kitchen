@@ -110,7 +110,9 @@ class PantryListViewState extends State<PantryListView> {
                       ListTile(
                         title: const Text('Join Pantry', style: drawerStyle,),
                         leading: const Icon(Icons.exit_to_app, color: drawerIcon,),
-                        onTap: () {},
+                        onTap: () {
+                          joinPantryDialog();
+                        },
                       ),
                       ListTile(
                           title: const Text('Delete Pantry', style: drawerStyle,),
@@ -197,6 +199,87 @@ class PantryListViewState extends State<PantryListView> {
                         child:
                         const Text(
                           "Create",
+                          style: TextStyle(
+                              fontSize: 32,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+      )
+  );
+
+  Future joinPantryDialog() => showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+          builder: (context, setState) =>
+              AlertDialog(
+                title:
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const [
+                    Text(
+                        "Join Pantry",
+                        style: TextStyle(
+                            fontSize: 32,
+                            color: Color(0xff7B7777),
+                            fontWeight: FontWeight.w400
+                        )
+                    ),
+                  ],
+                ),
+                content:
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      enabled: true,
+                      onChanged: (String input) {
+                      },
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
+                        ),
+                        hintText: "Pantry Name",
+                        contentPadding: EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    TextField(
+                      enabled: true,
+                      onChanged: (String input) {
+                      },
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
+                        ),
+                        hintText: "Pantry Number",
+                        contentPadding: EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
+                      ),
+                    ),
+
+                  ],
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                        },
+                        style: const ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
+                        ),
+                        child:
+                        const Text(
+                          "Join",
                           style: TextStyle(
                               fontSize: 32,
                               color: Colors.white,
