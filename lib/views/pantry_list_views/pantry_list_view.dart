@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_item.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/unavailable_pantry_item.dart';
 
+import 'package:pocket_kitchen/views/create_join_pantry_screen.dart';
+
+
 class PantryListView extends StatefulWidget {
   const PantryListView({super.key});
 
@@ -100,7 +103,8 @@ class PantryListViewState extends State<PantryListView> {
                       ListTile(
                         title: const Text('Create Pantry', style: drawerStyle,),
                         leading: const Icon(Icons.add_circle_outline, color: drawerIcon,),
-                        onTap: () {},
+                        onTap: () {
+                        },
                       ),
                       ListTile(
                         title: const Text('Join Pantry', style: drawerStyle,),
