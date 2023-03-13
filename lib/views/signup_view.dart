@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/views/signin_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pocket_kitchen/shared_preferences.dart';
 
 import '../database.dart';
+import '../main.dart';
 import '../models/user.dart';
 
 class SignUpView extends StatefulWidget {
@@ -13,11 +14,11 @@ class SignUpView extends StatefulWidget {
 }
 
 class SignUpViewState extends State<SignUpView> {
-  SharedPreferences prefs = SharedPreferences.getInstance() as SharedPreferences;
-
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confPasswordController = TextEditingController();
+
+  late List<User> usersList = [];
 
   static const passwordMatchSnackBar = SnackBar(
       content: Text("The passwords don't match.")
@@ -27,12 +28,20 @@ class SignUpViewState extends State<SignUpView> {
       content: Text("This account already exists.")
   );
 
-  _createUser(String email, String password) {
+  Future<void> _createUser(String email, String password) async {
     Database.createUser(email, password);
   }
 
-  _getUser(String id, String email, String qualifier) {
-    Database.getUser(id, email, qualifier);
+  Future<User> _getUser(String id, String email, String qualifier) async {
+    return Database.getUser(id, email, qualifier);
+  }
+
+  _getAllUsers() {
+    Database.getAllUsers().then((users){
+      setState(() {
+        usersList = users;
+      });
+    });
   }
 
   @override
@@ -105,17 +114,29 @@ class SignUpViewState extends State<SignUpView> {
                     padding: const EdgeInsets.fromLTRB(0.0, 72.0, 0.0, 64.0),
                     child:
                     TextButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        print(sharedPrefs.userId);
                         //check that password matches confirmed password
                         if (passwordController.text == confPasswordController.text) {
                           //check that the email doesn't already exist
-                          User user = _getUser("", emailController.text, Database.emailQual);
+                          print("getting user 1");
+                          User user = await _getUser("", emailController.text, Database.emailQual);
+                          //if email doesn't match existing
                           if (user.email != emailController.text) {
-                            _createUser(emailController.text, passwordController.text);
+                            print("create user");
+                            await _createUser(emailController.text, passwordController.text);
                             //get new user's id
-                            User user = _getUser("", emailController.text, Database.emailQual);
+                            print("get user 2");
+                            User user = await _getUser("", emailController.text, Database.emailQual);
                             //store id in local storage
-                            prefs.setInt("userId", user.id! as int);
+                            sharedPrefs.userId = user.id!;
+                            //load the app
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const TabBarMain()),
+                            );
+                            print(sharedPrefs.userId);
                           //if the email already exists
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(emailExistsSnackBar);

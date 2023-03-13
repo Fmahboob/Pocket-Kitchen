@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/views/signup_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pocket_kitchen/shared_preferences.dart';
 
 import '../database.dart';
+import '../main.dart';
 import '../models/user.dart';
 
 class SignInView extends StatefulWidget {
@@ -13,8 +14,6 @@ class SignInView extends StatefulWidget {
 }
 
 class SignInViewState extends State<SignInView> {
-  SharedPreferences prefs = SharedPreferences.getInstance() as SharedPreferences;
-
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confPasswordController = TextEditingController();
@@ -27,8 +26,8 @@ class SignInViewState extends State<SignInView> {
       content: Text("This account doesn't exist.")
   );
 
-  _getUser(String id, email, qualifier) {
-    Database.getUser(id, email, qualifier);
+  Future<User> _getUser(String id, email, qualifier) async {
+    return Database.getUser(id, email, qualifier);
   }
 
   @override
@@ -101,16 +100,23 @@ class SignInViewState extends State<SignInView> {
                 padding: const EdgeInsets.fromLTRB(0.0, 72.0, 0.0, 64.0),
                 child:
                 TextButton(
-                  onPressed: () {
+                  onPressed: () async {
                     //check that password matches confirmed password
                     if (passwordController.text == confPasswordController.text) {
                       //get the user's account details
-                      User user = _getUser("", emailController.text, Database.emailQual);
+                      User user = await _getUser("", emailController.text, Database.emailQual);
 
                       //check that the email/account exists
                       if (user.email != "" || user.email != " " || user.email != null) {
                         //store user id in local storage
-                        prefs.setInt("userId", user.id! as int);
+                        sharedPrefs.userId = user.id!;
+                        //load the app
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const TabBarMain()),
+                        );
+                        print(sharedPrefs.userId);
                       //if the email doesn't exist
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(emailNonExistSnackBar);

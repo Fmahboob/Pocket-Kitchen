@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:pocket_kitchen/shared_preferences.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_item.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/unavailable_pantry_item.dart';
+
+import '../signin_view.dart';
 
 class PantryListView extends StatefulWidget {
   const PantryListView({super.key});
@@ -24,7 +27,12 @@ class PantryListViewState extends State<PantryListView> {
             actions: [
               IconButton(
             onPressed: () {
-
+              sharedPrefs.userId = "";
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SignInView()),
+              );
             },
             icon: const Icon(Icons.exit_to_app_sharp),
             tooltip: 'Sign Out',
