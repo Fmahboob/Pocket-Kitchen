@@ -27,12 +27,7 @@ class PantryListViewState extends State<PantryListView> {
             actions: [
               IconButton(
             onPressed: () {
-              sharedPrefs.userId = "";
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SignInView()),
-              );
+              signOutDialog();
             },
             icon: const Icon(Icons.exit_to_app_sharp),
             tooltip: 'Sign Out',
@@ -147,4 +142,52 @@ class PantryListViewState extends State<PantryListView> {
 
     );
   }
+
+  Future signOutDialog() => showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+          builder: (context, setState) =>
+              AlertDialog(
+                content:
+                const Text(
+                  "Are you sure you want to sign out?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Color(0xff7B7777),
+                      fontWeight: FontWeight.w400
+                  ),
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          sharedPrefs.userId = "";
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SignInView()),
+                          );
+                        },
+                        style: const ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
+                        ),
+                        child:
+                        const Text(
+                          "Sign Out",
+                          style: TextStyle(
+                              fontSize: 32,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+      )
+  );
 }
