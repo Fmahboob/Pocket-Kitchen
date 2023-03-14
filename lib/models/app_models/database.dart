@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart';
-import 'package:pocket_kitchen/models/pantry_food.dart';
-import 'models/food.dart';
-import 'models/pantry.dart';
-import 'models/pantry_user.dart';
-import 'models/user.dart';
+import 'package:pocket_kitchen/models/data_models/pantry_food.dart';
+import '../data_models/food.dart';
+import '../data_models/pantry.dart';
+import '../data_models/pantry_user.dart';
+import '../data_models/user.dart';
 
 class Database {
   //Database interface API url

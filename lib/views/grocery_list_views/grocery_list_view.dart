@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/models/go_upc_models/go_upc_item.dart';
-import '../../models/food.dart';
-import '../../models/pantry_food.dart';
+import '../../models/data_models/food.dart';
+import '../../models/data_models/pantry_food.dart';
 import 'grocery_list_listview.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:pocket_kitchen/database.dart';
+import 'package:pocket_kitchen/models/app_models/database.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
 

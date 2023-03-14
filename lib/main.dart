@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:pocket_kitchen/shared_preferences.dart';
-import 'package:pocket_kitchen/views/cuisines_view.dart';
+import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
+import 'package:pocket_kitchen/views/cuisine_views/cuisines_view.dart';
+import 'package:pocket_kitchen/views/google_sign_in_view.dart';
 import 'package:pocket_kitchen/views/grocery_list_views/grocery_list_view.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_view.dart';
-import 'package:pocket_kitchen/views/signup_view.dart';
+import 'package:pocket_kitchen/views/sign_in_sign_up_views/signup_view.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +20,7 @@ class PocketKitchen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: sharedPrefs.signedIn ? const TabBarMain() : const SignUpView()
+      home: sharedPrefs.signedIn ? const TabBarMain() : const GoogleSignInView()
     );
   }
 }

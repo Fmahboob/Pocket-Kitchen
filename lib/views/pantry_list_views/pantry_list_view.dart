@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:pocket_kitchen/shared_preferences.dart';
+import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_item.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/unavailable_pantry_item.dart';
 
-import '../signin_view.dart';
+import '../sign_in_sign_up_views/signin_view.dart';
 
 class PantryListView extends StatefulWidget {
   const PantryListView({super.key});

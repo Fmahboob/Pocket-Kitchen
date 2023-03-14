@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../database.dart';
-import '../../models/food.dart';
-import '../../models/pantry_food.dart';
+import '../../models/app_models/database.dart';
+import '../../models/data_models/food.dart';
+import '../../models/data_models/pantry_food.dart';
 import 'grocery_list_item.dart';
 
 class GroceryList extends StatefulWidget {
