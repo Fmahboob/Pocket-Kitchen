@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_item.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/unavailable_pantry_item.dart';
+import 'package:pocket_kitchen/views/google_sign_in_view.dart';
 
-import '../sign_in_sign_up_views/signin_view.dart';
+import '../../models/app_models/google_sign_in_api.dart';
 
 class PantryListView extends StatefulWidget {
   const PantryListView({super.key});
@@ -162,13 +163,14 @@ class PantryListViewState extends State<PantryListView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          await GoogleSignInAPI.logout();
                           sharedPrefs.userId = "";
                           Navigator.pop(context);
                           Navigator.pop(context);
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const SignInView()),
+                            MaterialPageRoute(builder: (context) => const GoogleSignInView()),
                           );
                         },
                         style: const ButtonStyle(

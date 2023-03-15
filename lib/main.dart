@@ -4,7 +4,6 @@ import 'package:pocket_kitchen/views/cuisine_views/cuisines_view.dart';
 import 'package:pocket_kitchen/views/google_sign_in_view.dart';
 import 'package:pocket_kitchen/views/grocery_list_views/grocery_list_view.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_view.dart';
-import 'package:pocket_kitchen/views/sign_in_sign_up_views/signup_view.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

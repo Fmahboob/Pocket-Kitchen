@@ -32,7 +32,7 @@ class Database {
 
   //USER CRUD Methods
   //Create user
-  static Future<void> createUser(String email, String password) async {
+  static Future<void> createUser(String email) async {
     try {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$createAction";
@@ -40,7 +40,6 @@ class Database {
       bodyMap["qualifier"] = "";
       bodyMap["user_id"] = "";
       bodyMap["email"] = "$email";
-      bodyMap["password"] = "$password";
 
       final response = await post(root, body: bodyMap);
 
@@ -64,7 +63,6 @@ class Database {
       bodyMap["qualifier"] = "";
       bodyMap["user_id"] = "";
       bodyMap["email"] = "";
-      bodyMap["password"] = "";
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
@@ -91,7 +89,6 @@ class Database {
       bodyMap["qualifier"] = "$qualifier";
       bodyMap["user_id"] = "$id";
       bodyMap["email"] = "$email";
-      bodyMap["password"] = "";
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
@@ -107,7 +104,7 @@ class Database {
   }
 
   //Update user
-  static Future<void> updateUser(String id, String email, String password) async {
+  static Future<void> updateUser(String id, String email) async {
     try {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$updateAction";
@@ -115,7 +112,6 @@ class Database {
       bodyMap["qualifier"] = "";
       bodyMap["user_id"] = "$id";
       bodyMap["email"] = "$email";
-      bodyMap["password"] = "$password";
 
       final response = await post(root, body: bodyMap);
 
@@ -137,7 +133,6 @@ class Database {
       bodyMap["qualifier"] = "";
       bodyMap["user_id"] = "$id";
       bodyMap["email"] = "";
-      bodyMap["password"] = "";
 
       final response = await post(root, body: bodyMap);
 

@@ -1,7 +1,11 @@
+import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
+
 import '../../models/app_models/database.dart';
 import '../../models/data_models/food.dart';
 import '../../models/data_models/pantry_food.dart';
 import 'package:flutter/material.dart';
+
+import '../../models/data_models/user.dart';
 
 class GroceryListItem extends StatefulWidget {
   final PantryFood pantryFood;
@@ -20,6 +24,10 @@ class GroceryListItem extends StatefulWidget {
 class GroceryListItemState extends State<GroceryListItem> {
   get pantryFood => widget.pantryFood;
   bool isExpanded = false;
+
+  Future<User> _getUser(String id, email, qualifier) async {
+    return Database.getUser(id, email, qualifier);
+  }
 
   _getFood(String id) {
     Database.getFood("", "", id, Database.idQual);
@@ -142,7 +150,9 @@ class GroceryListItemState extends State<GroceryListItem> {
                                                     icon: const Icon(Icons.check),
                                                     color: const Color(0xff459657),
                                                     tooltip: 'Manually restock this item',
-                                                    onPressed: () {
+                                                    onPressed: () async {
+                                                      final user = await _getUser(sharedPrefs.userId, "", Database.idQual);
+                                                      print(user.email);
                                                       manualRestockDialog();
                                                     },
                                                   ),
