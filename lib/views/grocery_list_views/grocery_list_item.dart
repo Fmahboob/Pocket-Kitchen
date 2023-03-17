@@ -84,7 +84,7 @@ class GroceryListItemState extends State<GroceryListItem> {
                                         ),
                                       ),
                                       Expanded(
-                                        flex: 4,
+                                        flex: isExpanded ? 4 : 100,
                                         child:
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,7 +93,8 @@ class GroceryListItemState extends State<GroceryListItem> {
                                               constraints: BoxConstraints(
                                                 maxWidth: MediaQuery.of(context).size.width - 32.0,
                                               ),
-                                              child: Text(
+                                              child:
+                                              Text(
                                                 "Heinz Tomato Ketchup, 750mL/25oz., Bottle, {Imported From Canada",
                                                 textAlign: TextAlign.left,
                                                 style: const TextStyle(
@@ -102,7 +103,7 @@ class GroceryListItemState extends State<GroceryListItem> {
                                                   fontWeight: FontWeight.w500,
                                                 ),
                                                 maxLines: isExpanded ? 4 : 1,
-                                                overflow: isExpanded ? TextOverflow.ellipsis: TextOverflow.fade,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
                                             Visibility(
@@ -114,7 +115,7 @@ class GroceryListItemState extends State<GroceryListItem> {
                                               child: const Padding(
                                                 padding: EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
                                                 child: Text(
-                                                  "Vegetable, organic, classic, yummy",
+                                                  "Vegetable, organic, classic, yummy, phenomenal",
                                                   textAlign: TextAlign.left,
                                                   style: TextStyle(
                                                       fontSize: 18,
@@ -129,8 +130,8 @@ class GroceryListItemState extends State<GroceryListItem> {
                                           ],
                                         ),
                                       ),
-                                      Expanded(
-                                          flex: isExpanded ? 1 : 0,
+                                      Visibility(
+                                          visible: isExpanded,
                                           child: Column(
                                             children: [
                                               Visibility(
@@ -150,9 +151,7 @@ class GroceryListItemState extends State<GroceryListItem> {
                                                     icon: const Icon(Icons.check),
                                                     color: const Color(0xff459657),
                                                     tooltip: 'Manually restock this item',
-                                                    onPressed: () async {
-                                                      final user = await _getUser(sharedPrefs.userId, "", Database.idQual);
-                                                      print(user.email);
+                                                    onPressed: () {
                                                       manualRestockDialog();
                                                     },
                                                   ),
