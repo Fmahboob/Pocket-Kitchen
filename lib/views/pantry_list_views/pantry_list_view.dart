@@ -89,60 +89,63 @@ class PantryListViewState extends State<PantryListView> {
 
           ],
         ),
-        drawer: Drawer(
-            elevation: 1.5,
-            child: Column(children: <Widget>[
-              DrawerHeader(
-                  decoration: const BoxDecoration(
-                    color: Colors.transparent,
-                  ), child: Image.asset("lib/assets/logo.png")),
-              Expanded(
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: <Widget>[
-                      ListTile(
-                        title: const Text('Create Pantry', style: drawerStyle,),
-                        leading: const Icon(Icons.add_circle_outline, color: drawerIcon,),
-                        onTap: () {
-                          createPantryDialog();
-                        },
-                      ),
-                      ListTile(
-                        title: const Text('Join Pantry', style: drawerStyle,),
-                        leading: const Icon(Icons.exit_to_app, color: drawerIcon,),
-                        onTap: () {
-                          joinPantryDialog();
-                        },
-                      ),
-                      ListTile(
-                          title: const Text('Delete Pantry', style: drawerStyle,),
-                          leading: const Icon(Icons.delete_forever_rounded, color: drawerIcon,),
-                          onTap: () {}
-                      ),
-                      ListTile(
-                          title: const Text('Leave Pantry', style: drawerStyle,),
-                          leading: const Icon(Icons.arrow_back, color: drawerIcon,),
-                          onTap: () {}
-                      ),
-                      ListTile(
-                          title: const Text('Switch Pantry', style: drawerStyle,),
-                          leading: const Icon(Icons.swap_calls, color: drawerIcon,),
-                          onTap: () {}
-                      )
-                    ],
-                  )),
-             const Divider(),
-              Container(
-                  padding: const EdgeInsets.all(10),
-                  height: 100,
-                  child: const ListTile(
-                      title: Text("pantryName!", style: drawerStyle,),
-                      leading: Icon(Icons.desktop_windows_sharp, color: drawerIcon,),
-                  )
+        drawer: SizedBox(
+          width: 230,
+          child: Drawer(
+              elevation: 1.5,
+              child: Column(children: <Widget>[
+                DrawerHeader(
+                    decoration: const BoxDecoration(
+                      color: Colors.transparent,
+                    ), child: Image.asset("lib/assets/logo.png")),
+                Expanded(
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: <Widget>[
+                        ListTile(
+                          title: const Text('Create Pantry', style: drawerStyle,),
+                          leading: const Icon(Icons.add_circle_outline, color: drawerIcon,),
+                          onTap: () {
+                            createPantryDialog();
+                          },
+                        ),
+                        ListTile(
+                          title: const Text('Join Pantry', style: drawerStyle,),
+                          leading: const Icon(Icons.exit_to_app, color: drawerIcon,),
+                          onTap: () {
+                            joinPantryDialog();
+                          },
+                        ),
+                        ListTile(
+                            title: const Text('Delete Pantry', style: drawerStyle,),
+                            leading: const Icon(Icons.delete_forever_rounded, color: drawerIcon,),
+                            onTap: () {}
+                        ),
+                        ListTile(
+                            title: const Text('Leave Pantry', style: drawerStyle,),
+                            leading: const Icon(Icons.arrow_back, color: drawerIcon,),
+                            onTap: () {}
+                        ),
+                        ListTile(
+                            title: const Text('Switch Pantry', style: drawerStyle,),
+                            leading: const Icon(Icons.swap_calls, color: drawerIcon,),
+                            onTap: () {}
+                        )
+                      ],
+                    )),
+               const Divider(),
+                Container(
+                    padding: const EdgeInsets.all(10),
+                    height: 100,
+                    child: const ListTile(
+                        title: Text("pantryName!", style: drawerStyle,),
+                        leading: Icon(Icons.desktop_windows_sharp, color: drawerIcon,),
+                    )
 
-              ),
+                ),
 
-            ])),
+              ])),
+        ),
 
     );
   }
