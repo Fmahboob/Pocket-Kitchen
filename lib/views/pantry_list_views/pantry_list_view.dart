@@ -25,8 +25,11 @@ class PantryListViewState extends State<PantryListView> {
   String pantry2Name = "Robbie's Cottage";
   String pantry3Name = "Sarah's Home";
 
-  static const drawerIcon = Color(0xff459657);
-  static const drawerStyle = TextStyle(fontSize: 20, color: Color(0xff459657));
+  static const drawerGreenIcon = Color(0xff459657);
+  static const drawerGreyIcon = Color(0xff7B7777);
+
+  static const drawerGreenStyle = TextStyle(fontSize: 20, color: Color(0xff459657));
+  static const drawerGreyStyle = TextStyle(fontSize: 20, color: Color(0xff7B7777));
 
 
   @override
@@ -113,36 +116,40 @@ class PantryListViewState extends State<PantryListView> {
                     padding: EdgeInsets.zero,
                     children: <Widget>[
                       ListTile(
-                        title: const Text('Create Pantry', style: drawerStyle,),
-                        leading: const Icon(Icons.add_circle_outline, color: drawerIcon,),
+                        title: const Text('Create Pantry', style: drawerGreenStyle,),
+                        leading: const Icon(Icons.add_circle_outline, color: drawerGreenIcon,),
                         onTap: () {
                           createPantryDialog();
                         },
                       ),
                       ListTile(
-                        title: const Text('Join Pantry', style: drawerStyle,),
-                        leading: const Icon(Icons.exit_to_app, color: drawerIcon,),
+                        title: const Text('Join Pantry', style: drawerGreenStyle),
+                        leading: const Icon(Icons.exit_to_app, color: drawerGreenIcon,),
                         onTap: () {
                           joinPantryDialog();
                         },
                       ),
                       ListTile(
-                          title: const Text('Delete Pantry', style: drawerStyle,),
-                          leading: const Icon(Icons.delete_forever_rounded, color: drawerIcon,),
+                          title: Text('Delete Pantry', style: sharedPrefs.ownsCurrentPantry("3") ? drawerGreyStyle : drawerGreenStyle),
+                          leading: Icon(Icons.delete_forever_rounded, color: sharedPrefs.ownsCurrentPantry("3") ? drawerGreyIcon: drawerGreenIcon,),
                           onTap: () {
-                            deletePantryDialog();
+                            if (sharedPrefs.ownsCurrentPantry("3") == false) {
+                              deletePantryDialog();
+                            }
                           }
                       ),
                       ListTile(
-                          title: const Text('Leave Pantry', style: drawerStyle,),
-                          leading: const Icon(Icons.arrow_back, color: drawerIcon,),
+                          title: Text('Leave Pantry', style: sharedPrefs.ownsCurrentPantry("3") ? drawerGreenStyle : drawerGreyStyle),
+                          leading: Icon(Icons.arrow_back, color: sharedPrefs.ownsCurrentPantry("3") ? drawerGreenIcon : drawerGreyIcon),
                           onTap: () {
-                            leavePantryDialog();
+                            if (sharedPrefs.ownsCurrentPantry("3") == true) {
+                              leavePantryDialog();
+                            }
                           }
                       ),
                       ListTile(
-                          title: const Text('Switch Pantry', style: drawerStyle,),
-                          leading: const Icon(Icons.swap_calls, color: drawerIcon,),
+                          title: const Text('Switch Pantry', style: drawerGreenStyle,),
+                          leading: const Icon(Icons.swap_calls, color: drawerGreenIcon,),
                           onTap: () {
                             switchPantryDialog();
                           }
@@ -155,8 +162,8 @@ class PantryListViewState extends State<PantryListView> {
                   height: 100,
                   child:
                   ListTile(
-                      title: Text("$pantryName #$pantryId", style: drawerStyle,),
-                      leading: const Icon(Icons.inventory_2_outlined, color: drawerIcon,),
+                      title: Text("$pantryName #$pantryId", style: drawerGreenStyle,),
+                      leading: const Icon(Icons.inventory_2_outlined, color: drawerGreenIcon,),
                   )
 
               ),
