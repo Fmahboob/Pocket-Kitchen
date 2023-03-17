@@ -1,5 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../data_models/pantry.dart';
+
 class SharedPrefs {
   static SharedPreferences? _sharedPrefs;
 
@@ -17,11 +19,7 @@ class SharedPrefs {
   }
 
   //currentPantry getter
-  String get currentPantry => _sharedPrefs!.getStringList("pantries")?[0] ?? "";
-  //currentPantry setter
-  updateCurrentPantry(String value) {
-    _sharedPrefs!.getStringList("pantries")?.insert(0, value);
-  }
+  String get currentPantry => _sharedPrefs!.getStringList("pantries")?[0] ?? "4";
 
   //all pantries getter
   List<String> get pantries => _sharedPrefs!.getStringList("pantries") ?? [];
@@ -41,6 +39,15 @@ class SharedPrefs {
       return false;
     } else {
       return true;
+    }
+  }
+
+  //getter for if user owns current pantry
+  bool ownsCurrentPantry (String ownerId) {
+    if (ownerId == currentPantry) {
+      return true;
+    } else {
+      return false;
     }
   }
 }
