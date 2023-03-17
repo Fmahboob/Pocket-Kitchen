@@ -101,6 +101,7 @@ class PantryListViewState extends State<PantryListView> {
 
           ],
         ),
+
         drawer: Drawer(
             elevation: 1.5,
             child: Column(children: <Widget>[
@@ -159,9 +160,11 @@ class PantryListViewState extends State<PantryListView> {
                       leading: const Icon(Icons.inventory_2_outlined, color: drawerIcon,),
                   )
 
-              ),
 
-            ])),
+                ),
+
+              ])),
+
 
     );
   }
@@ -215,6 +218,7 @@ class PantryListViewState extends State<PantryListView> {
       )
   );
 
+
   Future createPantryDialog() => showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -225,6 +229,7 @@ class PantryListViewState extends State<PantryListView> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: const [
                     Text(
+
                         "Create a Pantry",
                         style: TextStyle(
                             fontSize: 32,
@@ -235,6 +240,7 @@ class PantryListViewState extends State<PantryListView> {
                   ],
                 ),
                 content:
+
                     Form(
                       key: _formKey,
                       child:
@@ -261,16 +267,19 @@ class PantryListViewState extends State<PantryListView> {
                         ],
                       ),
                     ),
+
                 actions: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextButton(
                         onPressed: () {
+
                           if(_formKey.currentState!.validate()) {
                             //create pantry logic
                             Navigator.pop(context);
                           }
+
                         },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
@@ -302,6 +311,7 @@ class PantryListViewState extends State<PantryListView> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: const [
                     Text(
+
                         "Join a Pantry",
                         style: TextStyle(
                             fontSize: 32,
@@ -312,6 +322,8 @@ class PantryListViewState extends State<PantryListView> {
                   ],
                 ),
                 content:
+
+
                     Form(
                       key: _formKey,
                       child:
@@ -402,6 +414,7 @@ class PantryListViewState extends State<PantryListView> {
                       color: Color(0xff7B7777),
                       fontWeight: FontWeight.w400
                   ),
+
                 ),
                 actions: [
                   Row(
@@ -409,14 +422,13 @@ class PantryListViewState extends State<PantryListView> {
                     children: [
                       TextButton(
                         onPressed: () {
-                          //delete pantry logic
-                          Navigator.pop(context);
-                        },
+    },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
                         ),
                         child:
                         const Text(
+
                           "Delete",
                           style: TextStyle(
                               fontSize: 32,
@@ -540,4 +552,5 @@ class PantryListViewState extends State<PantryListView> {
               )
       )
   );
+
 }
