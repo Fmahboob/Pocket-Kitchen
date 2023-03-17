@@ -1,5 +1,11 @@
-import '../../models/pantry_food.dart';
+import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
+
+import '../../models/app_models/database.dart';
+import '../../models/data_models/food.dart';
+import '../../models/data_models/pantry_food.dart';
 import 'package:flutter/material.dart';
+
+import '../../models/data_models/user.dart';
 
 class GroceryListItem extends StatefulWidget {
   final PantryFood pantryFood;
@@ -16,9 +22,20 @@ class GroceryListItem extends StatefulWidget {
 }
 
 class GroceryListItemState extends State<GroceryListItem> {
-
   get pantryFood => widget.pantryFood;
   bool isExpanded = false;
+
+  Future<User> _getUser(String id, email, qualifier) async {
+    return Database.getUser(id, email, qualifier);
+  }
+
+  _getFood(String id) {
+    Database.getFood("", "", id, Database.idQual);
+  }
+
+  _updatePantryFood (String id, String amount, String pantryId, String foodId) {
+    Database.updatePantryFood(id, amount, pantryId, foodId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +84,7 @@ class GroceryListItemState extends State<GroceryListItem> {
                                         ),
                                       ),
                                       Expanded(
-                                        flex: 4,
+                                        flex: isExpanded ? 4 : 100,
                                         child:
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,7 +93,8 @@ class GroceryListItemState extends State<GroceryListItem> {
                                               constraints: BoxConstraints(
                                                 maxWidth: MediaQuery.of(context).size.width - 32.0,
                                               ),
-                                              child: Text(
+                                              child:
+                                              Text(
                                                 "Heinz Tomato Ketchup, 750mL/25oz., Bottle, {Imported From Canada",
                                                 textAlign: TextAlign.left,
                                                 style: const TextStyle(
@@ -85,7 +103,7 @@ class GroceryListItemState extends State<GroceryListItem> {
                                                   fontWeight: FontWeight.w500,
                                                 ),
                                                 maxLines: isExpanded ? 4 : 1,
-                                                overflow: isExpanded ? TextOverflow.ellipsis: TextOverflow.fade,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
                                             Visibility(
@@ -97,7 +115,7 @@ class GroceryListItemState extends State<GroceryListItem> {
                                               child: const Padding(
                                                 padding: EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
                                                 child: Text(
-                                                  "Vegetable, organic, classic, yummy",
+                                                  "Vegetable, organic, classic, yummy, phenomenal",
                                                   textAlign: TextAlign.left,
                                                   style: TextStyle(
                                                       fontSize: 18,
@@ -112,8 +130,8 @@ class GroceryListItemState extends State<GroceryListItem> {
                                           ],
                                         ),
                                       ),
-                                      Expanded(
-                                          flex: isExpanded ? 1 : 0,
+                                      Visibility(
+                                          visible: isExpanded,
                                           child: Column(
                                             children: [
                                               Visibility(
@@ -173,7 +191,9 @@ class GroceryListItemState extends State<GroceryListItem> {
                     children: [
                       TextButton(
                         onPressed: () {
-                          //restocking food logic
+                          Food food = _getFood(pantryFood.foodId!);
+                          _updatePantryFood(pantryFood.id!, food.weight!, pantryFood.pantryId!, pantryFood.foodId!);
+
                           Navigator.pop(context);
                         },
                         style: const ButtonStyle(
