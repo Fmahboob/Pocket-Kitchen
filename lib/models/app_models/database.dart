@@ -200,15 +200,15 @@ class Database {
   }
 
   //Get one pantry
-  static Future<Pantry> getPantry(String id) async {
+  static Future<Pantry> getPantry(String id, String name, String qualifier) async {
     var pantry = Pantry();
     try {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readOneAction";
       bodyMap["table"] = "$pantryTable";
-      bodyMap["qualifier"] = "";
+      bodyMap["qualifier"] = "$qualifier";
       bodyMap["pantry_id"] = "$id";
-      bodyMap["name"] = "";
+      bodyMap["name"] = "$name";
       bodyMap["user_count"] = "";
       bodyMap["owner_id"] = "";
 

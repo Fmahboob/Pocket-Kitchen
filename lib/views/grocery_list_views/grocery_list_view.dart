@@ -26,7 +26,7 @@ class GroceryListViewState extends State<GroceryListView> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
 
-  //Food methods
+  //Food CRUD methods
   _createFood(String name, String imgUrl, String category, String desc, String weight, bool ownUnit, barcode) {
     Database.createFood(name, imgUrl, category, desc, weight, ownUnit, barcode);
   }
@@ -35,7 +35,7 @@ class GroceryListViewState extends State<GroceryListView> {
     return Database.getFood(barcode, name, id, qualifier);
   }
 
-  //Pantry food methods
+  //Pantry food CRUD methods
   _createPantryFood(String amount, String pantryId, String foodId) {
     Database.createPantryFood(amount, pantryId, foodId);
   }

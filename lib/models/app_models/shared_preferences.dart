@@ -20,10 +20,6 @@ class SharedPrefs {
 
   //currentPantry getter
   String get currentPantry => _sharedPrefs!.getStringList("pantries")?[0] ?? "4";
-  //currentPantry setter
-  updateCurrentPantry(String value) {
-    _sharedPrefs!.getStringList("pantries")?.insert(0, value);
-  }
 
   //all pantries getter
   List<String> get pantries => _sharedPrefs!.getStringList("pantries") ?? [];

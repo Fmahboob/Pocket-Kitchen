@@ -4,7 +4,9 @@ import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_item.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/unavailable_pantry_item.dart';
 import 'package:pocket_kitchen/views/google_sign_in_view.dart';
 
+import '../../models/app_models/database.dart';
 import '../../models/app_models/google_sign_in_api.dart';
+import '../../models/data_models/pantry.dart';
 
 class PantryListView extends StatefulWidget {
   const PantryListView({super.key});
@@ -31,6 +33,18 @@ class PantryListViewState extends State<PantryListView> {
   static const drawerGreenStyle = TextStyle(fontSize: 20, color: Color(0xff459657));
   static const drawerGreyStyle = TextStyle(fontSize: 20, color: Color(0xff7B7777));
 
+  //Pantry CRUD methods
+  _createPantry(String name, String ownerId) {
+    Database.createPantry(name, ownerId);
+  }
+
+  Future<Pantry> _getPantry(String id, String name, String qualifier) {
+    return Database.getPantry(id, name, qualifier);
+  }
+
+  _updatePantry(String id, String name, String userCount, String ownerId) {
+    Database.updatePantry(id, name, userCount, ownerId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -273,9 +287,18 @@ class PantryListViewState extends State<PantryListView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if(_formKey.currentState!.validate()) {
-                            //create pantry logic
+                            
+                            //create the pantry
+                            await _createPantry(createNameController.text, sharedPrefs.userId);
+
+                            //get new pantry id
+                            Pantry newPantry = await _getPantry("", createNameController.text, Database.nameQual);
+
+                            //add new pantry id to local storage
+                            sharedPrefs.addNewPantry(newPantry.id!);
+
                             Navigator.pop(context);
                           }
                         },
