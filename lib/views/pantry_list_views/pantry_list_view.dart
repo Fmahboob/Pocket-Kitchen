@@ -24,10 +24,10 @@ class PantryListViewState extends State<PantryListView> {
 
   final _formKey = GlobalKey<FormState>();
 
-  String pantryName = "Robbie's Home";
-  String pantryId = "154";
-  String pantry2Name = "Robbie's Cottage";
-  String pantry3Name = "Sarah's Home";
+  String pantryId = sharedPrefs.currentPantry;
+  String pantryName = sharedPrefs.currentPantryName;
+  String pantry2Name = "";
+  String pantry3Name = "";
 
   static const drawerGreenIcon = Color(0xff459657);
   static const drawerGreyIcon = Color(0xff7B7777);
@@ -72,7 +72,7 @@ class PantryListViewState extends State<PantryListView> {
         appBar: AppBar(
             centerTitle: true,
             backgroundColor: const Color(0xff459657),
-            title: const Text('Pocket Kitchen'),
+            title: Text(sharedPrefs.currentPantryName),
             actions: [
               IconButton(
             onPressed: () {
@@ -81,7 +81,7 @@ class PantryListViewState extends State<PantryListView> {
             icon: const Icon(Icons.exit_to_app_sharp),
             tooltip: 'Sign Out',
           ),
-    ]
+          ]
         ),
         body: Column(
 
@@ -185,7 +185,20 @@ class PantryListViewState extends State<PantryListView> {
                       ListTile(
                           title: const Text('Switch Pantry', style: drawerGreenStyle,),
                           leading: const Icon(Icons.swap_calls, color: drawerGreenIcon,),
-                          onTap: () {
+                          onTap: () async {
+
+                            //get 2nd pantry name
+                            Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", Database.idQual);
+
+                            //set 2nd pantry name
+                            pantry2Name = pantry2.name!;
+
+                            //get 3rd pantry name
+                            Pantry pantry3 = await _getPantry(sharedPrefs.pantries[2], "", Database.idQual);
+
+                            //set 2nd pantry name
+                            pantry3Name = pantry3.name!;
+
                             switchPantryDialog();
                           }
                       )
@@ -233,11 +246,9 @@ class PantryListViewState extends State<PantryListView> {
                           await GoogleSignInAPI.logout();
                           sharedPrefs.userId = "";
                           Navigator.pop(context);
-                          Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const GoogleSignInView()),
-                          );
+
+                          //reload app
+                          RestartWidget.restartApp(context);
                         },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),

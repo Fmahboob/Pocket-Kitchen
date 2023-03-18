@@ -10,16 +10,17 @@ import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_view.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await sharedPrefs.init();
+  await sharedPrefs.setCurrentPantryName();
   runApp(
-    RestartWidget(
-        child: const PocketKitchen()
+    const RestartWidget(
+        child: PocketKitchen()
     )
   );
 }
 
 //wrapping widget to allow state restarting
 class RestartWidget extends StatefulWidget {
-  const RestartWidget({required this.child});
+  const RestartWidget({super.key, required this.child});
 
   final Widget child;
 

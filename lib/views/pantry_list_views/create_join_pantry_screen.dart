@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/main.dart';
 
 import '../../models/app_models/database.dart';
+import '../../models/app_models/google_sign_in_api.dart';
 import '../../models/app_models/shared_preferences.dart';
 import '../../models/data_models/pantry.dart';
+import '../google_sign_in_view.dart';
 
 class NoPantryView extends StatefulWidget {
   const NoPantryView({super.key});
@@ -51,6 +53,16 @@ class NoPantryViewState extends State<NoPantryView> {
           centerTitle: true,
           backgroundColor: const Color(0xff459657),
           title: const Text('Pocket Kitchen'),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  print(sharedPrefs.userId);
+                  signOutDialog();
+                },
+                icon: const Icon(Icons.exit_to_app_sharp),
+                tooltip: 'Sign Out',
+              ),
+            ]
         ),
         body: Padding(
           padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
@@ -322,6 +334,53 @@ class NoPantryViewState extends State<NoPantryView> {
                         child:
                         const Text(
                           "Join",
+                          style: TextStyle(
+                              fontSize: 32,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+      )
+  );
+
+  Future signOutDialog() => showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+          builder: (context, setState) =>
+              AlertDialog(
+                content:
+                const Text(
+                  "Are you sure you want to sign out?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Color(0xff7B7777),
+                      fontWeight: FontWeight.w400
+                  ),
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+                          await GoogleSignInAPI.logout();
+                          sharedPrefs.userId = "";
+                          Navigator.pop(context);
+
+                          //reload app
+                          RestartWidget.restartApp(context);
+                        },
+                        style: const ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
+                        ),
+                        child:
+                        const Text(
+                          "Sign Out",
                           style: TextStyle(
                               fontSize: 32,
                               color: Colors.white,

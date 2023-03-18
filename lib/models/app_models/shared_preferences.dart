@@ -1,4 +1,7 @@
+import 'package:pocket_kitchen/models/app_models/database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../data_models/pantry.dart';
 
 class SharedPrefs {
   static SharedPreferences? _sharedPrefs;
@@ -16,10 +19,19 @@ class SharedPrefs {
     _sharedPrefs!.setString("userId", value);
   }
 
+  //currentPantry name getter
+  String get currentPantryName => _sharedPrefs!.getString("pantryName") ?? "";
+  //currentPantry name setter
+  setCurrentPantryName() async {
+    Pantry pantry = await Database.getPantry(currentPantry, "", Database.idQual);
+    _sharedPrefs!.setString("pantryName", pantry.name ?? "");
+  }
+
   //currentPantry getter
   String get currentPantry => _sharedPrefs!.getStringList("pantries")?[0] ?? "";
   //all pantries getter
   List<String> get pantries => _sharedPrefs!.getStringList("pantries") ?? [];
+
   //new pantry setter
   addNewPantry(String value) {
     String pantry1 = pantries[0];
