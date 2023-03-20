@@ -201,8 +201,16 @@ class NoPantryViewState extends State<NoPantryView> {
                             //add new pantry id to local storage
                             sharedPrefs.addNewPantry(newPantry.id!);
 
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                            //push main app
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const TabBarMain()),
+                            );
+
                             //reload app
-                            RestartWidget.restartApp(context);
+                            //RestartWidget.restartApp(context);
                           }
 
                         },
@@ -371,9 +379,15 @@ class NoPantryViewState extends State<NoPantryView> {
                           await GoogleSignInAPI.logout();
                           sharedPrefs.userId = "";
                           Navigator.pop(context);
+                          Navigator.pop(context);
 
+                          //repush login
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const GoogleSignInView()),
+                          );
                           //reload app
-                          RestartWidget.restartApp(context);
+                          //RestartWidget.restartApp(context);
                         },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),

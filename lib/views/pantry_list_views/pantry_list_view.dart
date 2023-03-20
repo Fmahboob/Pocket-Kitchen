@@ -247,8 +247,11 @@ class PantryListViewState extends State<PantryListView> {
                           sharedPrefs.userId = "";
                           Navigator.pop(context);
 
-                          //reload app
-                          RestartWidget.restartApp(context);
+                          //load sign in
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const GoogleSignInView()),
+                          );
                         },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
@@ -281,7 +284,6 @@ class PantryListViewState extends State<PantryListView> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: const [
                     Text(
-
                         "Create a Pantry",
                         style: TextStyle(
                             fontSize: 32,
@@ -513,8 +515,17 @@ class PantryListViewState extends State<PantryListView> {
                           //remove it from local storage
                           sharedPrefs.removeCurrentPantry();
 
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+
+                          //repush main app
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const GoogleSignInView()),
+                          );
                           //restart app
-                          RestartWidget.restartApp(context);
+                          //RestartWidget.restartApp(context);
                         },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
@@ -572,8 +583,17 @@ class PantryListViewState extends State<PantryListView> {
                           //remove pantry from local storage
                           sharedPrefs.removeCurrentPantry();
 
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+
+                          //repush main app
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const GoogleSignInView()),
+                          );
                           //restart app
-                          RestartWidget.restartApp(context);
+                          //RestartWidget.restartApp(context);
                         },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),

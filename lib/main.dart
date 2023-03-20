@@ -57,7 +57,7 @@ class PocketKitchen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: sharedPrefs.signedIn ? (sharedPrefs.hasPantries ? const TabBarMain() : const NoPantryView()) : const GoogleSignInView()
+      home: sharedPrefs.signedIn ? const TabBarMain() : const GoogleSignInView()
     );
   }
 }
@@ -70,7 +70,7 @@ class TabBarMain extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: DefaultTabController(
+      home: !sharedPrefs.hasPantries ? const NoPantryView() : DefaultTabController(
           length: 3,
           child: Scaffold(
               bottomNavigationBar: tabBarMenu(),

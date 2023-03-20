@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../models/app_models/shared_preferences.dart';
+
 class CuisinesView extends StatelessWidget {
   const CuisinesView({Key? key}) : super (key: key);
 
@@ -9,7 +11,7 @@ class CuisinesView extends StatelessWidget {
         appBar: AppBar(
             centerTitle: true,
             backgroundColor: const Color(0xff459657),
-            title: const Text('Recipes'),
+            title: Text(sharedPrefs.currentPantryName),
         ),
         body: Container(
 

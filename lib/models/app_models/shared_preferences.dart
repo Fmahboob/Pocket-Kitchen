@@ -28,18 +28,21 @@ class SharedPrefs {
   }
 
   //currentPantry getter
-  String get currentPantry => _sharedPrefs!.getStringList("pantries")?[0] ?? "";
+  String get currentPantry {
+    return _sharedPrefs!.getStringList("pantries")?[0] ?? "";
+  }
+
   //all pantries getter
   List<String> get pantries => _sharedPrefs!.getStringList("pantries") ?? [];
 
   //new pantry setter
   addNewPantry(String value) {
-    String pantry1 = pantries[0];
-    String pantry2 = pantries[1];
+    String pantry1 = _sharedPrefs!.getStringList("pantries")?[0] ?? "";
+    String pantry2 = _sharedPrefs!.getStringList("pantries")?[1] ?? "";
 
-    _sharedPrefs!.setString("pantries"[0], value);
-    _sharedPrefs!.setString("pantries"[1], pantry1);
-    _sharedPrefs!.setString("pantries"[2], pantry2);
+    List<String> pantries = [value, pantry1, pantry2];
+
+    _sharedPrefs!.setStringList("pantries", pantries);
   }
   //pantry remover
   removeCurrentPantry() {
