@@ -10,7 +10,6 @@ import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_view.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await sharedPrefs.init();
-  await sharedPrefs.setCurrentPantryName();
   runApp(
     const RestartWidget(
         child: PocketKitchen()

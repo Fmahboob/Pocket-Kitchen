@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
+import 'package:pocket_kitchen/views/pantry_list_views/create_join_pantry_screen.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_item.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/unavailable_pantry_item.dart';
 import 'package:pocket_kitchen/views/google_sign_in_view.dart';
@@ -191,13 +192,13 @@ class PantryListViewState extends State<PantryListView> {
                             Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", Database.idQual);
 
                             //set 2nd pantry name
-                            pantry2Name = pantry2.name!;
+                            pantry2Name = pantry2.name ?? "";
 
                             //get 3rd pantry name
                             Pantry pantry3 = await _getPantry(sharedPrefs.pantries[2], "", Database.idQual);
 
                             //set 2nd pantry name
-                            pantry3Name = pantry3.name!;
+                            pantry3Name = pantry3.name ?? "";
 
                             switchPantryDialog();
                           }
@@ -338,11 +339,20 @@ class PantryListViewState extends State<PantryListView> {
                             //create new pantry_user
                             await _createPantryUser(newPantry.id!, sharedPrefs.userId);
 
-                            //add new pantry id to local storage
+                            //add new pantry id and name to local storage
                             sharedPrefs.addNewPantry(newPantry.id!);
+                            sharedPrefs.currentPantryName = newPantry.name!;
+
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                            //push main app
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const TabBarMain()),
+                            );
 
                             //reload app
-                            RestartWidget.restartApp(context);
+                            //RestartWidget.restartApp(context);
                           }
 
                         },
@@ -454,11 +464,20 @@ class PantryListViewState extends State<PantryListView> {
                               //create new pantry_user
                               await _createPantryUser(joiningPantry.id!, sharedPrefs.userId);
 
-                              //add pantry id to local storage
+                              //add pantry id and name to local storage
                               sharedPrefs.addNewPantry(joiningPantry.id!);
+                              sharedPrefs.currentPantryName = joiningPantry.name!;
+
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              //push main app
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const TabBarMain()),
+                              );
 
                               //reload app
-                              RestartWidget.restartApp(context);
+                              //RestartWidget.restartApp(context);
 
                               //if name doesn't match id, inform user with snackbar
                             } else {
@@ -517,12 +536,11 @@ class PantryListViewState extends State<PantryListView> {
 
                           Navigator.pop(context);
                           Navigator.pop(context);
-                          Navigator.pop(context);
 
                           //repush main app
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const GoogleSignInView()),
+                            MaterialPageRoute(builder: (context) => const TabBarMain()),
                           );
                           //restart app
                           //RestartWidget.restartApp(context);
@@ -622,7 +640,7 @@ class PantryListViewState extends State<PantryListView> {
               AlertDialog(
                 content:
                 Text(
-                  "Switch From '$pantryName', to",
+                  "Switch from '$pantryName', to...",
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       color: Color(0xff7B7777),
@@ -691,11 +709,10 @@ class PantryListViewState extends State<PantryListView> {
                           ),
                       ),
                       Visibility(
-                        visible: sharedPrefs.threePantryExists,
+                        visible: !sharedPrefs.secondPantryExists,
                         child:
                         const Text(
                           "There are no pantries to switch to.",
-                          textAlign: TextAlign.center,
                           style: TextStyle(
                               color: Color(0xff7B7777),
                               fontWeight: FontWeight.w400

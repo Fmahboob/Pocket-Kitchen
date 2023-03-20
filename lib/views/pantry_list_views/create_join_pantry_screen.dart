@@ -198,8 +198,9 @@ class NoPantryViewState extends State<NoPantryView> {
                             //create new pantry_user
                             await _createPantryUser(newPantry.id!, sharedPrefs.userId);
 
-                            //add new pantry id to local storage
+                            //add new pantry id and name to local storage
                             sharedPrefs.addNewPantry(newPantry.id!);
+                            sharedPrefs.currentPantryName = newPantry.name!;
 
                             Navigator.pop(context);
                             Navigator.pop(context);
@@ -323,11 +324,20 @@ class NoPantryViewState extends State<NoPantryView> {
                               //create new pantry_user
                               await _createPantryUser(joiningPantry.id!, sharedPrefs.userId);
 
-                              //add pantry id to local storage
+                              //add pantry id and name to local storage
                               sharedPrefs.addNewPantry(joiningPantry.id!);
+                              sharedPrefs.currentPantryName = joiningPantry.name!;
+
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              //push main app
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const TabBarMain()),
+                              );
 
                               //reload app
-                              RestartWidget.restartApp(context);
+                              //RestartWidget.restartApp(context);
 
                             //if name doesn't match id, inform user with snackbar
                             } else {

@@ -22,9 +22,8 @@ class SharedPrefs {
   //currentPantry name getter
   String get currentPantryName => _sharedPrefs!.getString("pantryName") ?? "";
   //currentPantry name setter
-  setCurrentPantryName() async {
-    Pantry pantry = await Database.getPantry(currentPantry, "", Database.idQual);
-    _sharedPrefs!.setString("pantryName", pantry.name ?? "");
+  set currentPantryName(String value) {
+    _sharedPrefs!.setString("pantryName", value);
   }
 
   //currentPantry getter
@@ -49,9 +48,9 @@ class SharedPrefs {
     String pantry2 = _sharedPrefs!.getStringList("pantries")?[1] ?? "";
     String pantry3 = _sharedPrefs!.getStringList("pantries")?[2] ?? "";
 
-    _sharedPrefs!.setString("pantries"[0], pantry2);
-    _sharedPrefs!.setString("pantries"[1], pantry3);
-    _sharedPrefs!.setString("pantries"[2], "");
+    List<String> pantries = [pantry2, pantry3, ""];
+
+    _sharedPrefs!.setStringList("pantries", pantries);
   }
   //pantry switch
   switchCurrentPantry(int value) {
@@ -96,7 +95,7 @@ class SharedPrefs {
 
   //getter for if second pantry exists
   bool get secondPantryExists {
-    if (_sharedPrefs!.getString("pantries"[1]) != "") {
+    if (_sharedPrefs!.getStringList("pantries")?[1] != "") {
       return true;
     } else {
       return false;
@@ -105,16 +104,7 @@ class SharedPrefs {
 
   //getter for if third pantry exists
   bool get thirdPantryExists {
-    if (_sharedPrefs!.getString("pantries"[2]) != "") {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  //getter for if only 1 pantry (can't switch)
-  bool get threePantryExists {
-    if (secondPantryExists == true && thirdPantryExists == true) {
+    if (_sharedPrefs!.getStringList("pantries")?[2] != "") {
       return true;
     } else {
       return false;
