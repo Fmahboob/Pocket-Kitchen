@@ -205,11 +205,11 @@ class PantryListViewState extends State<PantryListView> {
                             if (sharedPrefs.ownsCurrentPantry() == false) {
                               //get 2nd pantry name
                               Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", Database.idQual);
-
+                              Pantry currPantry = await _getPantry(sharedPrefs.pantries[0], "", Database.idQual);
                               //set 2nd pantry name
                               pantry2Name = pantry2.name ?? "";
                               pantry2OwnerId = pantry2.ownerId ?? "";
-                              userCount = pantry2.userCount ?? "";
+                              userCount = currPantry.userCount ?? "";
 
                               deletePantryDialog();
                             } else {
