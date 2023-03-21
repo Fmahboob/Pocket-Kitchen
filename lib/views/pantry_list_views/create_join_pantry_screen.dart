@@ -28,8 +28,8 @@ class NoPantryViewState extends State<NoPantryView> {
     Database.createPantry(name, ownerId);
   }
 
-  Future<Pantry> _getPantry(String id, String name, String qualifier) {
-    return Database.getPantry(id, name, qualifier);
+  Future<Pantry> _getPantry(String id, String name, String ownerId, String qualifier) {
+    return Database.getPantry(id, name, ownerId, qualifier);
   }
 
   _updatePantry(String id, String name, String userCount, String ownerId) {
@@ -194,7 +194,7 @@ class NoPantryViewState extends State<NoPantryView> {
                             await _createPantry(createNameController.text, sharedPrefs.userId);
 
                             //get new pantry id
-                            Pantry newPantry = await _getPantry("", createNameController.text, Database.nameQual);
+                            Pantry newPantry = await _getPantry("", createNameController.text, sharedPrefs.userId, Database.bothQual);
 
                             //create new pantry_user
                             await _createPantryUser(newPantry.id!, sharedPrefs.userId);
@@ -312,7 +312,7 @@ class NoPantryViewState extends State<NoPantryView> {
                           if(_formKey.currentState!.validate()) {
 
                             //retrieve desired pantry
-                            Pantry joiningPantry = await _getPantry(joinIdController.text, joinNameController.text, Database.idQual);
+                            Pantry joiningPantry = await _getPantry(joinIdController.text, joinNameController.text, "", Database.idQual);
 
                             //check that name matches inputted name
                             if (joiningPantry.name == joinNameController.text) {

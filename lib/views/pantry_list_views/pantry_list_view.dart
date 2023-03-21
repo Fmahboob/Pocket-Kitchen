@@ -54,8 +54,8 @@ class PantryListViewState extends State<PantryListView> {
     Database.createPantry(name, ownerId);
   }
 
-  Future<Pantry> _getPantry(String id, String name, String qualifier) {
-    return Database.getPantry(id, name, qualifier);
+  Future<Pantry> _getPantry(String id, String name, String ownerId, String qualifier) {
+    return Database.getPantry(id, name, ownerId, qualifier);
   }
 
   _updatePantry(String id, String name, String userCount, String ownerId) {
@@ -176,8 +176,18 @@ class PantryListViewState extends State<PantryListView> {
                       ListTile(
                         title: const Text('Create Pantry', style: drawerGreenStyle,),
                         leading: const Icon(Icons.add_circle_outline, color: drawerGreenIcon,),
-                        onTap: () {
+                        onTap: () async {
+
+                          //get 2nd pantry name
+                          Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", "", Database.idQual);
+
+                          //set 2nd pantry name
+                          pantry2Name = pantry2.name ?? "";
+
                           if (sharedPrefs.pantries[2] == "") {
+                            print(createNameController.text);
+                            print(pantry2Name);
+                            print(sharedPrefs.currentPantryName);
                             createPantryDialog();
                           } else {
                             issueMessage = "You already have 3 pantries. Leave or delete a pantry to create another one.";
@@ -204,8 +214,8 @@ class PantryListViewState extends State<PantryListView> {
                             //get current pantry for its ownerId
                             if (sharedPrefs.ownsCurrentPantry() == false) {
                               //get 2nd pantry name
-                              Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", Database.idQual);
-                              Pantry currPantry = await _getPantry(sharedPrefs.pantries[0], "", Database.idQual);
+                              Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", "", Database.idQual);
+                              Pantry currPantry = await _getPantry(sharedPrefs.pantries[0], "", "", Database.idQual);
                               //set 2nd pantry name
                               pantry2Name = pantry2.name ?? "";
                               pantry2OwnerId = pantry2.ownerId ?? "";
@@ -224,7 +234,7 @@ class PantryListViewState extends State<PantryListView> {
                           onTap: () async {
                             if (sharedPrefs.ownsCurrentPantry() == true) {
                               //get 2nd pantry name
-                              Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", Database.idQual);
+                              Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", "", Database.idQual);
 
                               //set 2nd pantry name
                               pantry2Name = pantry2.name ?? "";
@@ -242,21 +252,26 @@ class PantryListViewState extends State<PantryListView> {
                           leading: const Icon(Icons.swap_calls, color: drawerGreenIcon,),
                           onTap: () async {
 
-                            //get 2nd pantry name
-                            Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", Database.idQual);
+                            if (sharedPrefs.secondPantryExists) {
+                              //get 2nd pantry name
+                              Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", "", Database.idQual);
 
-                            //set 2nd pantry name
-                            pantry2Name = pantry2.name ?? "";
-                            pantry2OwnerId = pantry2.ownerId ?? "";
+                              //set 2nd pantry name
+                              pantry2Name = pantry2.name ?? "";
+                              pantry2OwnerId = pantry2.ownerId ?? "";
 
-                            //get 3rd pantry name
-                            Pantry pantry3 = await _getPantry(sharedPrefs.pantries[2], "", Database.idQual);
+                              //get 3rd pantry name
+                              Pantry pantry3 = await _getPantry(sharedPrefs.pantries[2], "", "", Database.idQual);
 
-                            //set 2nd pantry name
-                            pantry3Name = pantry3.name ?? "";
-                            pantry3OwnerId = pantry3.ownerId ?? "";
+                              //set 2nd pantry name
+                              pantry3Name = pantry3.name ?? "";
+                              pantry3OwnerId = pantry3.ownerId ?? "";
 
-                            switchPantryDialog();
+                              switchPantryDialog();
+                            } else {
+                              issueMessage = "You don't have any pantries to switch to.";
+                              issueDialog();
+                            }
                           }
                       )
                     ],
@@ -381,27 +396,35 @@ class PantryListViewState extends State<PantryListView> {
                         onPressed: () async {
                           if(_formKey.currentState!.validate()) {
 
-                            //create the pantry
-                            await _createPantry(createNameController.text, sharedPrefs.userId);
+                            //check that you don't have a pantry with this name
+                            if (createNameController.text != pantry2Name && createNameController.text != sharedPrefs.currentPantryName) {
+                              //create the pantry
+                              await _createPantry(createNameController.text, sharedPrefs.userId);
 
-                            //get new pantry id
-                            Pantry newPantry = await _getPantry("", createNameController.text, Database.nameQual);
+                              //get new pantry id
+                              Pantry newPantry = await _getPantry("", createNameController.text, sharedPrefs.userId, Database.bothQual);
 
-                            //create new pantry_user
-                            await _createPantryUser(newPantry.id!, sharedPrefs.userId);
+                              //create new pantry_user
+                              await _createPantryUser(newPantry.id!, sharedPrefs.userId);
 
-                            //add new pantry id and name to local storage
-                            sharedPrefs.addNewPantry(newPantry.id!);
-                            sharedPrefs.currentPantryName = newPantry.name!;
-                            sharedPrefs.currentPantryOwner = newPantry.ownerId!;
+                              //add new pantry id and name to local storage
+                              sharedPrefs.addNewPantry(newPantry.id!);
+                              sharedPrefs.currentPantryName = newPantry.name!;
+                              sharedPrefs.currentPantryOwner = newPantry.ownerId!;
 
-                            Navigator.pop(context);
-                            Navigator.pop(context);
-                            //push main app
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const TabBarMain()),
-                            );
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              //push main app
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const TabBarMain()),
+                              );
+                            } else {
+                              createNameController.text = "";
+                              Navigator.pop(context);
+                              issueMessage = "You have already created a pantry with this name.";
+                              issueDialog();
+                            }
 
                             //reload app
                             //RestartWidget.restartApp(context);
@@ -502,7 +525,7 @@ class PantryListViewState extends State<PantryListView> {
                         onPressed: () async {
                           if(_formKey.currentState!.validate()) {
                             //retrieve desired pantry
-                            Pantry joiningPantry = await _getPantry(joinIdController.text, joinNameController.text, Database.idQual);
+                            Pantry joiningPantry = await _getPantry(joinIdController.text, joinNameController.text, "", Database.idQual);
 
                             //check that name matches inputted name
                             if (joiningPantry.name == joinNameController.text) {
@@ -642,7 +665,7 @@ class PantryListViewState extends State<PantryListView> {
                         onPressed: () async {
 
                           //retrieve pantry's user count
-                          Pantry leavePantry = await _getPantry(sharedPrefs.currentPantry, "", Database.idQual);
+                          Pantry leavePantry = await _getPantry(sharedPrefs.currentPantry, "", "", Database.idQual);
 
                           //update user count
                           int userCount = (leavePantry.userCount as int) - 1;
@@ -785,18 +808,6 @@ class PantryListViewState extends State<PantryListView> {
                                       fontWeight: FontWeight.w400
                                   ),
                                 ),
-                              ),
-                            ),
-                          ),
-                          Visibility(
-                            visible: !sharedPrefs.secondPantryExists,
-                            child:
-                            const Text(
-                              "There are no pantries to switch to.",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Color(0xff7B7777),
-                                  fontWeight: FontWeight.w400
                               ),
                             ),
                           ),
