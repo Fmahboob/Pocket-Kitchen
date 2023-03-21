@@ -201,6 +201,7 @@ class NoPantryViewState extends State<NoPantryView> {
                             //add new pantry id and name to local storage
                             sharedPrefs.addNewPantry(newPantry.id!);
                             sharedPrefs.currentPantryName = newPantry.name!;
+                            sharedPrefs.currentPantryOwner = newPantry.ownerId!;
 
                             Navigator.pop(context);
                             Navigator.pop(context);
@@ -327,6 +328,7 @@ class NoPantryViewState extends State<NoPantryView> {
                               //add pantry id and name to local storage
                               sharedPrefs.addNewPantry(joiningPantry.id!);
                               sharedPrefs.currentPantryName = joiningPantry.name!;
+                              sharedPrefs.currentPantryOwner = joiningPantry.ownerId!;
 
                               Navigator.pop(context);
                               Navigator.pop(context);

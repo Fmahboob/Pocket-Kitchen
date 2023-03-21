@@ -27,8 +27,16 @@ class PantryListViewState extends State<PantryListView> {
 
   String pantryId = sharedPrefs.currentPantry;
   String pantryName = sharedPrefs.currentPantryName;
+
   String pantry2Name = "";
+  String pantry2OwnerId = "";
+
   String pantry3Name = "";
+  String pantry3OwnerId = "";
+
+  String userCount = "";
+
+  String issueMessage = "";
 
   static const drawerGreenIcon = Color(0xff459657);
   static const drawerGreyIcon = Color(0xff7B7777);
@@ -153,11 +161,6 @@ class PantryListViewState extends State<PantryListView> {
                   ),
           ),
         ),
-
-
-
-
-
         drawer: Drawer(
             elevation: 1.5,
             child: Column(children: <Widget>[
@@ -173,46 +176,63 @@ class PantryListViewState extends State<PantryListView> {
                         title: const Text('Create Pantry', style: drawerGreenStyle,),
                         leading: const Icon(Icons.add_circle_outline, color: drawerGreenIcon,),
                         onTap: () {
-                          createPantryDialog();
+                          if (sharedPrefs.pantries[2] == "") {
+                            createPantryDialog();
+                          } else {
+                            issueMessage = "You already have 3 pantries. Leave or delete a pantry to create another one.";
+                            issueDialog();
+                          }
                         },
                       ),
                       ListTile(
                         title: const Text('Join Pantry', style: drawerGreenStyle),
                         leading: const Icon(Icons.exit_to_app, color: drawerGreenIcon,),
                         onTap: () {
-                          joinPantryDialog();
+                          if (sharedPrefs.pantries[2] == "") {
+                            joinPantryDialog();
+                          } else {
+                            issueMessage = "You already have 3 pantries. Leave or delete a pantry to join another one.";
+                            issueDialog();
+                          }
                         },
                       ),
                       ListTile(
-                          title: Text('Delete Pantry', style: sharedPrefs.ownsCurrentPantry("3") ? drawerGreyStyle : drawerGreenStyle),
-                          leading: Icon(Icons.delete_forever_rounded, color: sharedPrefs.ownsCurrentPantry("3") ? drawerGreyIcon: drawerGreenIcon,),
+                          title: Text('Delete Pantry', style: sharedPrefs.ownsCurrentPantry() ? drawerGreyStyle : drawerGreenStyle),
+                          leading: Icon(Icons.delete_forever_rounded, color: sharedPrefs.ownsCurrentPantry() ? drawerGreyIcon: drawerGreenIcon,),
                           onTap: () async {
-                            if (sharedPrefs.ownsCurrentPantry("3") == false) {
+                            //get current pantry for its ownerId
+                            if (sharedPrefs.ownsCurrentPantry() == false) {
                               //get 2nd pantry name
                               Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", Database.idQual);
 
                               //set 2nd pantry name
                               pantry2Name = pantry2.name ?? "";
+                              pantry2OwnerId = pantry2.ownerId ?? "";
+                              userCount = pantry2.userCount ?? "";
 
                               deletePantryDialog();
+                            } else {
+                              issueMessage = "You must own the pantry to delete it.";
+                              issueDialog();
                             }
                           }
                       ),
                       ListTile(
-                          title: Text('Leave Pantry', style: sharedPrefs.ownsCurrentPantry("3") ? drawerGreenStyle : drawerGreyStyle),
-                          leading: Icon(Icons.arrow_back, color: sharedPrefs.ownsCurrentPantry("3") ? drawerGreenIcon : drawerGreyIcon),
+                          title: Text('Leave Pantry', style: sharedPrefs.ownsCurrentPantry() ? drawerGreenStyle : drawerGreyStyle),
+                          leading: Icon(Icons.arrow_back, color: sharedPrefs.ownsCurrentPantry() ? drawerGreenIcon : drawerGreyIcon),
                           onTap: () async {
-                            print(sharedPrefs.currentPantry);
-                            Pantry pantry = await _getPantry("", sharedPrefs.currentPantryName, Database.nameQual);
-                            print(pantry.id!);
-                            if (sharedPrefs.ownsCurrentPantry("3") == true) {
+                            if (sharedPrefs.ownsCurrentPantry() == true) {
                               //get 2nd pantry name
                               Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", Database.idQual);
 
                               //set 2nd pantry name
                               pantry2Name = pantry2.name ?? "";
+                              pantry2OwnerId = pantry2.ownerId ?? "";
 
                               leavePantryDialog();
+                            } else {
+                              issueMessage = "You cannot leave a pantry you own.";
+                              issueDialog();
                             }
                           }
                       ),
@@ -226,12 +246,14 @@ class PantryListViewState extends State<PantryListView> {
 
                             //set 2nd pantry name
                             pantry2Name = pantry2.name ?? "";
+                            pantry2OwnerId = pantry2.ownerId ?? "";
 
                             //get 3rd pantry name
                             Pantry pantry3 = await _getPantry(sharedPrefs.pantries[2], "", Database.idQual);
 
                             //set 2nd pantry name
                             pantry3Name = pantry3.name ?? "";
+                            pantry3OwnerId = pantry3.ownerId ?? "";
 
                             switchPantryDialog();
                           }
@@ -247,13 +269,8 @@ class PantryListViewState extends State<PantryListView> {
                       title: Text("$pantryName #$pantryId", style: drawerGreenStyle,),
                       leading: const Icon(Icons.inventory_2_outlined, color: drawerGreenIcon,),
                   )
-
-
                 ),
-
               ])),
-
-
     );
   }
 
@@ -375,6 +392,7 @@ class PantryListViewState extends State<PantryListView> {
                             //add new pantry id and name to local storage
                             sharedPrefs.addNewPantry(newPantry.id!);
                             sharedPrefs.currentPantryName = newPantry.name!;
+                            sharedPrefs.currentPantryOwner = newPantry.ownerId!;
 
                             Navigator.pop(context);
                             Navigator.pop(context);
@@ -500,6 +518,7 @@ class PantryListViewState extends State<PantryListView> {
                               //add pantry id and name to local storage
                               sharedPrefs.addNewPantry(joiningPantry.id!);
                               sharedPrefs.currentPantryName = joiningPantry.name!;
+                              sharedPrefs.currentPantryOwner = joiningPantry.ownerId!;
 
                               Navigator.pop(context);
                               Navigator.pop(context);
@@ -546,7 +565,7 @@ class PantryListViewState extends State<PantryListView> {
               AlertDialog(
                 content:
                 Text(
-                  "Are you sure you want to delete your pantry '$pantryName'?",
+                  "Are you sure you want to delete your pantry '$pantryName'? $userCount users use this pantry.",
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       color: Color(0xff7B7777),
@@ -567,6 +586,7 @@ class PantryListViewState extends State<PantryListView> {
                           //remove it from local storage
                           sharedPrefs.removeCurrentPantry();
                           sharedPrefs.currentPantryName = pantry2Name;
+                          sharedPrefs.currentPantryOwner = pantry2OwnerId;
 
                           Navigator.pop(context);
                           Navigator.pop(context);
@@ -635,6 +655,7 @@ class PantryListViewState extends State<PantryListView> {
                           //remove pantry from local storage
                           sharedPrefs.removeCurrentPantry();
                           sharedPrefs.currentPantryName = pantry2Name;
+                          sharedPrefs.currentPantryOwner = pantry2OwnerId;
 
                           Navigator.pop(context);
                           Navigator.pop(context);
@@ -697,6 +718,7 @@ class PantryListViewState extends State<PantryListView> {
                                 //update current pantry (2 means 2nd pantry was selected as new current)
                                 sharedPrefs.switchCurrentPantry(2);
                                 sharedPrefs.currentPantryName = pantry2Name;
+                                sharedPrefs.currentPantryOwner = pantry2OwnerId;
 
                                 Navigator.pop(context);
                                 Navigator.pop(context);
@@ -736,6 +758,7 @@ class PantryListViewState extends State<PantryListView> {
                                   //update current pantry (3 means 3rd pantry was selected as new current)
                                   sharedPrefs.switchCurrentPantry(3);
                                   sharedPrefs.currentPantryName = pantry3Name;
+                                  sharedPrefs.currentPantryOwner = pantry3OwnerId;
 
                                   Navigator.pop(context);
                                   Navigator.pop(context);
@@ -785,4 +808,45 @@ class PantryListViewState extends State<PantryListView> {
       )
   );
 
+  Future issueDialog() => showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+          builder: (context, setState) =>
+              AlertDialog(
+                content:
+                Text(
+                  issueMessage,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      color: Color(0xff7B7777),
+                      fontWeight: FontWeight.w400
+                  ),
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: const ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
+                        ),
+                        child:
+                        const Text(
+                          "OK",
+                          style: TextStyle(
+                              fontSize: 32,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+      )
+  );
 }

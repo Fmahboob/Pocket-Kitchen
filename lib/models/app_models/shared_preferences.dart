@@ -26,6 +26,13 @@ class SharedPrefs {
     _sharedPrefs!.setString("pantryName", value);
   }
 
+  //currentPantry owner getter
+  String get currentPantryOwner => _sharedPrefs!.getString("pantryOwner") ?? "";
+  //currentPantry owner setter
+  set currentPantryOwner(String value) {
+    _sharedPrefs!.setString("pantryOwner", value);
+  }
+
   //currentPantry getter
   String get currentPantry {
     return _sharedPrefs!.getStringList("pantries")?[0] ?? "";
@@ -85,8 +92,8 @@ class SharedPrefs {
   }
 
   //getter for if user owns current pantry
-  bool ownsCurrentPantry (String ownerId) {
-    if (ownerId == currentPantry) {
+  bool ownsCurrentPantry () {
+    if (currentPantryOwner == currentPantry) {
       return true;
     } else {
       return false;
