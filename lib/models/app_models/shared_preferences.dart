@@ -58,11 +58,11 @@ class SharedPrefs {
     String pantry3 = _sharedPrefs!.getStringList("pantries")?[2] ?? "";
 
     if (value == 2) {
-      _sharedPrefs!.setString("pantries"[1], currentPantry);
-      _sharedPrefs!.setString("pantries"[0], pantry2);
+      List<String> pantries = [pantry2, currentPantry, pantry3];
+      _sharedPrefs!.setStringList("pantries", pantries);
     } else if (value == 3) {
-      _sharedPrefs!.setString("pantries"[2], currentPantry);
-      _sharedPrefs!.setString("pantries"[0], pantry3);
+      List<String> pantries = [pantry3, currentPantry, pantry2];
+      _sharedPrefs!.setStringList("pantries", pantries);
     }
   }
 

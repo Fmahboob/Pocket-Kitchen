@@ -85,7 +85,6 @@ class PantryListViewState extends State<PantryListView> {
           ]
         ),
         body: Column(
-
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget> [
            Padding(
@@ -168,8 +167,14 @@ class PantryListViewState extends State<PantryListView> {
                       ListTile(
                           title: Text('Delete Pantry', style: sharedPrefs.ownsCurrentPantry("3") ? drawerGreyStyle : drawerGreenStyle),
                           leading: Icon(Icons.delete_forever_rounded, color: sharedPrefs.ownsCurrentPantry("3") ? drawerGreyIcon: drawerGreenIcon,),
-                          onTap: () {
+                          onTap: () async {
                             if (sharedPrefs.ownsCurrentPantry("3") == false) {
+                              //get 2nd pantry name
+                              Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", Database.idQual);
+
+                              //set 2nd pantry name
+                              pantry2Name = pantry2.name ?? "";
+
                               deletePantryDialog();
                             }
                           }
@@ -177,8 +182,17 @@ class PantryListViewState extends State<PantryListView> {
                       ListTile(
                           title: Text('Leave Pantry', style: sharedPrefs.ownsCurrentPantry("3") ? drawerGreenStyle : drawerGreyStyle),
                           leading: Icon(Icons.arrow_back, color: sharedPrefs.ownsCurrentPantry("3") ? drawerGreenIcon : drawerGreyIcon),
-                          onTap: () {
+                          onTap: () async {
+                            print(sharedPrefs.currentPantry);
+                            Pantry pantry = await _getPantry("", sharedPrefs.currentPantryName, Database.nameQual);
+                            print(pantry.id!);
                             if (sharedPrefs.ownsCurrentPantry("3") == true) {
+                              //get 2nd pantry name
+                              Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", Database.idQual);
+
+                              //set 2nd pantry name
+                              pantry2Name = pantry2.name ?? "";
+
                               leavePantryDialog();
                             }
                           }
@@ -456,7 +470,7 @@ class PantryListViewState extends State<PantryListView> {
                             if (joiningPantry.name == joinNameController.text) {
 
                               //update user count for pantry
-                              int userCount = (joiningPantry.userCount! as int) + 1;
+                              int userCount = int.parse(joiningPantry.userCount!) + 1;
 
                               //update pantry
                               _updatePantry(joiningPantry.id!, joiningPantry.name!, userCount.toString(), joiningPantry.ownerId!);
@@ -533,6 +547,7 @@ class PantryListViewState extends State<PantryListView> {
 
                           //remove it from local storage
                           sharedPrefs.removeCurrentPantry();
+                          sharedPrefs.currentPantryName = pantry2Name;
 
                           Navigator.pop(context);
                           Navigator.pop(context);
@@ -600,8 +615,8 @@ class PantryListViewState extends State<PantryListView> {
 
                           //remove pantry from local storage
                           sharedPrefs.removeCurrentPantry();
+                          sharedPrefs.currentPantryName = pantry2Name;
 
-                          Navigator.pop(context);
                           Navigator.pop(context);
                           Navigator.pop(context);
 
@@ -648,57 +663,40 @@ class PantryListViewState extends State<PantryListView> {
                   ),
                 ),
                 actions: [
-                  Column(
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Visibility(
-                        visible: sharedPrefs.secondPantryExists,
-                        child:
-                          TextButton(
-                            onPressed: () {
-
-                              //update current pantry (2 means 2nd pantry was selected as new current)
-                              sharedPrefs.switchCurrentPantry(2);
-
-                              //restart app
-                              RestartWidget.restartApp(context);
-                            },
-                            style: const ButtonStyle(
-                              backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
-                            ),
-                            child:
-                            Text(
-                              pantry2Name,
-                              style: const TextStyle(
-                                  fontSize: 32,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w400
-                              ),
-                            ),
-                          ),
-                      ),
-                      Visibility(
-                        visible: sharedPrefs.thirdPantryExists,
-                        child:
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
+                      Column(
+                        children: [
+                          Visibility(
+                            visible: sharedPrefs.secondPantryExists,
                             child:
                             TextButton(
                               onPressed: () {
 
-                                //update current pantry (3 means 3rd pantry was selected as new current)
-                                sharedPrefs.switchCurrentPantry(3);
+                                //update current pantry (2 means 2nd pantry was selected as new current)
+                                sharedPrefs.switchCurrentPantry(2);
+                                sharedPrefs.currentPantryName = pantry2Name;
+
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+
+                                //repush main app
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const TabBarMain()),
+                                );
 
                                 //restart app
-                                RestartWidget.restartApp(context);
+                                //RestartWidget.restartApp(context);
                               },
                               style: const ButtonStyle(
                                 backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
                               ),
                               child:
                               Text(
-                                pantry3Name,
+                                pantry2Name,
                                 style: const TextStyle(
                                     fontSize: 32,
                                     color: Colors.white,
@@ -707,17 +705,59 @@ class PantryListViewState extends State<PantryListView> {
                               ),
                             ),
                           ),
-                      ),
-                      Visibility(
-                        visible: !sharedPrefs.secondPantryExists,
-                        child:
-                        const Text(
-                          "There are no pantries to switch to.",
-                          style: TextStyle(
-                              color: Color(0xff7B7777),
-                              fontWeight: FontWeight.w400
+                          Visibility(
+                            visible: sharedPrefs.thirdPantryExists,
+                            child:
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
+                              child:
+                              TextButton(
+                                onPressed: () {
+
+                                  //update current pantry (3 means 3rd pantry was selected as new current)
+                                  sharedPrefs.switchCurrentPantry(3);
+                                  sharedPrefs.currentPantryName = pantry3Name;
+
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+
+                                  //repush main app
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const TabBarMain()),
+                                  );
+
+                                  //restart app
+                                  //RestartWidget.restartApp(context);
+                                },
+                                style: const ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
+                                ),
+                                child:
+                                Text(
+                                  pantry3Name,
+                                  style: const TextStyle(
+                                      fontSize: 32,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w400
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                          Visibility(
+                            visible: !sharedPrefs.secondPantryExists,
+                            child:
+                            const Text(
+                              "There are no pantries to switch to.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Color(0xff7B7777),
+                                  fontWeight: FontWeight.w400
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
