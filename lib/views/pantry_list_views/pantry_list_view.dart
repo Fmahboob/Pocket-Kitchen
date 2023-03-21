@@ -78,6 +78,7 @@ class PantryListViewState extends State<PantryListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
         appBar: AppBar(
             centerTitle: true,
             backgroundColor: const Color(0xff459657),
@@ -565,7 +566,7 @@ class PantryListViewState extends State<PantryListView> {
               AlertDialog(
                 content:
                 Text(
-                  "Are you sure you want to delete your pantry '$pantryName'? $userCount users use this pantry.",
+                  "Are you sure you want to delete your pantry '$pantryName'? $userCount user(s) use this pantry.",
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       color: Color(0xff7B7777),

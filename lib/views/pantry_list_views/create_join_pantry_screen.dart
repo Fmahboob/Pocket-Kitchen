@@ -49,6 +49,7 @@ class NoPantryViewState extends State<NoPantryView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: const Color(0xff459657),
