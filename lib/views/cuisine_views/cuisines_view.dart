@@ -11,7 +11,7 @@ class CuisinesView extends StatelessWidget {
         appBar: AppBar(
             centerTitle: true,
             backgroundColor: const Color(0xff459657),
-            title: Text(sharedPrefs.currentPantryName),
+            title: const Text("Cuisines"),
         ),
         body: Container(
 
