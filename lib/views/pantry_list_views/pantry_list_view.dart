@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
+import 'package:pocket_kitchen/views/pantry_list_views/create_join_pantry_screen.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_item.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/unavailable_pantry_item.dart';
 import 'package:pocket_kitchen/views/google_sign_in_view.dart';
 
+import '../../main.dart';
 import '../../models/app_models/database.dart';
 import '../../models/app_models/google_sign_in_api.dart';
 import '../../models/data_models/pantry.dart';
@@ -15,6 +17,7 @@ class PantryListView extends StatefulWidget {
   State<StatefulWidget> createState() => PantryListViewState();
 
 }
+
 class PantryListViewState extends State<PantryListView> {
   final TextEditingController createNameController = TextEditingController();
   final TextEditingController joinNameController = TextEditingController();
@@ -22,16 +25,21 @@ class PantryListViewState extends State<PantryListView> {
 
   final _formKey = GlobalKey<FormState>();
 
-  String pantryName = "Robbie's Home";
-  String pantryId = "154";
-  String pantry2Name = "Robbie's Cottage";
-  String pantry3Name = "Sarah's Home";
+  String pantryId = sharedPrefs.currentPantry;
+  String pantryName = sharedPrefs.currentPantryName;
+  String pantry2Name = "";
+  String pantry3Name = "";
 
   static const drawerGreenIcon = Color(0xff459657);
   static const drawerGreyIcon = Color(0xff7B7777);
 
   static const drawerGreenStyle = TextStyle(fontSize: 20, color: Color(0xff459657));
   static const drawerGreyStyle = TextStyle(fontSize: 20, color: Color(0xff7B7777));
+
+  //Non-matching retrieved name to inputted name on pantry joining snackbar
+  final nonMatchSnackBar = const SnackBar(
+    content: Text("The Pantry Name and Number do not match."),
+  );
 
   //Pantry CRUD methods
   _createPantry(String name, String ownerId) {
@@ -46,13 +54,26 @@ class PantryListViewState extends State<PantryListView> {
     Database.updatePantry(id, name, userCount, ownerId);
   }
 
+  _deletePantry(String id) {
+    Database.deletePantry(id);
+  }
+
+  //Pantry_User CRUD methods
+  _createPantryUser(String pantryId, String userId) {
+    Database.createPantryUser(pantryId, userId);
+  }
+
+  _deletePantryUser(String pantryId, String userId) {
+    Database.deletePantryUser(pantryId, userId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
             centerTitle: true,
             backgroundColor: const Color(0xff459657),
-            title: const Text('Pocket Kitchen'),
+            title: Text(sharedPrefs.currentPantryName),
             actions: [
               IconButton(
             onPressed: () {
@@ -61,7 +82,7 @@ class PantryListViewState extends State<PantryListView> {
             icon: const Icon(Icons.exit_to_app_sharp),
             tooltip: 'Sign Out',
           ),
-    ]
+          ]
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -176,8 +197,14 @@ class PantryListViewState extends State<PantryListView> {
                       ListTile(
                           title: Text('Delete Pantry', style: sharedPrefs.ownsCurrentPantry("3") ? drawerGreyStyle : drawerGreenStyle),
                           leading: Icon(Icons.delete_forever_rounded, color: sharedPrefs.ownsCurrentPantry("3") ? drawerGreyIcon: drawerGreenIcon,),
-                          onTap: () {
+                          onTap: () async {
                             if (sharedPrefs.ownsCurrentPantry("3") == false) {
+                              //get 2nd pantry name
+                              Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", Database.idQual);
+
+                              //set 2nd pantry name
+                              pantry2Name = pantry2.name ?? "";
+
                               deletePantryDialog();
                             }
                           }
@@ -185,8 +212,17 @@ class PantryListViewState extends State<PantryListView> {
                       ListTile(
                           title: Text('Leave Pantry', style: sharedPrefs.ownsCurrentPantry("3") ? drawerGreenStyle : drawerGreyStyle),
                           leading: Icon(Icons.arrow_back, color: sharedPrefs.ownsCurrentPantry("3") ? drawerGreenIcon : drawerGreyIcon),
-                          onTap: () {
+                          onTap: () async {
+                            print(sharedPrefs.currentPantry);
+                            Pantry pantry = await _getPantry("", sharedPrefs.currentPantryName, Database.nameQual);
+                            print(pantry.id!);
                             if (sharedPrefs.ownsCurrentPantry("3") == true) {
+                              //get 2nd pantry name
+                              Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", Database.idQual);
+
+                              //set 2nd pantry name
+                              pantry2Name = pantry2.name ?? "";
+
                               leavePantryDialog();
                             }
                           }
@@ -194,7 +230,20 @@ class PantryListViewState extends State<PantryListView> {
                       ListTile(
                           title: const Text('Switch Pantry', style: drawerGreenStyle,),
                           leading: const Icon(Icons.swap_calls, color: drawerGreenIcon,),
-                          onTap: () {
+                          onTap: () async {
+
+                            //get 2nd pantry name
+                            Pantry pantry2 = await _getPantry(sharedPrefs.pantries[1], "", Database.idQual);
+
+                            //set 2nd pantry name
+                            pantry2Name = pantry2.name ?? "";
+
+                            //get 3rd pantry name
+                            Pantry pantry3 = await _getPantry(sharedPrefs.pantries[2], "", Database.idQual);
+
+                            //set 2nd pantry name
+                            pantry3Name = pantry3.name ?? "";
+
                             switchPantryDialog();
                           }
                       )
@@ -242,7 +291,8 @@ class PantryListViewState extends State<PantryListView> {
                           await GoogleSignInAPI.logout();
                           sharedPrefs.userId = "";
                           Navigator.pop(context);
-                          Navigator.pop(context);
+
+                          //load sign in
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => const GoogleSignInView()),
@@ -279,7 +329,6 @@ class PantryListViewState extends State<PantryListView> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: const [
                     Text(
-
                         "Create a Pantry",
                         style: TextStyle(
                             fontSize: 32,
@@ -290,7 +339,6 @@ class PantryListViewState extends State<PantryListView> {
                   ],
                 ),
                 content:
-
                     Form(
                       key: _formKey,
                       child:
@@ -325,17 +373,30 @@ class PantryListViewState extends State<PantryListView> {
                       TextButton(
                         onPressed: () async {
                           if(_formKey.currentState!.validate()) {
-                            
+
                             //create the pantry
                             await _createPantry(createNameController.text, sharedPrefs.userId);
 
                             //get new pantry id
                             Pantry newPantry = await _getPantry("", createNameController.text, Database.nameQual);
 
-                            //add new pantry id to local storage
+                            //create new pantry_user
+                            await _createPantryUser(newPantry.id!, sharedPrefs.userId);
+
+                            //add new pantry id and name to local storage
                             sharedPrefs.addNewPantry(newPantry.id!);
+                            sharedPrefs.currentPantryName = newPantry.name!;
 
                             Navigator.pop(context);
+                            Navigator.pop(context);
+                            //push main app
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const TabBarMain()),
+                            );
+
+                            //reload app
+                            //RestartWidget.restartApp(context);
                           }
 
                         },
@@ -369,7 +430,6 @@ class PantryListViewState extends State<PantryListView> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: const [
                     Text(
-
                         "Join a Pantry",
                         style: TextStyle(
                             fontSize: 32,
@@ -380,8 +440,6 @@ class PantryListViewState extends State<PantryListView> {
                   ],
                 ),
                 content:
-
-
                     Form(
                       key: _formKey,
                       child:
@@ -433,10 +491,43 @@ class PantryListViewState extends State<PantryListView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if(_formKey.currentState!.validate()) {
-                            //join pantry logic
-                            Navigator.pop(context);
+                            //retrieve desired pantry
+                            Pantry joiningPantry = await _getPantry(joinIdController.text, joinNameController.text, Database.idQual);
+
+                            //check that name matches inputted name
+                            if (joiningPantry.name == joinNameController.text) {
+
+                              //update user count for pantry
+                              int userCount = int.parse(joiningPantry.userCount!) + 1;
+
+                              //update pantry
+                              _updatePantry(joiningPantry.id!, joiningPantry.name!, userCount.toString(), joiningPantry.ownerId!);
+
+                              //create new pantry_user
+                              await _createPantryUser(joiningPantry.id!, sharedPrefs.userId);
+
+                              //add pantry id and name to local storage
+                              sharedPrefs.addNewPantry(joiningPantry.id!);
+                              sharedPrefs.currentPantryName = joiningPantry.name!;
+
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              //push main app
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const TabBarMain()),
+                              );
+
+                              //reload app
+                              //RestartWidget.restartApp(context);
+
+                              //if name doesn't match id, inform user with snackbar
+                            } else {
+                              nonMatchSnackBar;
+                              Navigator.pop(context);
+                            }
                           }
                         },
                         style: const ButtonStyle(
@@ -479,14 +570,31 @@ class PantryListViewState extends State<PantryListView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextButton(
-                        onPressed: () {
-    },
+                        onPressed: () async {
+
+                          //delete the pantry
+                          await _deletePantry(sharedPrefs.currentPantry);
+
+                          //remove it from local storage
+                          sharedPrefs.removeCurrentPantry();
+                          sharedPrefs.currentPantryName = pantry2Name;
+
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+
+                          //repush main app
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const TabBarMain()),
+                          );
+                          //restart app
+                          //RestartWidget.restartApp(context);
+                        },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
                         ),
                         child:
                         const Text(
-
                           "Delete",
                           style: TextStyle(
                               fontSize: 32,
@@ -521,9 +629,34 @@ class PantryListViewState extends State<PantryListView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextButton(
-                        onPressed: () {
-                          //leave pantry logic
+                        onPressed: () async {
+
+                          //retrieve pantry's user count
+                          Pantry leavePantry = await _getPantry(sharedPrefs.currentPantry, "", Database.idQual);
+
+                          //update user count
+                          int userCount = (leavePantry.userCount as int) - 1;
+
+                          //update pantry's user count
+                          await _updatePantry(leavePantry.id!, leavePantry.name!, userCount.toString(), leavePantry.ownerId!);
+
+                          //remove Pantry_User
+                          await _deletePantryUser(sharedPrefs.currentPantry, sharedPrefs.userId);
+
+                          //remove pantry from local storage
+                          sharedPrefs.removeCurrentPantry();
+                          sharedPrefs.currentPantryName = pantry2Name;
+
                           Navigator.pop(context);
+                          Navigator.pop(context);
+
+                          //repush main app
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const GoogleSignInView()),
+                          );
+                          //restart app
+                          //RestartWidget.restartApp(context);
                         },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
@@ -552,7 +685,7 @@ class PantryListViewState extends State<PantryListView> {
               AlertDialog(
                 content:
                 Text(
-                  "Switch From '$pantryName', to",
+                  "Switch from '$pantryName', to...",
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       color: Color(0xff7B7777),
@@ -560,49 +693,101 @@ class PantryListViewState extends State<PantryListView> {
                   ),
                 ),
                 actions: [
-                  Column(
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      TextButton(
-                        onPressed: () {
-                          //switch pantry logic
-                          Navigator.pop(context);
-                        },
-                        style: const ButtonStyle(
-                          backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
-                        ),
-                        child:
-                        Text(
-                          pantry2Name,
-                          style: const TextStyle(
-                              fontSize: 32,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w400
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
-                        child:
-                        TextButton(
-                          onPressed: () {
-                            //switch pantry logic
-                            Navigator.pop(context);
-                          },
-                          style: const ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
-                          ),
-                          child:
-                          Text(
-                            pantry3Name,
-                            style: const TextStyle(
-                                fontSize: 32,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w400
+                      Column(
+                        children: [
+                          Visibility(
+                            visible: sharedPrefs.secondPantryExists,
+                            child:
+                            TextButton(
+                              onPressed: () {
+
+                                //update current pantry (2 means 2nd pantry was selected as new current)
+                                sharedPrefs.switchCurrentPantry(2);
+                                sharedPrefs.currentPantryName = pantry2Name;
+
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+
+                                //repush main app
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const TabBarMain()),
+                                );
+
+                                //restart app
+                                //RestartWidget.restartApp(context);
+                              },
+                              style: const ButtonStyle(
+                                backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
+                              ),
+                              child:
+                              Text(
+                                pantry2Name,
+                                style: const TextStyle(
+                                    fontSize: 32,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w400
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          Visibility(
+                            visible: sharedPrefs.thirdPantryExists,
+                            child:
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
+                              child:
+                              TextButton(
+                                onPressed: () {
+
+                                  //update current pantry (3 means 3rd pantry was selected as new current)
+                                  sharedPrefs.switchCurrentPantry(3);
+                                  sharedPrefs.currentPantryName = pantry3Name;
+
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+
+                                  //repush main app
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const TabBarMain()),
+                                  );
+
+                                  //restart app
+                                  //RestartWidget.restartApp(context);
+                                },
+                                style: const ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
+                                ),
+                                child:
+                                Text(
+                                  pantry3Name,
+                                  style: const TextStyle(
+                                      fontSize: 32,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w400
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Visibility(
+                            visible: !sharedPrefs.secondPantryExists,
+                            child:
+                            const Text(
+                              "There are no pantries to switch to.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Color(0xff7B7777),
+                                  fontWeight: FontWeight.w400
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

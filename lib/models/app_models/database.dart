@@ -518,15 +518,15 @@ class Database {
     }
   }
   //Delete pantry_user
-  static Future<void> deletePantryUser(String id) async {
+  static Future<void> deletePantryUser(String userId, String pantryId) async {
     try {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$deleteAction";
       bodyMap["table"] = "$userTable";
       bodyMap["qualifier"] = "";
-      bodyMap["pantry_user_id"] = "$id";
-      bodyMap["pantry_id"] = "";
-      bodyMap["user_id"] = "";
+      bodyMap["pantry_user_id"] = "";
+      bodyMap["pantry_id"] = "$pantryId";
+      bodyMap["user_id"] = "$userId";
 
       final response = await post(root, body: bodyMap);
 

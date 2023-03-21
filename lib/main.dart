@@ -3,16 +3,53 @@ import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
 import 'package:pocket_kitchen/views/cuisine_views/cuisines_view.dart';
 import 'package:pocket_kitchen/views/google_sign_in_view.dart';
 import 'package:pocket_kitchen/views/grocery_list_views/grocery_list_view.dart';
+import 'package:pocket_kitchen/views/pantry_list_views/create_join_pantry_screen.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_view.dart';
 
+//main app run
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await sharedPrefs.init();
   runApp(
-    const PocketKitchen(),
+    const RestartWidget(
+        child: PocketKitchen()
+    )
   );
 }
 
+//wrapping widget to allow state restarting
+class RestartWidget extends StatefulWidget {
+  const RestartWidget({super.key, required this.child});
+
+  final Widget child;
+
+  static void restartApp(BuildContext context) {
+    context.findAncestorStateOfType<_RestartWidgetState>()?.restartApp();
+  }
+
+  @override
+  _RestartWidgetState createState() => _RestartWidgetState();
+}
+
+class _RestartWidgetState extends State<RestartWidget> {
+  Key key = UniqueKey();
+
+  void restartApp() {
+    setState(() {
+      key = UniqueKey();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return KeyedSubtree(
+      key: key,
+      child: widget.child,
+    );
+  }
+}
+
+//main app load up webbing logic
 class PocketKitchen extends StatelessWidget {
   const PocketKitchen({super.key});
 
@@ -24,6 +61,7 @@ class PocketKitchen extends StatelessWidget {
   }
 }
 
+//main app
 class TabBarMain extends StatelessWidget {
   const TabBarMain({super.key});
 
@@ -31,7 +69,7 @@ class TabBarMain extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: DefaultTabController(
+      home: !sharedPrefs.hasPantries ? const NoPantryView() : DefaultTabController(
           length: 3,
           child: Scaffold(
               bottomNavigationBar: tabBarMenu(),
@@ -48,6 +86,7 @@ class TabBarMain extends StatelessWidget {
   }
 }
 
+//app tab bar
 Widget tabBarMenu() {
   return const TabBar(
     unselectedLabelColor: Color(0xff7B7777),
