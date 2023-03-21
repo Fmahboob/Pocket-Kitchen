@@ -94,27 +94,17 @@ class PantryListViewState extends State<PantryListView> {
                      Padding(
                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                        child: TextField(
-                         onChanged: (value){
-
+                         enabled: true,
+                         onChanged: (String input) {
+                           //searchTerm = input;
                          },
-                         controller: TextEditingController(),
-
                          decoration: const InputDecoration(
-                           filled: true,
-                             fillColor: Colors.white,
-                             hintText: "Search",
-                             prefixIcon: Icon(Icons.search, color: Colors.black38,),
-                             enabledBorder: OutlineInputBorder(
-                               borderSide: BorderSide(
-                                 width: 1.0,
-                                 color: Colors.grey,
-                               ),
+                             border: OutlineInputBorder(
+                                 borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
                              ),
-
-                           focusedBorder: OutlineInputBorder(
-                             borderSide: BorderSide(width: 2.0, color: Colors.black38,)
-                           )
-
+                             hintText: "Search",
+                             contentPadding: EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
+                             prefixIcon: Icon(Icons.search)
                          ),
                        ),
                      ),
