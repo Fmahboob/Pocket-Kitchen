@@ -63,61 +63,90 @@ class PantryListViewState extends State<PantryListView> {
           ),
     ]
         ),
-        body: Column(
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
 
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget> [
-           Padding(
-             padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-             child: TextField(
-               onChanged: (value){
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget> [
+                     Padding(
+                       padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                       child: TextField(
+                         onChanged: (value){
 
-               },
-               controller: TextEditingController(),
+                         },
+                         controller: TextEditingController(),
 
-               decoration: const InputDecoration(
-                 filled: true,
-                   fillColor: Colors.white,
-                   hintText: "Search",
-                   prefixIcon: Icon(Icons.search, color: Colors.black38,),
-                   enabledBorder: OutlineInputBorder(
-                     borderSide: BorderSide(
-                       width: 1.0,
-                       color: Colors.grey,
+                         decoration: const InputDecoration(
+                           filled: true,
+                             fillColor: Colors.white,
+                             hintText: "Search",
+                             prefixIcon: Icon(Icons.search, color: Colors.black38,),
+                             enabledBorder: OutlineInputBorder(
+                               borderSide: BorderSide(
+                                 width: 1.0,
+                                 color: Colors.grey,
+                               ),
+                             ),
+
+                           focusedBorder: OutlineInputBorder(
+                             borderSide: BorderSide(width: 2.0, color: Colors.black38,)
+                           )
+
+                         ),
+                       ),
                      ),
-                   ),
 
-                 focusedBorder: OutlineInputBorder(
-                   borderSide: BorderSide(width: 2.0, color: Colors.black38,)
-                 )
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 0.0),
+                        child: Text("Available", style: TextStyle(
+                            fontSize: 17,
+                            color: Color(0xff459657),
+                            fontWeight: FontWeight.w600
+                        ),),
+                      ),
 
-               ),
-             ),
-           ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-              child: Text("Available", style: TextStyle(fontSize: 15, color: Color(0xff459657)),),
-            ),
-            Expanded(child: ListView.builder(itemBuilder: (context, index){
-              return PantryListItem(onLongPress: () {
+                         ListView.builder(
+                           shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index){
+                          return PantryListItem(onLongPress: () {
 
-              });
-            }
-            )
-            ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-              child: Text("Unavailable", style: TextStyle(fontSize: 15, color: Color(0xff9E4848)),),
-            ),
-            
-            Expanded(child: ListView.builder(itemBuilder: (context, index){
-              return const UnavailablePantryItem();
-            }
-            )
-            )
+                          });
+                        },
+                           itemCount: 10,
+                        ),
 
-          ],
+
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 0.0),
+                        child: Text("Unavailable", style: TextStyle(
+                            fontSize: 17,
+                            color: Color(0xff9E4848),
+                            fontWeight: FontWeight.w600
+                        ),),
+                      ),
+
+                       ListView.builder(
+                           shrinkWrap: true,
+                           physics: const NeverScrollableScrollPhysics(),
+                           itemBuilder: (context, index){
+                          return const UnavailablePantryItem();
+                        },
+                         itemCount: 10,
+                        ),
+
+
+
+                    ],
+                  ),
+          ),
         ),
+
+
+
+
 
         drawer: Drawer(
             elevation: 1.5,
