@@ -1,6 +1,9 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
 import 'package:pocket_kitchen/models/go_upc_models/go_upc_item.dart';
+import '../../main.dart';
 import '../../models/data_models/food.dart';
 import '../../models/data_models/pantry_food.dart';
 import 'grocery_list_listview.dart';
@@ -16,7 +19,7 @@ class GroceryListView extends StatefulWidget {
   GroceryListViewState createState() => GroceryListViewState();
 }
 class GroceryListViewState extends State<GroceryListView> {
-  List<PantryFood> groceryList = [PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1")];
+  List<PantryFood> groceryList = [];
   List<Food> allFoods = [];
   late GoUPCItem scannedItem;
 
@@ -65,42 +68,34 @@ class GroceryListViewState extends State<GroceryListView> {
       scannedItem = GoUPCItem.fromJson(jsonDecode(response.body));
 
       //query for food with same barcode to check if it already exists in the food table
-      Food checkFood = _getFood(barcodeNo, "", "", Database.barcodeQual) as Food;
+      Food checkFood = await _getFood(barcodeNo, "", "", Database.barcodeQual);
 
       //if the barcode does match and the food already exists
       if (checkFood.barcode == barcodeNo) {
 
         //query for pantry food with the same barcode to check if it already exists in the pantry food table
-        PantryFood checkPantryFood = _getPantryFood(checkFood.id!);
+        PantryFood checkPantryFood = await _getPantryFood(checkFood.id!);
 
         //if the barcode matches and its pantry id is the user's current pantry id, then it exists
-        if (checkPantryFood.foodId == checkFood.id /*&& checkPantryFood.pantryId == pantryId*/) {
+        if (checkPantryFood.foodId == checkFood.id && checkPantryFood.pantryId == sharedPrefs.currentPantry) {
 
           //Therefore, the user is refilling the item's stock. Update the amount to full (equal to it's food's weight)
-          _updatePantryFood(checkPantryFood.id!, checkFood.weight!, checkPantryFood.pantryId!, checkPantryFood.foodId!);
+          await _updatePantryFood(checkPantryFood.id!, checkFood.weight!, checkPantryFood.pantryId!, checkPantryFood.foodId!);
 
         //if the food doesn't exist in the user's pantry foods, create it
         } else {
-          //_createPantryFood(scannedItem.product!.specs!["Liquid Volume"]!, pantryId, checkFood.id!);
+          await _createPantryFood(scannedItem.product!.specs!["Liquid Volume"]!, sharedPrefs.currentPantry, checkFood.id!);
         }
 
       //if the barcode doesn't match and the food isn't in the food's table, create a food and pantry food of it
       } else {
-        _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl!, scannedItem.product!.category!, scannedItem.product!.description!, scannedItem.product!.specs!["Liquid Volume"]!, false, barcodeNo);
-        Food inputtedFood = _getFood(barcodeNo, "", "", Database.barcodeQual) as Food;
-        //_createPantryFood(scannedItem.product!.specs!["Liquid Volume"]!, pantryId, inputtedFood.id!);
+        await _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl!, scannedItem.product!.category!, scannedItem.product!.description!, scannedItem.product!.specs!["Liquid Volume"]!, false, barcodeNo);
+        Food inputtedFood = await _getFood(barcodeNo, "", "", Database.barcodeQual);
+        await _createPantryFood(scannedItem.product!.specs!["Liquid Volume"]!, sharedPrefs.currentPantry, inputtedFood.id!);
       }
     }
   }
-/*
-  _getAllUsers() {
-    Database.getAllUsers().then((users){
-      setState(() {
-        usersList = users;
-      });
-    });
-  }
-*/
+
   @override
   Widget build(BuildContext context) =>
     Scaffold(
@@ -238,10 +233,21 @@ class GroceryListViewState extends State<GroceryListView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextButton(
-                    onPressed: () {
-                      _createFood(nameController.text, "", "", "", amountController.text, isChecked, "");
-                      //_createPantryFood(amountController.text, /*pantryId,*/ foodId);
+                    onPressed: () async {
+                      //create food
+                      await _createFood(nameController.text, "", "", "", amountController.text, isChecked, "");
+                      //get food for id
+                      Food food = await _getFood("", nameController.text, "", Database.nameQual);
+                      //create pantry food
+                      await _createPantryFood(amountController.text, sharedPrefs.currentPantry, food.id!);
+
                       Navigator.pop(context);
+                      Navigator.pop(context);
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const TabBarMain()),
+                      );
                     },
                     style: const ButtonStyle(
                       backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),

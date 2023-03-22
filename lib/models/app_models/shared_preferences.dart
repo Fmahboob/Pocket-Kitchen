@@ -1,4 +1,5 @@
 import 'package:pocket_kitchen/models/app_models/database.dart';
+import 'package:pocket_kitchen/models/data_models/pantry_food.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data_models/pantry.dart';
@@ -12,19 +13,41 @@ class SharedPrefs {
     }
   }
 
+
+  //set current pantry foods
+  setPantryFoods(String pantryId) async {
+    //get all pantry foods for the user's current pantry
+    List<PantryFood> pantryFoods = await Database.getAllPantryFoods(sharedPrefs.currentPantry);
+    List<String> pantryFoodIds = [];
+    //loop through the pantry foods to extract ids
+    pantryFoods.forEach((PantryFood pantryFood) {
+      pantryFoodIds.add(pantryFood.id!);
+    });
+    //save the ids to local storage
+    _sharedPrefs!.setStringList("pantryFoods", pantryFoodIds);
+  }
+
+  //get current pantry foods
+  List<String> get pantryFoods => _sharedPrefs!.getStringList("pantryFoods") ?? [];
+
+
   //userId getter
   String get userId => _sharedPrefs!.getString("userId") ?? "";
+
   //userId setter
   set userId(String value) {
     _sharedPrefs!.setString("userId", value);
   }
 
+
   //currentPantry name getter
   String get currentPantryName => _sharedPrefs!.getString("pantryName") ?? "";
+
   //currentPantry name setter
   set currentPantryName(String value) {
     _sharedPrefs!.setString("pantryName", value);
   }
+
 
   //currentPantry owner getter
   String get currentPantryOwner => _sharedPrefs!.getString("pantryOwner") ?? "";
@@ -33,13 +56,16 @@ class SharedPrefs {
     _sharedPrefs!.setString("pantryOwner", value);
   }
 
+
   //currentPantry getter
   String get currentPantry {
     return _sharedPrefs!.getStringList("pantries")?[0] ?? "";
   }
 
+
   //all pantries getter
   List<String> get pantries => _sharedPrefs!.getStringList("pantries") ?? [];
+
 
   //new pantry setter
   addNewPantry(String value) {
@@ -50,6 +76,7 @@ class SharedPrefs {
 
     _sharedPrefs!.setStringList("pantries", pantries);
   }
+
   //pantry remover
   removeCurrentPantry() {
     String pantry2 = _sharedPrefs!.getStringList("pantries")?[1] ?? "";
@@ -59,6 +86,7 @@ class SharedPrefs {
 
     _sharedPrefs!.setStringList("pantries", pantries);
   }
+
   //pantry switch
   switchCurrentPantry(int value) {
     String pantry2 = _sharedPrefs!.getStringList("pantries")?[1] ?? "";
@@ -73,6 +101,7 @@ class SharedPrefs {
     }
   }
 
+
   //getter for if user is signed in
   bool get signedIn {
     if (userId == "") {
@@ -81,6 +110,7 @@ class SharedPrefs {
       return true;
     }
   }
+
 
   //getter for if the user has any pantries currently
   bool get hasPantries {
@@ -91,6 +121,7 @@ class SharedPrefs {
     }
   }
 
+
   //getter for if user owns current pantry
   bool ownsCurrentPantry () {
     if (currentPantryOwner == currentPantry) {
@@ -99,6 +130,7 @@ class SharedPrefs {
       return false;
     }
   }
+
 
   //getter for if second pantry exists
   bool get secondPantryExists {

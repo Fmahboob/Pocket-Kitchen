@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:http/http.dart';
 import 'package:pocket_kitchen/models/data_models/pantry_food.dart';
 import '../data_models/food.dart';
@@ -45,12 +46,12 @@ class Database {
       final response = await post(root, body: bodyMap);
 
       if (200 == response.statusCode) {
-        print("Response 200 = Good");
+        print("Created user.");
       } else {
-        print("Not a 200 response, but a response.");
+        print("Couldn't create user.");
       }
     } catch (e) {
-      print("Post failed.");
+      print("Create user failed.");
     }
   }
 
@@ -69,12 +70,12 @@ class Database {
       if (response.statusCode == 200) {
         print(response.body);
         userList = parseUsersToList(response.body);
-        print("Successful");
+        print("Got all users.");
         print(userList.length);
         return userList;
       }
     } catch (e) {
-      print("Unsuccessful");
+      print("Couldn't get all users.");
       return [];
     }
     return [];
@@ -94,11 +95,11 @@ class Database {
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
         user = parseUsersToList(response.body)[0];
-        print("Successful");
+        print("Got the user");
         return user;
       }
     } catch (e) {
-     print("Unsuccessful");
+     print("Couldn't get the user");
      return user;
     }
     return user;
@@ -117,12 +118,12 @@ class Database {
       final response = await post(root, body: bodyMap);
 
       if (200 == response.statusCode) {
-        print("Response 200 = Good");
+        print("Updated user.");
       } else {
-        print("Not a 200 response, but a response.");
+        print("Couldn't update user.");
       }
     } catch (e) {
-      print("Post failed.");
+      print("Update user failed.");
     }
   }
   //Delete user
@@ -138,12 +139,12 @@ class Database {
       final response = await post(root, body: bodyMap);
 
       if (200 == response.statusCode) {
-        print("Response 200 = Good");
+        print("User deleted.");
       } else {
-        print("Not a 200 response, but a response.");
+        print("User couldn't be deleted.");
       }
     } catch (e) {
-      print("Post failed.");
+      print("Failed deleting user.");
     }
   }
 
@@ -163,12 +164,12 @@ class Database {
       final response = await post(root, body: bodyMap);
 
       if (200 == response.statusCode) {
-        print("Response 200 = Good");
+        print("Pantry created.");
       } else {
-        print("Not a 200 response, but a response.");
+        print("Pantry couldn't be created.");
       }
     } catch (e) {
-      print("Post failed.");
+      print("Failed creating pantry.");
     }
   }
 
@@ -189,12 +190,12 @@ class Database {
       if (response.statusCode == 200) {
         print(response.body);
         pantryList = parsePantriesToList(response.body);
-        print("Successful");
+        print("Got all pantries.");
         print(pantryList.length);
         return pantryList;
       }
     } catch (e) {
-      print("Unsuccessful");
+      print("Couldn't get all pantries.");
       return [];
     }
     return [];
@@ -216,11 +217,11 @@ class Database {
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
         pantry = parsePantriesToList(response.body)[0];
-        print("Successful");
+        print("Got the pantry.");
         return pantry;
       }
     } catch (e) {
-     print("Unsuccessful");
+     print("Couldn't get the pantry");
      return pantry;
     }
     return pantry;
@@ -241,12 +242,12 @@ class Database {
       final response = await post(root, body: bodyMap);
 
       if (200 == response.statusCode) {
-        print("Response 200 = Good");
+        print("Updated pantry.");
       } else {
-        print("Not a 200 response, but a response.");
+        print("Couldn't update pantry.");
       }
     } catch (e) {
-      print("Post failed.");
+      print("Failed updating pantry.");
     }
   }
   //Delete pantry
@@ -264,12 +265,12 @@ class Database {
       final response = await post(root, body: bodyMap);
 
       if (200 == response.statusCode) {
-        print("Response 200 = Good");
+        print("Deleted pantry.");
       } else {
-        print("Not a 200 response, but a response.");
+        print("Couldn't delete pantry.");
       }
     } catch (e) {
-      print("Post failed.");
+      print("Failed deleting pantry.");
     }
   }
 
@@ -293,12 +294,12 @@ class Database {
       final response = await post(root, body: bodyMap);
 
       if (200 == response.statusCode) {
-        print("Response 200 = Good");
+        print("Created food.");
       } else {
-        print("Not a 200 response, but a response.");
+        print("Couldn't create food.");
       }
     } catch (e) {
-      print("Post failed.");
+      print("Failed creating food.");
     }
   }
 
@@ -323,12 +324,12 @@ class Database {
       if (response.statusCode == 200) {
         print(response.body);
         foodList = parseFoodsToList(response.body);
-        print("Successful");
+        print("Got all foods.");
         print(foodList.length);
         return foodList;
       }
     } catch (e) {
-      print("Unsuccessful");
+      print("Couldn't get all foods.");
       return [];
     }
     return [];
@@ -340,7 +341,7 @@ class Database {
     try {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readOneAction";
-      bodyMap["table"] = "$pantryTable";
+      bodyMap["table"] = "$foodTable";
       bodyMap["qualifier"] = "$qualifier";
       bodyMap["food_id"] = "$id";
       bodyMap["name"] = "$name";
@@ -352,13 +353,14 @@ class Database {
       bodyMap["barcode"] = "$barcode";
 
       final response = await post(root, body: bodyMap);
+      print(response.body);
       if (response.statusCode == 200) {
         food = parseFoodsToList(response.body)[0];
-        print("Successful");
+        print("Got the food.");
         return food;
       }
     } catch (e) {
-     print("Unsuccessful");
+     print("Couldn't get the food.");
      return food;
     }
     return food;
@@ -383,12 +385,12 @@ class Database {
       final response = await post(root, body: bodyMap);
 
       if (200 == response.statusCode) {
-        print("Response 200 = Good");
+        print("Updated food.");
       } else {
-        print("Not a 200 response, but a response.");
+        print("Couldn't update food.");
       }
     } catch (e) {
-      print("Post failed.");
+      print("Failed updating food.");
     }
   }
 
@@ -411,12 +413,12 @@ class Database {
       final response = await post(root, body: bodyMap);
 
       if (200 == response.statusCode) {
-        print("Response 200 = Good");
+        print("Deleted food.");
       } else {
-        print("Not a 200 response, but a response.");
+        print("Couldn't delete food.");
       }
     } catch (e) {
-      print("Post failed.");
+      print("Failed eleting food.");
     }
   }
 
@@ -435,12 +437,12 @@ class Database {
       final response = await post(root, body: bodyMap);
 
       if (200 == response.statusCode) {
-        print("Response 200 = Good");
+        print("Created pantry user.");
       } else {
-        print("Not a 200 response, but a response.");
+        print("Couldn't create pantry user.");
       }
     } catch (e) {
-      print("Post failed.");
+      print("Failed creating pantry user.");
     }
   }
 
@@ -460,12 +462,12 @@ class Database {
       if (response.statusCode == 200) {
         print(response.body);
         pantryUserList = parsePantryUsersToList(response.body);
-        print("Successful");
+        print("Got all pantry users.");
         print(pantryUserList.length);
         return pantryUserList;
       }
     } catch (e) {
-      print("Unsuccessful");
+      print("Couldn't get all pantry users.");
       return [];
     }
       return [];
@@ -486,11 +488,11 @@ class Database {
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
         pantryUser = parsePantryUsersToList(response.body)[0];
-        print("Successful");
+        print("Got pantry user.");
         return pantryUser;
       }
     } catch (e) {
-      print("Unsuccessful");
+      print("Couldn't get pantry user.");
      return pantryUser;
     }
     return pantryUser;
@@ -510,12 +512,12 @@ class Database {
       final response = await post(root, body: bodyMap);
 
       if (200 == response.statusCode) {
-        print("Response 200 = Good");
+        print("Updated pantry.");
       } else {
-        print("Not a 200 response, but a response.");
+        print("Couldn't update pantry user.");
       }
     } catch (e) {
-    print("Post failed.");
+    print("Failed updating pantry user.");
     }
   }
   //Delete pantry_user
@@ -532,12 +534,12 @@ class Database {
       final response = await post(root, body: bodyMap);
 
       if (200 == response.statusCode) {
-        print("Response 200 = Good");
+        print("Deleted pantry user.");
       } else {
-        print("Not a 200 response, but a response.");
+        print("Couldn't delete pantry user.");
       }
     } catch (e) {
-    print("Post failed.");
+    print("Failed deleting pantry user.");
     }
   }
 
@@ -557,17 +559,17 @@ class Database {
       final response = await post(root, body: bodyMap);
 
       if (200 == response.statusCode) {
-        print("Response 200 = Good");
+        print("Created pantry food.");
       } else {
-        print("Not a 200 response, but a response.");
+        print("Couldn't create pantry food.");
       }
     } catch (e) {
-      print("Post failed.");
+      print("Failed creating pantry food.");
     }
   }
 
   //Get all pantry_foods
-  static Future<List<PantryFood>> getAllPantryFoods() async {
+  static Future<List<PantryFood>> getAllPantryFoods(String pantryId) async {
     List<PantryFood> pantryFoodList;
     try {
       var bodyMap = <String, dynamic>{};
@@ -576,19 +578,17 @@ class Database {
       bodyMap["qualifier"] = "";
       bodyMap["pantry_food_id"] = "";
       bodyMap["amount"] = "";
-      bodyMap["pantry_id"] = "";
+      bodyMap["pantry_id"] = "$pantryId";
       bodyMap["food_id"] = "";
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
-        print(response.body);
         pantryFoodList = parsePantryFoodsToList(response.body);
-        print("Successful");
-        print(pantryFoodList.length);
+        print("Got all pantry foods.");
         return pantryFoodList;
       }
     } catch (e) {
-      print("Unsuccessful");
+      print("Couldn't get all pantry foods.");
     return [];
     }
     return [];
@@ -610,11 +610,11 @@ class Database {
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
         pantryFood = parsePantryFoodsToList(response.body)[0];
-        print("Successful");
+        print("Got pantry food.");
         return pantryFood;
       }
     } catch (e) {
-      print("Unsuccessful");
+      print("Couldn't get pantry food.");
     return pantryFood;
     }
     return pantryFood;
@@ -635,12 +635,12 @@ class Database {
       final response = await post(root, body: bodyMap);
 
       if (200 == response.statusCode) {
-        print("Response 200 = Good");
+        print("Updated pantry food.");
       } else {
-        print("Not a 200 response, but a response.");
+        print("Couldn't update pantry food.");
       }
     } catch (e) {
-      print("Post failed.");
+      print("Failed updating pantry food.");
     }
   }
   //Delete pantry_food
@@ -658,12 +658,12 @@ class Database {
       final response = await post(root, body: bodyMap);
 
       if (200 == response.statusCode) {
-        print("Response 200 = Good");
+        print("Deleted pantry food.");
       } else {
-        print("Not a 200 response, but a response.");
+        print("Couldn't delete pantry food.");
       }
     } catch (e) {
-      print("Post failed.");
+      print("Failed deleting pantry food.");
     }
   }
 

@@ -10,15 +10,23 @@ import '../../models/app_models/database.dart';
 import '../../models/app_models/google_sign_in_api.dart';
 import '../../models/data_models/pantry.dart';
 
+abstract class MyState<T extends StatefulWidget> extends State {
+  @override
+  void initState() {
+    sharedPrefs.setPantryFoods(sharedPrefs.currentPantry);
+    print(sharedPrefs.pantryFoods);
+    super.initState();
+  }
+}
+
 class PantryListView extends StatefulWidget {
   const PantryListView({super.key});
 
   @override
   State<StatefulWidget> createState() => PantryListViewState();
-
 }
 
-class PantryListViewState extends State<PantryListView> {
+class PantryListViewState extends MyState<PantryListView> {
   final TextEditingController createNameController = TextEditingController();
   final TextEditingController joinNameController = TextEditingController();
   final TextEditingController joinIdController = TextEditingController();
