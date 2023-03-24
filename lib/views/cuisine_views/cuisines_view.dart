@@ -39,13 +39,15 @@ class CuisinesViewState extends State<CuisinesView> {
             ),
           ),
 
-             ListView.builder(
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-               return cuisinesListItem(index);
+             Expanded(
+               child: ListView.builder(
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                 return cuisinesListItem(index);
     },
 
             ),
+             ),
         ],
       ),
     );
