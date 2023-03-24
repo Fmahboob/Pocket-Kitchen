@@ -52,6 +52,23 @@ class GroceryListViewState extends State<GroceryListView> {
     Database.getPantryFood(foodId);
   }
 
+  bool isNumeric(String s) {
+    try {
+      int.parse(s);
+      return true;
+    } catch(e) {
+      return false;
+    }
+  }
+
+  bool isPeriod(String s) {
+    if (s == ".") {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Future _scan() async {
     //scans barcode and returns the barcode number
     //await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
@@ -65,10 +82,117 @@ class GroceryListViewState extends State<GroceryListView> {
     if (response.statusCode == 200) {
       //store returned item values
       scannedItem = GoUPCItem.fromJson(jsonDecode(response.body));
-      print(response.body);
-      print(scannedItem);
-    }
-/*
+
+      var amountStr = "";
+      var amount = "";
+      var amountCharLength = 0;
+
+      //get amount out of name string
+      //loop over product.name string
+      scannedItem.product!.name!.runes.forEach((int rune) {
+        //add each character to temp var amountStr
+        amountStr = amountStr + String.fromCharCode(rune).toLowerCase();
+        //check that amountStr ends with kg (ready to retrieve measurement)
+        if (amountStr.endsWith("kg")) {
+          //cut off string besides last 8 characters (8 characters is the maximum, for a 5 digit weight that has a space between kg ex. 23.45 KG)
+          amountStr = amountStr.substring(amountStr.length - 8);
+          //check if string has space between measurement and 'kg' or not
+          if (amountStr[amountStr.length - 3] == " ") {
+            //checks that the current character is a number or decimal (when it isn't, we have our string)
+            if (isNumeric(amountStr[amountStr.length - 4]) || isPeriod(amountStr[amountStr.length - 4])) {
+              //checks that the current character is a number or decimal (when it isn't, we have our string)
+              if (isNumeric(amountStr[amountStr.length - 5]) || isPeriod(amountStr[amountStr.length - 5])) {
+                //checks that the current character is a number or decimal (when it isn't, we have our string)
+                if (isNumeric(amountStr[amountStr.length - 6]) || isPeriod(amountStr[amountStr.length - 6])) {
+                  //checks that the current character is a number or decimal (when it isn't, we have our string)
+                  if (isNumeric(amountStr[amountStr.length - 7]) || isPeriod(amountStr[amountStr.length - 7])) {
+                    //checks that the current character is a number or decimal (when it isn't, we have our string)
+                    if (isNumeric(amountStr[amountStr.length - 8])) {
+                      //cuts off 'kg'
+                      amountStr = amountStr.substring(0, 5);
+                      //sets expected length of amount for substring
+                      amountCharLength = 5;
+                    } else {
+                      //cuts off 'kg'
+                      amountStr = amountStr.substring(1, 5);
+                      //sets expected length of amount for substring
+                      amountCharLength = 4;
+                    }
+                  } else {
+                    //cuts off 'kg'
+                    amountStr = amountStr.substring(2, 5);
+                    //sets expected length of amount for substring
+                    amountCharLength = 3;
+                  }
+                } else {
+                  //cuts off 'kg'
+                  amountStr = amountStr.substring(3, 5);
+                  //sets expected length of amount for substring
+                  amountCharLength = 2;
+                }
+              } else {
+                //cuts off 'kg'
+                amountStr = amountStr.substring(4, 5);
+                //sets expected length of amount for substring
+                amountCharLength = 1;
+              }
+            }
+          //if there isn't a space between measurement and 'kg'
+          } else {
+            //checks that the current character is a number or decimal (when it isn't, we have our string)
+            if (isNumeric(amountStr[amountStr.length - 3]) || isPeriod(amountStr[amountStr.length - 3])) {
+              //checks that the current character is a number or decimal (when it isn't, we have our string)
+              if (isNumeric(amountStr[amountStr.length - 4]) || isPeriod(amountStr[amountStr.length - 4])) {
+                //checks that the current character is a number or decimal (when it isn't, we have our string)
+                if (isNumeric(amountStr[amountStr.length - 5]) || isPeriod(amountStr[amountStr.length - 5])) {
+                  //checks that the current character is a number or decimal (when it isn't, we have our string)
+                  if (isNumeric(amountStr[amountStr.length - 6]) || isPeriod(amountStr[amountStr.length - 6])) {
+                    //checks that the current character is a number or decimal (when it isn't, we have our string)
+                    if (isNumeric(amountStr[amountStr.length - 7])) {
+                      //cuts off 'kg'
+                      amountStr = amountStr.substring(1, 6);
+                      //sets expected length of amount for substring
+                      amountCharLength = 5;
+                    } else {
+                      //cuts off 'kg'
+                      amountStr = amountStr.substring(2, 6);
+                      //sets expected length of amount for substring
+                      amountCharLength = 4;
+                    }
+                  } else {
+                    //cuts off 'kg'
+                    amountStr = amountStr.substring(3, 6);
+                    //sets expected length of amount for substring
+                    amountCharLength = 3;
+                  }
+                } else {
+                  //cuts off 'kg'
+                  amountStr = amountStr.substring(4, 6);
+                  //sets expected length of amount for substring
+                  amountCharLength = 2;
+                }
+              } else {
+                //cuts off 'kg'
+                amountStr = amountStr.substring(5, 6);
+                //sets expected length of amount for substring
+                amountCharLength = 1;
+              }
+            }
+          }
+        }
+      });
+
+      //sub string the temp var from the first index to the length it should be (amountCharLength)
+      amount = amountStr.substring(0, amountCharLength);
+      print(amount);
+      /*
+      //loop temp var amountStr to remove excess characters from the end (last loop is unbreakable, therefore ending of string isn't normalized)
+      amountStr.runes.forEach((int rune) {
+        if (isNumeric(String.fromCharCode(rune)) || isPeriod(String.fromCharCode(rune))) {
+          amount = amount + String.fromCharCode(rune);
+        }
+      });
+
       //query for food with same barcode to check if it already exists in the food table
       Food checkFood = await _getFood(barcodeNo, "", "", Database.barcodeQual);
 
@@ -92,7 +216,7 @@ class GroceryListViewState extends State<GroceryListView> {
         } else {
 
           //create pantry food
-          await _createPantryFood(scannedItem.product!.specs!["Liquid Volume"]!, sharedPrefs.currentPantry, checkFood.id!);
+          await _createPantryFood("1", sharedPrefs.currentPantry, checkFood.id!);
 
           //update pantryFood list
           await sharedPrefs.setPantryFoods(sharedPrefs.currentPantry);
@@ -103,20 +227,20 @@ class GroceryListViewState extends State<GroceryListView> {
       } else {
 
         //create food
-        await _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl!, scannedItem.product!.category!, scannedItem.product!.description!, scannedItem.product!.specs!["Liquid Volume"]!, false, barcodeNo);
+        await _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl!, scannedItem.product!.category!, scannedItem.product!.description!, amount, false, barcodeNo);
 
         //get food
         Food inputtedFood = await _getFood(barcodeNo, "", "", Database.barcodeQual);
 
         //create pantry food
-        await _createPantryFood(scannedItem.product!.specs!["Liquid Volume"]!, sharedPrefs.currentPantry, inputtedFood.id!);
+        await _createPantryFood("1", sharedPrefs.currentPantry, inputtedFood.id!);
 
         //update pantryFood list
         await sharedPrefs.setPantryFoods(sharedPrefs.currentPantry);
         print(sharedPrefs.pantryFoods);
       }
+       */
     }
- */
   }
 
   @override
