@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+<<<<<<< HEAD
 
 class CuisinesView extends StatefulWidget {
   const CuisinesView({super.key});
@@ -14,9 +15,11 @@ class CuisinesViewState extends State<CuisinesView> {
   // By default first one is selected
   int selectedIndex = 0;
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: const Color(0xff459657),
@@ -38,18 +41,13 @@ class CuisinesViewState extends State<CuisinesView> {
             ),
           ),
 
-          Expanded(
-
-            child: ListView.builder(
+             ListView.builder(
               itemCount: categories.length,
               itemBuilder: (context, index) {
                return cuisinesListItem(index);
     },
 
             ),
-          ),
-
-
         ],
       ),
     );

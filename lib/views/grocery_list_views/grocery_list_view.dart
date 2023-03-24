@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
 import 'package:pocket_kitchen/models/go_upc_models/go_upc_item.dart';
 import '../../models/data_models/food.dart';
 import '../../models/data_models/pantry_food.dart';
@@ -106,7 +107,7 @@ class GroceryListViewState extends State<GroceryListView> {
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: const Color(0xff459657),
-          title: const Text('Pocket Kitchen'),
+          title: Text(sharedPrefs.currentPantryName),
           leading: IconButton(
             onPressed: () {
               foodEntryDialog();

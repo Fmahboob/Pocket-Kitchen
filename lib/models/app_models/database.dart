@@ -29,6 +29,7 @@ class Database {
   static const nameQual = "NAME";
   static const idQual = "ID";
   static const emailQual = "EMAIL";
+  static const bothQual = "BOTH";
 
   //USER CRUD Methods
   //Create user
@@ -200,7 +201,7 @@ class Database {
   }
 
   //Get one pantry
-  static Future<Pantry> getPantry(String id, String name, String qualifier) async {
+  static Future<Pantry> getPantry(String id, String name, String ownerId, String qualifier) async {
     var pantry = Pantry();
     try {
       var bodyMap = <String, dynamic>{};
@@ -210,7 +211,7 @@ class Database {
       bodyMap["pantry_id"] = "$id";
       bodyMap["name"] = "$name";
       bodyMap["user_count"] = "";
-      bodyMap["owner_id"] = "";
+      bodyMap["owner_id"] = "$ownerId";
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
@@ -518,15 +519,15 @@ class Database {
     }
   }
   //Delete pantry_user
-  static Future<void> deletePantryUser(String id) async {
+  static Future<void> deletePantryUser(String userId, String pantryId) async {
     try {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$deleteAction";
       bodyMap["table"] = "$userTable";
       bodyMap["qualifier"] = "";
-      bodyMap["pantry_user_id"] = "$id";
-      bodyMap["pantry_id"] = "";
-      bodyMap["user_id"] = "";
+      bodyMap["pantry_user_id"] = "";
+      bodyMap["pantry_id"] = "$pantryId";
+      bodyMap["user_id"] = "$userId";
 
       final response = await post(root, body: bodyMap);
 
