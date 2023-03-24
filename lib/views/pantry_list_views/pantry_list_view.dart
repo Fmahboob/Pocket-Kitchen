@@ -321,6 +321,7 @@ class PantryListViewState extends MyState<PantryListView> {
                           await GoogleSignInAPI.logout();
                           sharedPrefs.userId = "";
                           Navigator.pop(context);
+                          Navigator.pop(context);
 
                           //load sign in
                           Navigator.push(
