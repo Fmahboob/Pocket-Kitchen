@@ -25,7 +25,7 @@ class GroceryListViewState extends State<GroceryListView> {
 
   String searchTerm = "";
   bool isChecked = false;
-  String barcodeNo = "";
+  String barcodeNo = "0058891252220";
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
@@ -40,8 +40,8 @@ class GroceryListViewState extends State<GroceryListView> {
   }
 
   //Pantry food CRUD methods
-  _createPantryFood(String amount, String pantryId, String foodId) {
-    Database.createPantryFood(amount, pantryId, foodId);
+  Future<void> _createPantryFood(String amount, String pantryId, String foodId) async {
+    await Database.createPantryFood(amount, pantryId, foodId);
   }
 
   _updatePantryFood(String id, String amount, String pantryId, String foodId) {
@@ -52,9 +52,9 @@ class GroceryListViewState extends State<GroceryListView> {
     Database.getPantryFood(foodId);
   }
 
-  Future _scan() async{
+  Future _scan() async {
     //scans barcode and returns the barcode number
-    await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
+    //await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
 
     //API call to Go-UPC with barcode number
     Response response = await get(Uri.parse('https://go-upc.com/api/v1/code/$barcodeNo'), headers: {
@@ -63,10 +63,12 @@ class GroceryListViewState extends State<GroceryListView> {
 
     //if response succeeds
     if (response.statusCode == 200) {
-
       //store returned item values
       scannedItem = GoUPCItem.fromJson(jsonDecode(response.body));
-
+      print(response.body);
+      print(scannedItem);
+    }
+/*
       //query for food with same barcode to check if it already exists in the food table
       Food checkFood = await _getFood(barcodeNo, "", "", Database.barcodeQual);
 
@@ -82,18 +84,39 @@ class GroceryListViewState extends State<GroceryListView> {
           //Therefore, the user is refilling the item's stock. Update the amount to full (equal to it's food's weight)
           await _updatePantryFood(checkPantryFood.id!, checkFood.weight!, checkPantryFood.pantryId!, checkPantryFood.foodId!);
 
+          //update pantryFood list
+          await sharedPrefs.setPantryFoods(sharedPrefs.currentPantry);
+          print(sharedPrefs.pantryFoods);
+
         //if the food doesn't exist in the user's pantry foods, create it
         } else {
+
+          //create pantry food
           await _createPantryFood(scannedItem.product!.specs!["Liquid Volume"]!, sharedPrefs.currentPantry, checkFood.id!);
+
+          //update pantryFood list
+          await sharedPrefs.setPantryFoods(sharedPrefs.currentPantry);
+          print(sharedPrefs.pantryFoods);
         }
 
       //if the barcode doesn't match and the food isn't in the food's table, create a food and pantry food of it
       } else {
+
+        //create food
         await _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl!, scannedItem.product!.category!, scannedItem.product!.description!, scannedItem.product!.specs!["Liquid Volume"]!, false, barcodeNo);
+
+        //get food
         Food inputtedFood = await _getFood(barcodeNo, "", "", Database.barcodeQual);
+
+        //create pantry food
         await _createPantryFood(scannedItem.product!.specs!["Liquid Volume"]!, sharedPrefs.currentPantry, inputtedFood.id!);
+
+        //update pantryFood list
+        await sharedPrefs.setPantryFoods(sharedPrefs.currentPantry);
+        print(sharedPrefs.pantryFoods);
       }
     }
+ */
   }
 
   @override
@@ -234,20 +257,21 @@ class GroceryListViewState extends State<GroceryListView> {
                 children: [
                   TextButton(
                     onPressed: () async {
+
                       //create food
                       await _createFood(nameController.text, "", "", "", amountController.text, isChecked, "");
+
                       //get food for id
                       Food food = await _getFood("", nameController.text, "", Database.nameQual);
+
                       //create pantry food
                       await _createPantryFood(amountController.text, sharedPrefs.currentPantry, food.id!);
 
-                      Navigator.pop(context);
-                      Navigator.pop(context);
+                      //update pantryFood list
+                      await sharedPrefs.setPantryFoods(sharedPrefs.currentPantry);
+                      print(sharedPrefs.pantryFoods);
 
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const TabBarMain()),
-                      );
+                      Navigator.pop(context);
                     },
                     style: const ButtonStyle(
                       backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
