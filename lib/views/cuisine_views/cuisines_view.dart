@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-<<<<<<< HEAD
-
 class CuisinesView extends StatefulWidget {
   const CuisinesView({super.key});
 
