@@ -6,6 +6,7 @@ import 'package:pocket_kitchen/models/go_upc_models/go_upc_item.dart';
 import '../../main.dart';
 import '../../models/data_models/food.dart';
 import '../../models/data_models/pantry_food.dart';
+import 'grocery_list_item.dart';
 import 'grocery_list_listview.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:pocket_kitchen/models/app_models/database.dart';
@@ -19,12 +20,10 @@ class GroceryListView extends StatefulWidget {
   GroceryListViewState createState() => GroceryListViewState();
 }
 class GroceryListViewState extends State<GroceryListView> {
-  List<PantryFood> groceryList = [];
-  List<Food> allFoods = [];
-  late GoUPCItem scannedItem;
-
   String searchTerm = "";
   bool isChecked = false;
+
+  late GoUPCItem scannedItem;
   String barcodeNo = "0058891252220";
 
   final TextEditingController nameController = TextEditingController();
@@ -89,7 +88,7 @@ class GroceryListViewState extends State<GroceryListView> {
 
       //get amount out of name string
       //loop over product.name string
-      scannedItem.product!.name!.runes.forEach((int rune) {
+      for (var rune in scannedItem.product!.name!.runes) {
         //add each character to temp var amountStr
         amountStr = amountStr + String.fromCharCode(rune).toLowerCase();
         //check that amountStr ends with kg (ready to retrieve measurement)
@@ -180,18 +179,10 @@ class GroceryListViewState extends State<GroceryListView> {
             }
           }
         }
-      });
+      }
 
       //sub string the temp var from the first index to the length it should be (amountCharLength)
       amount = amountStr.substring(0, amountCharLength);
-      print(amount);
-      /*
-      //loop temp var amountStr to remove excess characters from the end (last loop is unbreakable, therefore ending of string isn't normalized)
-      amountStr.runes.forEach((int rune) {
-        if (isNumeric(String.fromCharCode(rune)) || isPeriod(String.fromCharCode(rune))) {
-          amount = amount + String.fromCharCode(rune);
-        }
-      });
 
       //query for food with same barcode to check if it already exists in the food table
       Food checkFood = await _getFood(barcodeNo, "", "", Database.barcodeQual);
@@ -206,11 +197,11 @@ class GroceryListViewState extends State<GroceryListView> {
         if (checkPantryFood.foodId == checkFood.id && checkPantryFood.pantryId == sharedPrefs.currentPantry) {
 
           //Therefore, the user is refilling the item's stock. Update the amount to full (equal to it's food's weight)
-          await _updatePantryFood(checkPantryFood.id!, checkFood.weight!, checkPantryFood.pantryId!, checkPantryFood.foodId!);
+          await _updatePantryFood(checkPantryFood.id!, "1", checkPantryFood.pantryId!, checkPantryFood.foodId!);
 
           //update pantryFood list
-          await sharedPrefs.setPantryFoods(sharedPrefs.currentPantry);
-          print(sharedPrefs.pantryFoods);
+          await sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
+          print(sharedPrefs.pantryFoodIds);
 
         //if the food doesn't exist in the user's pantry foods, create it
         } else {
@@ -219,8 +210,8 @@ class GroceryListViewState extends State<GroceryListView> {
           await _createPantryFood("1", sharedPrefs.currentPantry, checkFood.id!);
 
           //update pantryFood list
-          await sharedPrefs.setPantryFoods(sharedPrefs.currentPantry);
-          print(sharedPrefs.pantryFoods);
+          await sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
+          print(sharedPrefs.pantryFoodIds);
         }
 
       //if the barcode doesn't match and the food isn't in the food's table, create a food and pantry food of it
@@ -236,10 +227,9 @@ class GroceryListViewState extends State<GroceryListView> {
         await _createPantryFood("1", sharedPrefs.currentPantry, inputtedFood.id!);
 
         //update pantryFood list
-        await sharedPrefs.setPantryFoods(sharedPrefs.currentPantry);
-        print(sharedPrefs.pantryFoods);
+        await sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
+        print(sharedPrefs.pantryFoodIds);
       }
-       */
     }
   }
 
@@ -304,7 +294,34 @@ class GroceryListViewState extends State<GroceryListView> {
                           ),
                           Expanded(
                             child:
-                            GroceryList(groceryList: groceryList),
+                            FutureBuilder(
+                                future: Future.wait([
+                                  sharedPrefs.getAvailablePantryFoods(),
+                                  sharedPrefs.getFoodsForPantryFoods(1)
+                                ]),
+                                builder: (context, AsyncSnapshot<List<List<dynamic>>> snapshot) {
+                                  return ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemCount: sharedPrefs.pantryFoodIds.length,
+                                      itemBuilder: (context, index) {
+                                        return GroceryListItem(
+                                            onLongPress: () {
+                                              setState(() async {
+                                                //get pantry food to update availability
+                                                PantryFood pantryFood = await _getPantryFood(snapshot.data![0][index]);
+
+                                                //update the availability to full (100%/1)
+                                                await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
+                                              });
+                                            },
+                                            pantryFood: snapshot.data![0][index],
+                                            food: snapshot.data![1][index]
+                                        );
+                                      }
+                                  );
+                                }
+                            ),
                           ),
                         ],
                       )
@@ -392,8 +409,8 @@ class GroceryListViewState extends State<GroceryListView> {
                       await _createPantryFood(amountController.text, sharedPrefs.currentPantry, food.id!);
 
                       //update pantryFood list
-                      await sharedPrefs.setPantryFoods(sharedPrefs.currentPantry);
-                      print(sharedPrefs.pantryFoods);
+                      await sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
+                      print(sharedPrefs.pantryFoodIds);
 
                       Navigator.pop(context);
                     },

@@ -606,8 +606,8 @@ class Database {
       bodyMap["amount"] = "";
       bodyMap["pantry_id"] = "";
       bodyMap["food_id"] = "$foodId";
-
       final response = await post(root, body: bodyMap);
+      print("in get food db");
       if (response.statusCode == 200) {
         pantryFood = parsePantryFoodsToList(response.body)[0];
         print("Got pantry food.");

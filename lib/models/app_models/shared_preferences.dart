@@ -2,6 +2,7 @@ import 'package:pocket_kitchen/models/app_models/database.dart';
 import 'package:pocket_kitchen/models/data_models/pantry_food.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../data_models/food.dart';
 import '../data_models/pantry.dart';
 
 class SharedPrefs {
@@ -14,8 +15,8 @@ class SharedPrefs {
   }
 
 
-  //set current pantry foods
-  setPantryFoods(String pantryId) async {
+  //set current pantry food ids
+  setPantryFoodIds(String pantryId) async {
     //get all pantry foods for the user's current pantry
     List<PantryFood> pantryFoods = await Database.getAllPantryFoods(sharedPrefs.currentPantry);
     List<String> pantryFoodIds = [];
@@ -27,9 +28,67 @@ class SharedPrefs {
     _sharedPrefs!.setStringList("pantryFoods", pantryFoodIds);
   }
 
-  //get current pantry foods
-  List<String> get pantryFoods => _sharedPrefs!.getStringList("pantryFoods") ?? [];
+  //get current pantry food ids
+  List<String> get pantryFoodIds => _sharedPrefs!.getStringList("pantryFoods") ?? [];
 
+  //get all current pantry foods
+  Future<List<PantryFood>> getPantryFoods() async {
+    List<PantryFood> pantryFoods = [];
+    for (var element in pantryFoodIds) {
+      print("in get pf");
+      pantryFoods.add(await Database.getPantryFood(element));
+    }
+    print("$pantryFoods foods");
+    return pantryFoods;
+  }
+
+  //get all available pantry foods
+  Future<List<PantryFood>> getAvailablePantryFoods() async {
+    List<PantryFood> availablePantryFoods = [];
+    print("in avail");
+    List<PantryFood> pantryFoods = await getPantryFoods();
+    for (var element in pantryFoods) {
+      if (element.amount != "0") {
+        availablePantryFoods.add(element);
+      }
+    }
+    print("$availablePantryFoods available");
+    return availablePantryFoods;
+  }
+
+  //get unavailable list of pantryFoods
+  Future<List<PantryFood>> getUnavailablePantryFoods() async {
+    List<PantryFood> unavailablePantryFoods = [];
+    List<PantryFood> pantryFoods = await getPantryFoods();
+    for (var element in pantryFoods) {
+      if (element.amount == "0") {
+        unavailablePantryFoods.add(element);
+      }
+    }
+    print("$unavailablePantryFoods unavailable");
+    return unavailablePantryFoods;
+  }
+
+  //get associated foods list to specified pantry foods list (available, unavailable, all)
+  Future<List<Food>> getFoodsForPantryFoods (int flag) async {
+    List<PantryFood> pantryFoods = [];
+    List<Food> foods = [];
+
+    if (flag == 0) {
+      pantryFoods = await getAvailablePantryFoods();
+    } else if (flag == 1) {
+      pantryFoods = await getUnavailablePantryFoods();
+    } else if (flag == 2) {
+      pantryFoods = await getPantryFoods();
+    }
+
+    for (var element in pantryFoods) {
+      Food food = await Database.getFood("", "", element.foodId!, Database.idQual);
+      foods.add(food);
+    }
+
+    return foods;
+  }
 
   //userId getter
   String get userId => _sharedPrefs!.getString("userId") ?? "";
@@ -56,7 +115,6 @@ class SharedPrefs {
     _sharedPrefs!.setString("pantryOwner", value);
   }
 
-
   //currentPantry getter
   String get currentPantry {
     return _sharedPrefs!.getStringList("pantries")?[0] ?? "";
@@ -65,7 +123,6 @@ class SharedPrefs {
 
   //all pantries getter
   List<String> get pantries => _sharedPrefs!.getStringList("pantries") ?? [];
-
 
   //new pantry setter
   addNewPantry(String value) {

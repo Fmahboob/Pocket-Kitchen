@@ -8,13 +8,15 @@ import 'package:pocket_kitchen/views/google_sign_in_view.dart';
 import '../../main.dart';
 import '../../models/app_models/database.dart';
 import '../../models/app_models/google_sign_in_api.dart';
+import '../../models/data_models/food.dart';
 import '../../models/data_models/pantry.dart';
+import '../../models/data_models/pantry_food.dart';
 
-abstract class MyState<T extends StatefulWidget> extends State {
+abstract class PantryState<T extends StatefulWidget> extends State {
   @override
   void initState() {
-    sharedPrefs.setPantryFoods(sharedPrefs.currentPantry);
-    print(sharedPrefs.pantryFoods);
+    sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
+    print(sharedPrefs.pantryFoodIds);
     super.initState();
   }
 }
@@ -26,7 +28,7 @@ class PantryListView extends StatefulWidget {
   State<StatefulWidget> createState() => PantryListViewState();
 }
 
-class PantryListViewState extends MyState<PantryListView> {
+class PantryListViewState extends PantryState<PantryListView> {
   final TextEditingController createNameController = TextEditingController();
   final TextEditingController joinNameController = TextEditingController();
   final TextEditingController joinIdController = TextEditingController();
@@ -83,6 +85,15 @@ class PantryListViewState extends MyState<PantryListView> {
     Database.deletePantryUser(pantryId, userId);
   }
 
+  //PantryFood CRUD Methods
+  _updatePantryFood(String id, String amount, String pantryId, String foodId) {
+    Database.updatePantryFood(id, amount, pantryId, foodId);
+  }
+
+  _getPantryFood (String foodId) {
+    Database.getPantryFood(foodId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,18 +144,27 @@ class PantryListViewState extends MyState<PantryListView> {
                             fontWeight: FontWeight.w600
                         ),),
                       ),
-
-                         ListView.builder(
-                           shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, index){
-                          return PantryListItem(onLongPress: () {
-
-                          });
-                        },
-                           itemCount: 10,
-                        ),
-
+                         FutureBuilder(
+                           future: Future.wait([
+                             sharedPrefs.getAvailablePantryFoods(),
+                             sharedPrefs.getFoodsForPantryFoods(0)
+                           ]),
+                           builder: (context, AsyncSnapshot<List<List<dynamic>>> snapshot) {
+                             return ListView.builder(
+                               shrinkWrap: true,
+                               physics: const NeverScrollableScrollPhysics(),
+                               itemCount: sharedPrefs.pantryFoodIds.length,
+                               itemBuilder: (context, index) {
+                                 return PantryListItem(
+                                     pantryFood: snapshot.data![0][index],
+                                     food: snapshot.data![1][index],
+                                     onLongPress: () {
+                                      manualEmptyDialog(snapshot.data![0][index]);
+                                     });
+                               },
+                             );
+                           }
+                         ),
 
                       const Padding(
                         padding: EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 0.0),
@@ -155,17 +175,34 @@ class PantryListViewState extends MyState<PantryListView> {
                         ),),
                       ),
 
-                       ListView.builder(
-                           shrinkWrap: true,
-                           physics: const NeverScrollableScrollPhysics(),
-                           itemBuilder: (context, index){
-                          return const UnavailablePantryItem();
-                        },
-                         itemCount: 10,
-                        ),
+                      FutureBuilder(
+                          future: Future.wait([
+                            sharedPrefs.getAvailablePantryFoods(),
+                            sharedPrefs.getFoodsForPantryFoods(1)
+                          ]),
+                          builder: (context, AsyncSnapshot<List<List<dynamic>>> snapshot) {
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: sharedPrefs.pantryFoodIds.length,
+                              itemBuilder: (context, index) {
+                                return UnavailablePantryItem(
+                                    onLongPress: () {
+                                      setState(() async {
+                                        //get pantry food to update availability
+                                        PantryFood pantryFood = await _getPantryFood(snapshot.data![0][index]);
 
-
-
+                                        //update the availability to full (100%/1)
+                                        await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
+                                      });
+                                    },
+                                    pantryFood: snapshot.data![0][index],
+                                    food: snapshot.data![1][index]
+                                );
+                              }
+                            );
+                          }
+                      ),
                     ],
                   ),
           ),
@@ -434,9 +471,6 @@ class PantryListViewState extends MyState<PantryListView> {
                               issueMessage = "You have already created a pantry with this name.";
                               issueDialog();
                             }
-
-                            //reload app
-                            //RestartWidget.restartApp(context);
                           }
 
                         },
@@ -857,6 +891,52 @@ class PantryListViewState extends MyState<PantryListView> {
                         child:
                         const Text(
                           "OK",
+                          style: TextStyle(
+                              fontSize: 32,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+      )
+  );
+
+  Future manualEmptyDialog(PantryFood pantryFood) => showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+          builder: (context, setState) =>
+              AlertDialog(
+                content:
+                const Text(
+                  "Are you sure this item is completely out of stock?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Color(0xff7B7777),
+                      fontWeight: FontWeight.w400
+                  ),
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+                          setState(() {
+                            //update the availability to empty (0%/0)
+                            _updatePantryFood(pantryFood.id!, "0", pantryFood.pantryId!, pantryFood.foodId!);
+                          });
+                          Navigator.pop(context);
+                        },
+                        style: const ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
+                        ),
+                        child:
+                        const Text(
+                          "Out of Stock",
                           style: TextStyle(
                               fontSize: 32,
                               color: Colors.white,
