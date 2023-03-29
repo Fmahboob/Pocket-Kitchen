@@ -122,8 +122,10 @@ class PantryListViewState extends PantryState<PantryListView> {
                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                        child: TextField(
                          enabled: true,
-                         onChanged: (String input) {
-                           //searchTerm = input;
+                         onChanged: (String search) {
+                           setState(() {
+                             sharedPrefs.getAllListsFiltered(search);
+                           });
                          },
                          decoration: const InputDecoration(
                              border: OutlineInputBorder(

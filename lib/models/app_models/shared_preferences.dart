@@ -69,6 +69,40 @@ class SharedPrefs {
     return unavailablePantryFoods;
   }
 
+  //get unavailable and available lists filtered by the search query
+  Future<List<List<PantryFood>>> getAllListsFiltered(String search) async {
+    //all pantry foods
+    List<PantryFood> pantryFoods = await getPantryFoods();
+    //all pantry food's foods
+    List<Food> foods = await getFoodsForPantryFoods(2);
+    //final available searched list
+    List<PantryFood> availPantryFoods = [];
+    //final unavailable searched list
+    List<PantryFood> unavailPantryFoods = [];
+
+    //loop over all pantryfoods
+    for (var pantryFood in pantryFoods) {
+      //available list
+      if (pantryFood.amount != "0") {
+        //get index to check if search matches PantryFood's food details
+        int index = foods.indexWhere((element) => element.id == pantryFood.foodId);
+        //check if search is contained in the food's name, category, and description
+        if (foods[index].name!.contains(search) || foods[index].category!.contains(search) || foods[index].desc!.contains(search)) {
+          availPantryFoods.add(pantryFood);
+        }
+      //unavailable list
+      } else {
+        //get index to check if search matches PantryFood's food details
+        int index = foods.indexWhere((element) => element.id == pantryFood.foodId);
+        //check if search is contained in the food's name, category, and description
+        if (foods[index].name!.contains(search) || foods[index].category!.contains(search) || foods[index].desc!.contains(search)) {
+          unavailPantryFoods.add(pantryFood);
+        }
+      }
+    }
+    return [availPantryFoods, unavailPantryFoods];
+  }
+
   //get associated foods list to specified pantry foods list (available, unavailable, all)
   Future<List<Food>> getFoodsForPantryFoods (int flag) async {
     List<PantryFood> pantryFoods = [];

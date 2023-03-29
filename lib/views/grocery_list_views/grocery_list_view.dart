@@ -268,8 +268,10 @@ class GroceryListViewState extends State<GroceryListView> {
                         children: [
                           TextField(
                             enabled: true,
-                            onChanged: (String input) {
-                              searchTerm = input;
+                            onChanged: (String search) {
+                              setState(() {
+                                sharedPrefs.getAllListsFiltered(search);
+                              });
                             },
                             decoration: const InputDecoration(
                                 border: OutlineInputBorder(
