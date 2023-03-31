@@ -58,7 +58,7 @@ class CuisinesViewState extends State<CuisinesView> {
     return GestureDetector(
       onTap: () {
 
-      },
+            },
       child: Padding(
         padding: const EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
         child: Container(
