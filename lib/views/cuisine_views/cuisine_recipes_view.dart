@@ -35,22 +35,53 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
         backgroundColor: const Color(0xff459657),
     title: Text(pantryName),
     ),
-    body: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: const [
-       Padding(
-        padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
-        child: Text(
-            "Recipes",
-            textAlign: TextAlign.left,
-            style: TextStyle(
-                fontSize: 17,
-                color: Color(0xff459657),
-                fontWeight: FontWeight.w600
-            )
-        ),
-      ),
-    ],
+    body: FutureBuilder<List<RecipeList>>(
+      future: futureRecipes,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final List<RecipeList> recipes = snapshot.data!;
+          return Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+                child: Text(
+                    "Cuisines",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                        fontSize: 17,
+                        color: Color(0xff459657),
+                        fontWeight: FontWeight.w600
+                    )
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: recipes.length,
+                  itemBuilder: (context, index) {
+                    final RecipeList recipe = recipes[index];
+                    return Card(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+
+
+                          Text(recipe.title),
+                          Image.network(recipe.imageUrl),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        }
+        else {
+          return Center(
+            child: Text('${snapshot.error}'),
+          );
+        }
+      },
     ),
     );
   }
