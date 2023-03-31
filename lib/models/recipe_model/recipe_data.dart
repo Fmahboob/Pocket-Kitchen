@@ -6,7 +6,7 @@ import 'package:pocket_kitchen/models/recipe_model/recipe_list.dart';
 
 import '../../views/cuisine_views/api.dart';
 
-class RecipeService {
+class RecipeData {
   API apiKey = API();
   final String _baseUrl = 'https://api.spoonacular.com/recipes/complexSearch';
 

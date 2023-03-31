@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pocket_kitchen/views/cuisine_views/cuisine_recipes_view.dart';
 
 class CuisinesView extends StatefulWidget {
   const CuisinesView({super.key});
@@ -57,6 +58,13 @@ class CuisinesViewState extends State<CuisinesView> {
   Widget cuisinesListItem(int index) {
     return GestureDetector(
       onTap: () {
+        String category = categories[index];
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => CuisinesRecipesView(title: 'Recipes',
+              selectedCuisine: category),
+          ),
+        );
             },
       child: Padding(
         padding: const EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),

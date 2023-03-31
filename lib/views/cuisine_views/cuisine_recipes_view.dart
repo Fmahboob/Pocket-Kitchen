@@ -1,14 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:pocket_kitchen/models/recipe_model/recipe_list.dart';
+import 'package:pocket_kitchen/views/cuisine_views/recipe_view.dart';
+
+import '../../models/recipe_model/recipe_data.dart';
 
 class CuisinesRecipesView extends StatefulWidget {
-  const CuisinesRecipesView({super.key});
+  final String title;
+  final String selectedCuisine;
+  const CuisinesRecipesView({super.key, required this.title, required this.selectedCuisine});
 
   @override
   State<StatefulWidget> createState() => CuisinesRecipesViewState();
 }
 
 class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
+  late Future<List<RecipeList>> futureRecipes;
   String pantryName = "Robbie's Home";
+
+  @override
+  void initState() {
+    super.initState();
+    futureRecipes = RecipeData().recipesByCuisine(widget.selectedCuisine);
+    setState(() {
+
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,7 +35,8 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
         backgroundColor: const Color(0xff459657),
     title: Text(pantryName),
     ),
-    body: Column(
+     body:
+      Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: const [
        Padding(
@@ -33,6 +51,7 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
             )
         ),
       ),
+
     ],
     ),
     );
