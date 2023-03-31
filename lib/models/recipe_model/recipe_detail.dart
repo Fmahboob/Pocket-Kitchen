@@ -9,4 +9,5 @@ class RecipeDetail {
 
   RecipeDetail(this.id, this.title, this.imageUrl, this.cookTime, this.ingredientUnit, this.ingredientName, this.instructions);
 
+
 }
