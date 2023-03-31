@@ -1,15 +1,16 @@
 import 'dart:convert';
 
+
 import 'package:http/http.dart' as http;
+import 'package:pocket_kitchen/models/recipe_model/recipe_list.dart';
 
-import '../../models/recipe_model/recipe_list.dart';
-import 'api.dart';
+import '../../views/cuisine_views/api.dart';
 
-class RecipeData {
+class RecipeService {
   API apiKey = API();
   final String _baseUrl = 'https://api.spoonacular.com/recipes/complexSearch';
 
-  Future<List<RecipeList>> searchRecipesByCuisine(String cuisine) async {
+  Future<List<RecipeList>> recipesByCuisine(String cuisine) async {
     final url = '$_baseUrl?cuisine=$cuisine&apiKey=${apiKey.apiKey}';
 
     final response = await http.get(Uri.parse(url));

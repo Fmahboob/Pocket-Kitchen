@@ -57,7 +57,6 @@ class CuisinesViewState extends State<CuisinesView> {
   Widget cuisinesListItem(int index) {
     return GestureDetector(
       onTap: () {
-
             },
       child: Padding(
         padding: const EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
