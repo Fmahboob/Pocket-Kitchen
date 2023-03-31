@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/models/recipe_model/recipe_list.dart';
-import 'package:pocket_kitchen/views/cuisine_views/recipe_view.dart';
+
 
 import '../../models/recipe_model/recipe_data.dart';
 
@@ -35,8 +35,7 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
         backgroundColor: const Color(0xff459657),
     title: Text(pantryName),
     ),
-     body:
-      Column(
+    body: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: const [
        Padding(
@@ -51,7 +50,6 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
             )
         ),
       ),
-
     ],
     ),
     );
