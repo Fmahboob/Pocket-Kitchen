@@ -39,13 +39,14 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
       future: futureRecipes,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
+          print(snapshot.data);
           final List<RecipeList> recipes = snapshot.data!;
           return Column(
             children: [
               const Padding(
                 padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
                 child: Text(
-                    "Cuisines",
+                    "Recipes",
                     textAlign: TextAlign.left,
                     style: TextStyle(
                         fontSize: 17,
@@ -62,14 +63,12 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
                     return  Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-
-
                           Container(
                             decoration: const BoxDecoration(
                               borderRadius: BorderRadius.all(Radius.circular(5)),
                               color: Color(0xff459657),
 
-                            ), 
+                            ),
                             alignment: Alignment.center,
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
@@ -81,7 +80,7 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
                             ),
                           ),
                           Padding(
-                              padding: EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
+                              padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
                               child: Image.network(recipe.imageUrl)),
                         ],
                       );
