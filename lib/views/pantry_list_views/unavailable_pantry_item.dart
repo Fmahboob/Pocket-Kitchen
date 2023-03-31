@@ -1,19 +1,35 @@
-
-
 import 'package:flutter/material.dart';
 
+import '../../models/app_models/database.dart';
+import '../../models/data_models/food.dart';
+import '../../models/data_models/pantry_food.dart';
+
 class UnavailablePantryItem extends StatefulWidget {
-  const UnavailablePantryItem({super.key});
+  final VoidCallback onLongPress;
+  final PantryFood pantryFood;
+  final Food food;
+
+  const UnavailablePantryItem({
+    super.key,
+    required this.onLongPress,
+    required this.pantryFood,
+    required this.food
+  });
 
   @override
   State<StatefulWidget> createState() => UnavailablePantryItemState();
-
 }
 
 class UnavailablePantryItemState extends State<UnavailablePantryItem> {
-
+  get pantryFood => widget.pantryFood;
+  get food => widget.food;
 
   bool isExpanded = false;
+
+  //PantryFood CRUD Methods
+  _updatePantryFood (String id, String amount, String pantryId, String foodId) {
+    Database.updatePantryFood(id, amount, pantryId, foodId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +73,7 @@ class UnavailablePantryItemState extends State<UnavailablePantryItem> {
                                 borderRadius: BorderRadius.all(Radius.circular(5)),
                                 color: Colors.white,
                               ),
-                              child: Image.network("https://www.pngmart.com/files/5/Ketchup-PNG-HD.png"),
+                              child: Image.network(food.imgUrl ?? "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930"),
                             ),
                           ),
                         ),
@@ -72,7 +88,7 @@ class UnavailablePantryItemState extends State<UnavailablePantryItem> {
                                   maxWidth: MediaQuery.of(context).size.width - 32.0,
                                 ),
                                 child: Text(
-                                  "Heinz Tomato Ketchup, 750mL/25oz., Bottle, {Imported From Canada",
+                                  food.name,
                                   textAlign: TextAlign.left,
                                   style: const TextStyle(
                                     fontSize: 20,
@@ -89,12 +105,12 @@ class UnavailablePantryItemState extends State<UnavailablePantryItem> {
                               ),
                               Visibility(
                                 visible: isExpanded,
-                                child: const Padding(
-                                  padding: EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
                                   child: Text(
-                                    "Vegetable, organic, classic, yummy",
+                                    food.category ?? "No category.",
                                     textAlign: TextAlign.left,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 18,
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500
@@ -168,7 +184,10 @@ class UnavailablePantryItemState extends State<UnavailablePantryItem> {
                     children: [
                       TextButton(
                         onPressed: () {
-                          //restocking food logic
+                          setState(() async {
+                            //update the availability to full (100%/1)
+                            await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
+                          });
                           Navigator.pop(context);
                         },
                         style: const ButtonStyle(

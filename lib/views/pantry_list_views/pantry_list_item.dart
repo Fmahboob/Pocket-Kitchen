@@ -1,16 +1,43 @@
 import 'package:flutter/material.dart';
 
+import '../../models/app_models/database.dart';
+import '../../models/data_models/food.dart';
+import '../../models/data_models/pantry_food.dart';
+
 class PantryListItem extends StatefulWidget {
   final VoidCallback onLongPress;
+  final PantryFood pantryFood;
+  final Food food;
 
-  const PantryListItem({super.key, required this.onLongPress});
+  const PantryListItem({
+    super.key,
+    required this.onLongPress,
+    required this.pantryFood,
+    required this.food
+  });
   @override
   State<StatefulWidget> createState() => PantryListItemState();
 
 }
 
 class PantryListItemState extends State<PantryListItem> {
+  get pantryFood => widget.pantryFood;
+  get food => widget.food;
   bool isExpanded = false;
+
+  final TextEditingController percentController = TextEditingController();
+
+  String percentLeft() {
+    double percentDecimal = double.parse(pantryFood.amount);
+    double percentWhole = percentDecimal * 100;
+    return "$percentWhole%";
+  }
+
+  //PantryFood CRUD Methods
+  _updatePantryFood (String id, String amount, String pantryId, String foodId) {
+    Database.updatePantryFood(id, amount, pantryId, foodId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -53,7 +80,7 @@ class PantryListItemState extends State<PantryListItem> {
                                 borderRadius: BorderRadius.all(Radius.circular(5)),
                                 color: Colors.white,
                               ),
-                              child: Image.network("https://www.pngmart.com/files/5/Ketchup-PNG-HD.png"),
+                              child: Image.network(food.imgUrl ?? "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930"),
                             ),
                           ),
                         ),
@@ -69,7 +96,7 @@ class PantryListItemState extends State<PantryListItem> {
                                 ),
                                 child:
                                 Text(
-                                  "Heinz Tomato Ketchup, 750mL/25oz., Bottle, {Imported From Canada",
+                                  food.name,
                                   textAlign: TextAlign.left,
                                   style: const TextStyle(
                                     fontSize: 20,
@@ -86,12 +113,12 @@ class PantryListItemState extends State<PantryListItem> {
                               ),
                               Visibility(
                                 visible: isExpanded,
-                                child: const Padding(
-                                  padding: EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
                                   child: Text(
-                                    "Vegetable, organic, classic, yummy, phenomenal",
+                                    food.category ?? "No category.",
                                     textAlign: TextAlign.left,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 18,
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500
@@ -118,7 +145,7 @@ class PantryListItemState extends State<PantryListItem> {
                                 child: const Padding(
                                   padding: EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
                                   child: Text(
-                                    " % left",
+                                    "% Left",
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
                                         fontSize: 18,
@@ -134,18 +161,19 @@ class PantryListItemState extends State<PantryListItem> {
                                 visible: isExpanded,
                                 child: const Spacer(),
                               ),
-                              const SizedBox(
+                              SizedBox(
                                 height: 30,
                                 width: 50,
-                                child: TextField(
+                                child: TextFormField(
                                   enabled: true,
+                                  controller: percentController,
                                   keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: Colors.white,
-                                    border: OutlineInputBorder(),
-                                    hintText: '30 %',
-                                    contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                    border: const OutlineInputBorder(),
+                                    hintText: percentLeft(),
+                                    contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                                   ),
                                 ),
                               ),
@@ -163,7 +191,27 @@ class PantryListItemState extends State<PantryListItem> {
                                     color: Colors.white,
                                   ),
                                   child: TextButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      setState(() async {
+                                        //check for % in input
+                                        if (percentController.text.endsWith("%")) {
+                                          //remove the %
+                                          String decimalStr = "";
+                                          for (var rune in percentController.text.runes) {
+                                            if (rune != "%") {
+                                              decimalStr = "$decimalStr$rune";
+                                            }
+                                          }
+                                          //convert percent and update pantry food
+                                          double decimal = double.parse(decimalStr) / 100;
+                                          await _updatePantryFood(pantryFood.id, decimal.toString(), pantryFood.pantryId, pantryFood.foodId);
+                                        } else {
+                                          //convert percent and update pantry food
+                                          double decimal = double.parse(percentController.text) / 100;
+                                          await _updatePantryFood(pantryFood.id, decimal.toString(), pantryFood.pantryId, pantryFood.foodId);
+                                        }
+                                      });
+                                    },
                                     child: Container(
                                       color: Colors.white,
                                       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),

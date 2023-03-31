@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
 
 import '../../models/app_models/database.dart';
@@ -10,11 +12,13 @@ import '../../models/data_models/user.dart';
 class GroceryListItem extends StatefulWidget {
   final PantryFood pantryFood;
   final VoidCallback onLongPress;
+  final Food food;
 
   const GroceryListItem({
     Key? key,
     required this.pantryFood,
-    required this.onLongPress
+    required this.onLongPress,
+    required this.food
   }) : super(key: key);
 
   @override
@@ -23,16 +27,10 @@ class GroceryListItem extends StatefulWidget {
 
 class GroceryListItemState extends State<GroceryListItem> {
   get pantryFood => widget.pantryFood;
+  get food => widget.food;
   bool isExpanded = false;
 
-  Future<User> _getUser(String id, email, qualifier) async {
-    return Database.getUser(id, email, qualifier);
-  }
-
-  _getFood(String id) {
-    Database.getFood("", "", id, Database.idQual);
-  }
-
+  //PantryFood CRUD Methods
   _updatePantryFood (String id, String amount, String pantryId, String foodId) {
     Database.updatePantryFood(id, amount, pantryId, foodId);
   }
@@ -79,7 +77,7 @@ class GroceryListItemState extends State<GroceryListItem> {
                                               borderRadius: BorderRadius.all(Radius.circular(5)),
                                               color: Colors.white,
                                             ),
-                                            child: Image.network("https://www.pngmart.com/files/5/Ketchup-PNG-HD.png"),
+                                            child: Image.network(food.imgUrl ?? "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930"),
                                           ),
                                         ),
                                       ),
@@ -95,7 +93,7 @@ class GroceryListItemState extends State<GroceryListItem> {
                                               ),
                                               child:
                                               Text(
-                                                "Heinz Tomato Ketchup, 750mL/25oz., Bottle, {Imported From Canada",
+                                                food.name,
                                                 textAlign: TextAlign.left,
                                                 style: const TextStyle(
                                                   fontSize: 20,
@@ -112,12 +110,12 @@ class GroceryListItemState extends State<GroceryListItem> {
                                             ),
                                             Visibility(
                                               visible: isExpanded,
-                                              child: const Padding(
-                                                padding: EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
+                                              child: Padding(
+                                                padding: const EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
                                                 child: Text(
-                                                  "Vegetable, organic, classic, yummy, phenomenal",
+                                                  food.category,
                                                   textAlign: TextAlign.left,
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                       fontSize: 18,
                                                       color: Colors.white,
                                                       fontWeight: FontWeight.w500
@@ -191,9 +189,10 @@ class GroceryListItemState extends State<GroceryListItem> {
                     children: [
                       TextButton(
                         onPressed: () {
-                          Food food = _getFood(pantryFood.foodId!);
-                          _updatePantryFood(pantryFood.id!, food.weight!, pantryFood.pantryId!, pantryFood.foodId!);
-
+                          setState(() async {
+                            //update the availability to full (100%/1)
+                            await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
+                          });
                           Navigator.pop(context);
                         },
                         style: const ButtonStyle(

@@ -1,8 +1,12 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
 import 'package:pocket_kitchen/models/go_upc_models/go_upc_item.dart';
+import '../../main.dart';
 import '../../models/data_models/food.dart';
 import '../../models/data_models/pantry_food.dart';
+import 'grocery_list_item.dart';
 import 'grocery_list_listview.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:pocket_kitchen/models/app_models/database.dart';
@@ -16,13 +20,11 @@ class GroceryListView extends StatefulWidget {
   GroceryListViewState createState() => GroceryListViewState();
 }
 class GroceryListViewState extends State<GroceryListView> {
-  List<PantryFood> groceryList = [PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1"), PantryFood(id: "1", amount: "5.55", pantryId: "0", foodId: "1")];
-  List<Food> allFoods = [];
-  late GoUPCItem scannedItem;
-
   String searchTerm = "";
   bool isChecked = false;
-  String barcodeNo = "";
+
+  late GoUPCItem scannedItem;
+  String barcodeNo = "0058891252220";
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
@@ -37,8 +39,8 @@ class GroceryListViewState extends State<GroceryListView> {
   }
 
   //Pantry food CRUD methods
-  _createPantryFood(String amount, String pantryId, String foodId) {
-    Database.createPantryFood(amount, pantryId, foodId);
+  Future<void> _createPantryFood(String amount, String pantryId, String foodId) async {
+    await Database.createPantryFood(amount, pantryId, foodId);
   }
 
   _updatePantryFood(String id, String amount, String pantryId, String foodId) {
@@ -49,9 +51,26 @@ class GroceryListViewState extends State<GroceryListView> {
     Database.getPantryFood(foodId);
   }
 
-  Future _scan() async{
+  bool isNumeric(String s) {
+    try {
+      int.parse(s);
+      return true;
+    } catch(e) {
+      return false;
+    }
+  }
+
+  bool isPeriod(String s) {
+    if (s == ".") {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future _scan() async {
     //scans barcode and returns the barcode number
-    await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
+    //await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
 
     //API call to Go-UPC with barcode number
     Response response = await get(Uri.parse('https://go-upc.com/api/v1/code/$barcodeNo'), headers: {
@@ -60,47 +79,160 @@ class GroceryListViewState extends State<GroceryListView> {
 
     //if response succeeds
     if (response.statusCode == 200) {
-
       //store returned item values
       scannedItem = GoUPCItem.fromJson(jsonDecode(response.body));
 
+      var amountStr = "";
+      var amount = "";
+      var amountCharLength = 0;
+
+      //get amount out of name string
+      //loop over product.name string
+      for (var rune in scannedItem.product!.name!.runes) {
+        //add each character to temp var amountStr
+        amountStr = amountStr + String.fromCharCode(rune).toLowerCase();
+        //check that amountStr ends with kg (ready to retrieve measurement)
+        if (amountStr.endsWith("kg")) {
+          //cut off string besides last 8 characters (8 characters is the maximum, for a 5 digit weight that has a space between kg ex. 23.45 KG)
+          amountStr = amountStr.substring(amountStr.length - 8);
+          //check if string has space between measurement and 'kg' or not
+          if (amountStr[amountStr.length - 3] == " ") {
+            //checks that the current character is a number or decimal (when it isn't, we have our string)
+            if (isNumeric(amountStr[amountStr.length - 4]) || isPeriod(amountStr[amountStr.length - 4])) {
+              //checks that the current character is a number or decimal (when it isn't, we have our string)
+              if (isNumeric(amountStr[amountStr.length - 5]) || isPeriod(amountStr[amountStr.length - 5])) {
+                //checks that the current character is a number or decimal (when it isn't, we have our string)
+                if (isNumeric(amountStr[amountStr.length - 6]) || isPeriod(amountStr[amountStr.length - 6])) {
+                  //checks that the current character is a number or decimal (when it isn't, we have our string)
+                  if (isNumeric(amountStr[amountStr.length - 7]) || isPeriod(amountStr[amountStr.length - 7])) {
+                    //checks that the current character is a number or decimal (when it isn't, we have our string)
+                    if (isNumeric(amountStr[amountStr.length - 8])) {
+                      //cuts off 'kg'
+                      amountStr = amountStr.substring(0, 5);
+                      //sets expected length of amount for substring
+                      amountCharLength = 5;
+                    } else {
+                      //cuts off 'kg'
+                      amountStr = amountStr.substring(1, 5);
+                      //sets expected length of amount for substring
+                      amountCharLength = 4;
+                    }
+                  } else {
+                    //cuts off 'kg'
+                    amountStr = amountStr.substring(2, 5);
+                    //sets expected length of amount for substring
+                    amountCharLength = 3;
+                  }
+                } else {
+                  //cuts off 'kg'
+                  amountStr = amountStr.substring(3, 5);
+                  //sets expected length of amount for substring
+                  amountCharLength = 2;
+                }
+              } else {
+                //cuts off 'kg'
+                amountStr = amountStr.substring(4, 5);
+                //sets expected length of amount for substring
+                amountCharLength = 1;
+              }
+            }
+          //if there isn't a space between measurement and 'kg'
+          } else {
+            //checks that the current character is a number or decimal (when it isn't, we have our string)
+            if (isNumeric(amountStr[amountStr.length - 3]) || isPeriod(amountStr[amountStr.length - 3])) {
+              //checks that the current character is a number or decimal (when it isn't, we have our string)
+              if (isNumeric(amountStr[amountStr.length - 4]) || isPeriod(amountStr[amountStr.length - 4])) {
+                //checks that the current character is a number or decimal (when it isn't, we have our string)
+                if (isNumeric(amountStr[amountStr.length - 5]) || isPeriod(amountStr[amountStr.length - 5])) {
+                  //checks that the current character is a number or decimal (when it isn't, we have our string)
+                  if (isNumeric(amountStr[amountStr.length - 6]) || isPeriod(amountStr[amountStr.length - 6])) {
+                    //checks that the current character is a number or decimal (when it isn't, we have our string)
+                    if (isNumeric(amountStr[amountStr.length - 7])) {
+                      //cuts off 'kg'
+                      amountStr = amountStr.substring(1, 6);
+                      //sets expected length of amount for substring
+                      amountCharLength = 5;
+                    } else {
+                      //cuts off 'kg'
+                      amountStr = amountStr.substring(2, 6);
+                      //sets expected length of amount for substring
+                      amountCharLength = 4;
+                    }
+                  } else {
+                    //cuts off 'kg'
+                    amountStr = amountStr.substring(3, 6);
+                    //sets expected length of amount for substring
+                    amountCharLength = 3;
+                  }
+                } else {
+                  //cuts off 'kg'
+                  amountStr = amountStr.substring(4, 6);
+                  //sets expected length of amount for substring
+                  amountCharLength = 2;
+                }
+              } else {
+                //cuts off 'kg'
+                amountStr = amountStr.substring(5, 6);
+                //sets expected length of amount for substring
+                amountCharLength = 1;
+              }
+            }
+          }
+        }
+      }
+
+      //sub string the temp var from the first index to the length it should be (amountCharLength)
+      amount = amountStr.substring(0, amountCharLength);
+
       //query for food with same barcode to check if it already exists in the food table
-      Food checkFood = _getFood(barcodeNo, "", "", Database.barcodeQual) as Food;
+      Food checkFood = await _getFood(barcodeNo, "", "", Database.barcodeQual);
 
       //if the barcode does match and the food already exists
       if (checkFood.barcode == barcodeNo) {
 
         //query for pantry food with the same barcode to check if it already exists in the pantry food table
-        PantryFood checkPantryFood = _getPantryFood(checkFood.id!);
+        PantryFood checkPantryFood = await _getPantryFood(checkFood.id!);
 
         //if the barcode matches and its pantry id is the user's current pantry id, then it exists
-        if (checkPantryFood.foodId == checkFood.id /*&& checkPantryFood.pantryId == pantryId*/) {
+        if (checkPantryFood.foodId == checkFood.id && checkPantryFood.pantryId == sharedPrefs.currentPantry) {
 
           //Therefore, the user is refilling the item's stock. Update the amount to full (equal to it's food's weight)
-          _updatePantryFood(checkPantryFood.id!, checkFood.weight!, checkPantryFood.pantryId!, checkPantryFood.foodId!);
+          await _updatePantryFood(checkPantryFood.id!, "1", checkPantryFood.pantryId!, checkPantryFood.foodId!);
+
+          //update pantryFood list
+          await sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
+          print(sharedPrefs.pantryFoodIds);
 
         //if the food doesn't exist in the user's pantry foods, create it
         } else {
-          //_createPantryFood(scannedItem.product!.specs!["Liquid Volume"]!, pantryId, checkFood.id!);
+
+          //create pantry food
+          await _createPantryFood("1", sharedPrefs.currentPantry, checkFood.id!);
+
+          //update pantryFood list
+          await sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
+          print(sharedPrefs.pantryFoodIds);
         }
 
       //if the barcode doesn't match and the food isn't in the food's table, create a food and pantry food of it
       } else {
-        _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl!, scannedItem.product!.category!, scannedItem.product!.description!, scannedItem.product!.specs!["Liquid Volume"]!, false, barcodeNo);
-        Food inputtedFood = _getFood(barcodeNo, "", "", Database.barcodeQual) as Food;
-        //_createPantryFood(scannedItem.product!.specs!["Liquid Volume"]!, pantryId, inputtedFood.id!);
+
+        //create food
+        await _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl!, scannedItem.product!.category!, scannedItem.product!.description!, amount, false, barcodeNo);
+
+        //get food
+        Food inputtedFood = await _getFood(barcodeNo, "", "", Database.barcodeQual);
+
+        //create pantry food
+        await _createPantryFood("1", sharedPrefs.currentPantry, inputtedFood.id!);
+
+        //update pantryFood list
+        await sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
+        print(sharedPrefs.pantryFoodIds);
       }
     }
   }
-/*
-  _getAllUsers() {
-    Database.getAllUsers().then((users){
-      setState(() {
-        usersList = users;
-      });
-    });
-  }
-*/
+
   @override
   Widget build(BuildContext context) =>
     Scaffold(
@@ -136,8 +268,10 @@ class GroceryListViewState extends State<GroceryListView> {
                         children: [
                           TextField(
                             enabled: true,
-                            onChanged: (String input) {
-                              searchTerm = input;
+                            onChanged: (String search) {
+                              setState(() {
+                                sharedPrefs.getAllListsFiltered(search);
+                              });
                             },
                             decoration: const InputDecoration(
                                 border: OutlineInputBorder(
@@ -162,7 +296,34 @@ class GroceryListViewState extends State<GroceryListView> {
                           ),
                           Expanded(
                             child:
-                            GroceryList(groceryList: groceryList),
+                            FutureBuilder(
+                                future: Future.wait([
+                                  sharedPrefs.getAvailablePantryFoods(),
+                                  sharedPrefs.getFoodsForPantryFoods(1)
+                                ]),
+                                builder: (context, AsyncSnapshot<List<List<dynamic>>> snapshot) {
+                                  return ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemCount: sharedPrefs.pantryFoodIds.length,
+                                      itemBuilder: (context, index) {
+                                        return GroceryListItem(
+                                            onLongPress: () {
+                                              setState(() async {
+                                                //get pantry food to update availability
+                                                PantryFood pantryFood = await _getPantryFood(snapshot.data![0][index]);
+
+                                                //update the availability to full (100%/1)
+                                                await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
+                                              });
+                                            },
+                                            pantryFood: snapshot.data![0][index],
+                                            food: snapshot.data![1][index]
+                                        );
+                                      }
+                                  );
+                                }
+                            ),
                           ),
                         ],
                       )
@@ -238,9 +399,21 @@ class GroceryListViewState extends State<GroceryListView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextButton(
-                    onPressed: () {
-                      _createFood(nameController.text, "", "", "", amountController.text, isChecked, "");
-                      //_createPantryFood(amountController.text, /*pantryId,*/ foodId);
+                    onPressed: () async {
+
+                      //create food
+                      await _createFood(nameController.text, "", "", "", amountController.text, isChecked, "");
+
+                      //get food for id
+                      Food food = await _getFood("", nameController.text, "", Database.nameQual);
+
+                      //create pantry food
+                      await _createPantryFood(amountController.text, sharedPrefs.currentPantry, food.id!);
+
+                      //update pantryFood list
+                      await sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
+                      print(sharedPrefs.pantryFoodIds);
+
                       Navigator.pop(context);
                     },
                     style: const ButtonStyle(
