@@ -29,6 +29,9 @@ class GroceryListViewState extends State<GroceryListView> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
 
+  List<PantryFood> unavailPantryFoods = [PantryFood(amount: "1", pantryId: "3", foodId: "4"), PantryFood(amount: "1", pantryId: "3", foodId: "4"), PantryFood(amount: "1", pantryId: "3", foodId: "4")];
+  List<Food> unavailFoods = [Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg")];
+
   //Food CRUD methods
   _createFood(String name, String imgUrl, String category, String desc, String weight, bool ownUnit, barcode) {
     Database.createFood(name, imgUrl, category, desc, weight, ownUnit, barcode);
@@ -70,7 +73,7 @@ class GroceryListViewState extends State<GroceryListView> {
 
   Future _scan() async {
     //scans barcode and returns the barcode number
-    //await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
+    await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
 
     //API call to Go-UPC with barcode number
     Response response = await get(Uri.parse('https://go-upc.com/api/v1/code/$barcodeNo'), headers: {
@@ -305,7 +308,7 @@ class GroceryListViewState extends State<GroceryListView> {
                                   return ListView.builder(
                                       shrinkWrap: true,
                                       physics: const NeverScrollableScrollPhysics(),
-                                      itemCount: sharedPrefs.pantryFoodIds.length,
+                                      itemCount: unavailPantryFoods.length,//sharedPrefs.pantryFoodIds.length,
                                       itemBuilder: (context, index) {
                                         return GroceryListItem(
                                             onLongPress: () {
@@ -317,8 +320,8 @@ class GroceryListViewState extends State<GroceryListView> {
                                                 await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
                                               });
                                             },
-                                            pantryFood: snapshot.data![0][index],
-                                            food: snapshot.data![1][index]
+                                            pantryFood: unavailPantryFoods[index],//snapshot.data![0][index],
+                                            food: unavailFoods[index],//snapshot.data![1][index]
                                         );
                                       }
                                   );
