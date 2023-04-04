@@ -27,4 +27,6 @@ class RecipeData {
       throw Exception('Failed to fetch recipes');
     }
   }
+
+
 }

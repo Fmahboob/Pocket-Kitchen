@@ -93,6 +93,7 @@ class Database {
       bodyMap["email"] = "$email";
 
       final response = await post(root, body: bodyMap);
+      print(response.body);
       if (response.statusCode == 200) {
         user = parseUsersToList(response.body)[0];
         print("Got the user");

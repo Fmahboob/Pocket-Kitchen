@@ -27,7 +27,7 @@ class RecipeViewState extends State<RecipeView>{
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 8.0, 4.0, 8.0),
+            padding: const EdgeInsets.fromLTRB(4.0, 8.0, 4.0, 8.0),
             child: Container(
               decoration: const BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -36,36 +36,35 @@ class RecipeViewState extends State<RecipeView>{
               ),
               alignment: Alignment.center,
               child: const Padding(
-                padding: EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
+                padding: EdgeInsets.all(8.0),
                 child: Text("Recipe Title", style: headingStyle
                 ),
                 ),
               ),
             ),
           const Padding(
-              padding: EdgeInsets.fromLTRB(16.0, 4.0, 4.0, 4.0),
+              padding: EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
               child: Text("Image",
                 style: textStyle,
               )),
           Row(
             children: const [
               Padding(
-                padding: EdgeInsets.fromLTRB(16.0, 4.0, 4.0, 4.0),
+                padding: EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
                 child: Text("Cook Time",
                   style: textStyle,),
               ),
 
             Padding(
-              padding: EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
+              padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
               child: Text("min",
                 style: textStyle,),
             ),
             ],
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.fromLTRB(4.0, 8.0, 4.0, 8.0),
             child: Container(
-    height: 50,
     decoration: const BoxDecoration(
     borderRadius: BorderRadius.all(Radius.circular(5)),
     color: Color(0xff459657),
@@ -74,19 +73,15 @@ class RecipeViewState extends State<RecipeView>{
               child: Row(
                 children: const [
                  Padding(
-                        padding: EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text("Ingredients",
                           style: headingStyle,),
                       ),
                   Spacer(),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+                    padding: EdgeInsets.all(8.0),
                     child: Text("Available",
-                      style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500
-                      ),),
+                      style: headingStyle,),
                   ),
 
                 ],
@@ -94,7 +89,33 @@ class RecipeViewState extends State<RecipeView>{
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
+            padding: const EdgeInsets.all(4.0),
+
+              child: Row(
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
+                    child: Text("Ingredients",
+                      style: textStyle,),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
+                    child: Text("X",
+                      style: textStyle,),
+                  ),
+                  Spacer(),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(4.0, 4.0, 8.0, 4.0),
+                    child: Text("Available",
+                      style: textStyle,),
+                  ),
+
+                ],
+              ),
+            ),
+
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4.0, 8.0, 4.0, 8.0),
             child: Container(
               decoration: const BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -103,20 +124,18 @@ class RecipeViewState extends State<RecipeView>{
               ),
               alignment: Alignment.centerLeft,
               child: const Padding(
-                padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
-                child: Text("Instructions", style:headingStyle
+                padding: EdgeInsets.all(8.0),
+                child: Text("Instructions", style: headingStyle
                 ),
               ),
             ),
           ),
           const Padding(
-              padding: EdgeInsets.fromLTRB(16.0, 4.0, 4.0, 4.0),
+              padding: EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
               child: Text("Instruct",
                 style: textStyle,
-              )),
-
-
-
+              ),
+          ),
         ],
       ),
     );
