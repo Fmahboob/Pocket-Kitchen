@@ -19,22 +19,34 @@ class SharedPrefs {
   setPantryFoodIds(String pantryId) async {
     //get all pantry foods for the user's current pantry
     List<PantryFood> pantryFoods = await Database.getAllPantryFoods(sharedPrefs.currentPantry);
-    List<String> pantryFoodIds = [];
+
+    List<String> availPantryFoodIds = [];
+    List<String> unavailPantryFoodIds = [];
+    List<String> allPantryFoodIds = [];
     //loop through the pantry foods to extract ids
     pantryFoods.forEach((PantryFood pantryFood) {
-      pantryFoodIds.add(pantryFood.id!);
+      if (pantryFood.amount == 0) {
+        unavailPantryFoodIds.add(pantryFood.id!);
+      } else {
+        availPantryFoodIds.add(pantryFood.id!);
+      }
+      allPantryFoodIds.add(pantryFood.id!);
     });
     //save the ids to local storage
-    _sharedPrefs!.setStringList("pantryFoods", pantryFoodIds);
+    _sharedPrefs!.setStringList("availPantryFoods", availPantryFoodIds);
+    _sharedPrefs!.setStringList("unavailPantryFoods", unavailPantryFoodIds);
+    _sharedPrefs!.setStringList("allPantryFoods", allPantryFoodIds);
   }
 
   //get current pantry food ids
-  List<String> get pantryFoodIds => _sharedPrefs!.getStringList("pantryFoods") ?? [];
+  List<String> get availPantryFoodIds => _sharedPrefs!.getStringList("availPantryFoods") ?? [];
+  List<String> get unavailPantryFoodIds => _sharedPrefs!.getStringList("unavailPantryFoods") ?? [];
+  List<String> get allPantryFoodIds => _sharedPrefs!.getStringList("allPantryFoods") ?? [];
 
   //get all current pantry foods
   Future<List<PantryFood>> getPantryFoods() async {
     List<PantryFood> pantryFoods = [];
-    for (var element in pantryFoodIds) {
+    for (var element in allPantryFoodIds) {
       print("in get pf");
       pantryFoods.add(await Database.getPantryFood(element));
     }
@@ -209,6 +221,26 @@ class SharedPrefs {
       return false;
     } else {
       return true;
+    }
+  }
+
+  //getter for if available list is empty
+  bool get availableEmpty {
+    List<String> availableList = availPantryFoodIds;
+    if (availableList.isEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  //getter for if unavailable list is empty
+  bool get unavailableEmpty {
+    List<String> availableList = unavailPantryFoodIds;
+    if (availableList.isEmpty) {
+      return true;
+    } else {
+      return false;
     }
   }
 

@@ -18,19 +18,20 @@ class Database {
   static const updateAction = 'UPDATE';
   static const deleteAction = 'DELETE';
 
-  //Data table constants
+  //Table constants
   static const foodTable = 'FOODS';
   static const userTable = 'USERS';
   static const pantryTable = 'PANTRIES';
   static const pantryFoodTable = 'PANTRY_FOODS';
   static const pantryUserTable = 'PANTRY_USERS';
 
-  //Qualifier options
+  //Qualifier constants
   static const barcodeQual = "BARCODE";
   static const nameQual = "NAME";
   static const idQual = "ID";
   static const emailQual = "EMAIL";
   static const bothQual = "BOTH";
+  static const ownerQual = "OWNER";
 
   //USER CRUD Methods
   //Create user
@@ -94,7 +95,9 @@ class Database {
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
+        print(response.body);
         user = parseUsersToList(response.body)[0];
+        print("after convert");
         print("Got the user");
         return user;
       }
@@ -174,17 +177,17 @@ class Database {
   }
 
   //Get all pantries
-  static Future<List<Pantry>> getAllPantries() async {
+  static Future<List<Pantry>> getAllPantries(String ownerId, String qualifier) async {
     List<Pantry> pantryList;
     try {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readAllAction";
       bodyMap["table"] = "$pantryTable";
-      bodyMap["qualifier"] = "";
+      bodyMap["qualifier"] = "$qualifier";
       bodyMap["pantry_id"] = "";
       bodyMap["name"] = "";
       bodyMap["user_count"] = "";
-      bodyMap["owner_id"] = "";
+      bodyMap["owner_id"] = "$ownerId";
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
@@ -276,7 +279,7 @@ class Database {
 
   //FOOD CRUD Methods
   //Create food
-  static Future<void> createFood(String name, String imgUrl, String category, String desc, String weight, bool ownUnit, String barcode) async {
+  static Future<void> createFood(String name, String imgUrl, String category, String desc, String weight, String ownUnit, String barcode) async {
     try {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$createAction";

@@ -16,7 +16,7 @@ abstract class PantryState<T extends StatefulWidget> extends State {
   @override
   void initState() {
     sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
-    print(sharedPrefs.pantryFoodIds);
+    print(sharedPrefs.allPantryFoodIds);
     super.initState();
   }
 }
@@ -365,7 +365,27 @@ class PantryListViewState extends PantryState<PantryListView> {
                       TextButton(
                         onPressed: () async {
                           await GoogleSignInAPI.logout();
+
+                          //reset user id
                           sharedPrefs.userId = "";
+
+                          //reset current pantry owner id
+                          sharedPrefs.currentPantryOwner = "";
+
+                          //reset current pantry name
+                          sharedPrefs.currentPantryName = "";
+
+                          //remove pantries from local storage
+                          if (sharedPrefs.currentPantry != "") {
+                            sharedPrefs.removeCurrentPantry();
+                            if(sharedPrefs.currentPantry != "") {
+                              sharedPrefs.removeCurrentPantry();
+                              if (sharedPrefs.currentPantry != "") {
+                                sharedPrefs.removeCurrentPantry();
+                              }
+                            }
+                          }
+
                           Navigator.pop(context);
                           Navigator.pop(context);
 

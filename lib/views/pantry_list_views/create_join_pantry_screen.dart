@@ -390,17 +390,35 @@ class NoPantryViewState extends State<NoPantryView> {
                       TextButton(
                         onPressed: () async {
                           await GoogleSignInAPI.logout();
+
+                          //reset user id
                           sharedPrefs.userId = "";
+
+                          //reset current pantry owner id
+                          sharedPrefs.currentPantryOwner = "";
+
+                          //reset current pantry name
+                          sharedPrefs.currentPantryName = "";
+
+                          //remove pantries from local storage
+                          if (sharedPrefs.currentPantry != "") {
+                            sharedPrefs.removeCurrentPantry();
+                            if(sharedPrefs.currentPantry != "") {
+                              sharedPrefs.removeCurrentPantry();
+                              if (sharedPrefs.currentPantry != "") {
+                                sharedPrefs.removeCurrentPantry();
+                              }
+                            }
+                          }
+
                           Navigator.pop(context);
                           Navigator.pop(context);
 
-                          //repush login
+                          //load sign in
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => const GoogleSignInView()),
                           );
-                          //reload app
-                          //RestartWidget.restartApp(context);
                         },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),

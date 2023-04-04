@@ -33,7 +33,7 @@ class GroceryListViewState extends State<GroceryListView> {
   List<Food> unavailFoods = [Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg")];
 
   //Food CRUD methods
-  _createFood(String name, String imgUrl, String category, String desc, String weight, bool ownUnit, barcode) {
+  _createFood(String name, String imgUrl, String category, String desc, String weight, String ownUnit, String barcode) {
     Database.createFood(name, imgUrl, category, desc, weight, ownUnit, barcode);
   }
 
@@ -204,7 +204,7 @@ class GroceryListViewState extends State<GroceryListView> {
 
           //update pantryFood list
           await sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
-          print(sharedPrefs.pantryFoodIds);
+          print(sharedPrefs.allPantryFoodIds);
 
         //if the food doesn't exist in the user's pantry foods, create it
         } else {
@@ -214,14 +214,14 @@ class GroceryListViewState extends State<GroceryListView> {
 
           //update pantryFood list
           await sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
-          print(sharedPrefs.pantryFoodIds);
+          print(sharedPrefs.allPantryFoodIds);
         }
 
       //if the barcode doesn't match and the food isn't in the food's table, create a food and pantry food of it
       } else {
 
         //create food
-        await _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl!, scannedItem.product!.category!, scannedItem.product!.description!, amount, false, barcodeNo);
+        await _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl!, scannedItem.product!.category!, scannedItem.product!.description!, amount, "0", barcodeNo);
 
         //get food
         Food inputtedFood = await _getFood(barcodeNo, "", "", Database.barcodeQual);
@@ -231,7 +231,7 @@ class GroceryListViewState extends State<GroceryListView> {
 
         //update pantryFood list
         await sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
-        print(sharedPrefs.pantryFoodIds);
+        print(sharedPrefs.allPantryFoodIds);
       }
     }
   }
@@ -299,34 +299,34 @@ class GroceryListViewState extends State<GroceryListView> {
                           ),
                           Expanded(
                             child:
-                            FutureBuilder(
-                                future: Future.wait([
-                                  sharedPrefs.getAvailablePantryFoods(),
-                                  sharedPrefs.getFoodsForPantryFoods(1)
-                                ]),
-                                builder: (context, AsyncSnapshot<List<List<dynamic>>> snapshot) {
-                                  return ListView.builder(
-                                      shrinkWrap: true,
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      itemCount: unavailPantryFoods.length,//sharedPrefs.pantryFoodIds.length,
-                                      itemBuilder: (context, index) {
-                                        return GroceryListItem(
-                                            onLongPress: () {
-                                              setState(() async {
-                                                //get pantry food to update availability
-                                                PantryFood pantryFood = await _getPantryFood(snapshot.data![0][index]);
+                                    FutureBuilder(
+                                        future: Future.wait([
+                                          sharedPrefs.getAvailablePantryFoods(),
+                                          sharedPrefs.getFoodsForPantryFoods(1)
+                                        ]),
+                                        builder: (context, AsyncSnapshot<List<List<dynamic>>> snapshot) {
+                                          return ListView.builder(
+                                              shrinkWrap: true,
+                                              physics: const NeverScrollableScrollPhysics(),
+                                              itemCount: unavailPantryFoods.length,//sharedPrefs.pantryFoodIds.length,
+                                              itemBuilder: (context, index) {
+                                                return GroceryListItem(
+                                                  onLongPress: () {
+                                                    setState(() async {
+                                                      //get pantry food to update availability
+                                                      PantryFood pantryFood = await _getPantryFood(snapshot.data![0][index]);
 
-                                                //update the availability to full (100%/1)
-                                                await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
-                                              });
-                                            },
-                                            pantryFood: unavailPantryFoods[index],//snapshot.data![0][index],
-                                            food: unavailFoods[index],//snapshot.data![1][index]
-                                        );
-                                      }
-                                  );
-                                }
-                            ),
+                                                      //update the availability to full (100%/1)
+                                                      await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
+                                                    });
+                                                  },
+                                                  pantryFood: unavailPantryFoods[index],//snapshot.data![0][index],
+                                                  food: unavailFoods[index],//snapshot.data![1][index]
+                                                );
+                                              }
+                                          );
+                                        }
+                                    ),
                           ),
                         ],
                       )
@@ -403,9 +403,15 @@ class GroceryListViewState extends State<GroceryListView> {
                 children: [
                   TextButton(
                     onPressed: () async {
-
+                      //set is its own unit var
+                      String ownUnit = "";
+                      if (isChecked) {
+                        ownUnit = "1";
+                      } else {
+                        ownUnit = "0";
+                      }
                       //create food
-                      await _createFood(nameController.text, "", "", "", amountController.text, isChecked, "");
+                      await _createFood(nameController.text, "", "", "", amountController.text, ownUnit, "");
 
                       //get food for id
                       Food food = await _getFood("", nameController.text, "", Database.nameQual);
@@ -415,7 +421,7 @@ class GroceryListViewState extends State<GroceryListView> {
 
                       //update pantryFood list
                       await sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
-                      print(sharedPrefs.pantryFoodIds);
+                      print(sharedPrefs.allPantryFoodIds);
 
                       Navigator.pop(context);
                     },
