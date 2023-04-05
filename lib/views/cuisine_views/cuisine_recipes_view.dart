@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/models/recipe_model/recipe_list.dart';
 
 
+import '../../models/app_models/shared_preferences.dart';
 import '../../models/recipe_model/recipe_data.dart';
 
 class CuisinesRecipesView extends StatefulWidget {
@@ -15,7 +16,6 @@ class CuisinesRecipesView extends StatefulWidget {
 
 class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
   late Future<List<RecipeList>> futureRecipes;
-  String pantryName = "Robbie's Home";
 
   @override
   void initState() {
@@ -33,7 +33,7 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
         appBar: AppBar(
         centerTitle: true,
         backgroundColor: const Color(0xff459657),
-    title: Text(pantryName),
+    title: Text(sharedPrefs.currentPantryName),
     ),
     body: FutureBuilder<List<RecipeList>>(
       future: futureRecipes,

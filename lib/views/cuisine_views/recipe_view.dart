@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../models/app_models/shared_preferences.dart';
+
 class RecipeView extends StatefulWidget {
   const RecipeView({super.key});
 
@@ -10,7 +12,6 @@ class RecipeView extends StatefulWidget {
 }
 
 class RecipeViewState extends State<RecipeView>{
-  String pantryName = "Robbie's Home";
   static const textStyle = TextStyle(fontSize: 20, color: Color(0xff7B7777));
   static const headingStyle = TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.w500
   );
@@ -21,7 +22,7 @@ class RecipeViewState extends State<RecipeView>{
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: const Color(0xff459657),
-        title: Text(pantryName),
+        title: Text(sharedPrefs.currentPantryName),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
