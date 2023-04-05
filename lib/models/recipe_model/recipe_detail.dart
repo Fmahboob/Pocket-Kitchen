@@ -3,11 +3,17 @@ class RecipeDetail {
   final String title;
   final String imageUrl;
   final String cookTime;
-  final int ingredientUnit;
-  final String ingredientName;
   final String instructions;
 
-  RecipeDetail(this.id, this.title, this.imageUrl, this.cookTime, this.ingredientUnit, this.ingredientName, this.instructions);
+  RecipeDetail({required this.id, required this.title, required this.imageUrl, required this.cookTime, required this.instructions});
 
+  factory RecipeDetail.fromJson(Map<String, dynamic> json) {
+    return RecipeDetail(
+        id: json['id'],
+        title: json['title'],
+        imageUrl: json['image'],
+        cookTime: json['readyInMinutes'],
+        instructions: json['instructions']);
+  }
 
 }
