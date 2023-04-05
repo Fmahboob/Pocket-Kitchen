@@ -16,7 +16,7 @@ abstract class PantryState<T extends StatefulWidget> extends State {
   @override
   void initState() {
     sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
-    print(sharedPrefs.pantryFoodIds);
+    print(sharedPrefs.allPantryFoodIds);
     super.initState();
   }
 }
@@ -53,6 +53,13 @@ class PantryListViewState extends PantryState<PantryListView> {
 
   static const drawerGreenStyle = TextStyle(fontSize: 20, color: Color(0xff459657));
   static const drawerGreyStyle = TextStyle(fontSize: 20, color: Color(0xff7B7777));
+
+  List<PantryFood> availPantryFoods = [PantryFood(amount: "1", pantryId: "3", foodId: "4"), PantryFood(amount: "1", pantryId: "3", foodId: "4"), PantryFood(amount: "1", pantryId: "3", foodId: "4")];
+  List<PantryFood> unavailPantryFoods = [PantryFood(amount: "1", pantryId: "3", foodId: "4"), PantryFood(amount: "1", pantryId: "3", foodId: "4"), PantryFood(amount: "1", pantryId: "3", foodId: "4")];
+
+  List<Food> availFoods = [Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg")];
+  List<Food> unavailFoods = [Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg")];
+
 
   //Non-matching retrieved name to inputted name on pantry joining snackbar
   final nonMatchSnackBar = const SnackBar(
@@ -155,11 +162,11 @@ class PantryListViewState extends PantryState<PantryListView> {
                              return ListView.builder(
                                shrinkWrap: true,
                                physics: const NeverScrollableScrollPhysics(),
-                               itemCount: sharedPrefs.pantryFoodIds.length,
+                               itemCount: availPantryFoods.length,//sharedPrefs.pantryFoodIds.length,
                                itemBuilder: (context, index) {
                                  return PantryListItem(
-                                     pantryFood: snapshot.data![0][index],
-                                     food: snapshot.data![1][index],
+                                     pantryFood: availPantryFoods[index],//snapshot.data![0][index],
+                                     food: availFoods[index],//snapshot.data![1][index],
                                      onLongPress: () {
                                       manualEmptyDialog(snapshot.data![0][index]);
                                      });
@@ -186,7 +193,7 @@ class PantryListViewState extends PantryState<PantryListView> {
                             return ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: sharedPrefs.pantryFoodIds.length,
+                              itemCount: unavailPantryFoods.length,//sharedPrefs.pantryFoodIds.length,
                               itemBuilder: (context, index) {
                                 return UnavailablePantryItem(
                                     onLongPress: () {
@@ -198,8 +205,8 @@ class PantryListViewState extends PantryState<PantryListView> {
                                         await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
                                       });
                                     },
-                                    pantryFood: snapshot.data![0][index],
-                                    food: snapshot.data![1][index]
+                                    pantryFood: unavailPantryFoods[index],//snapshot.data![0][index],
+                                    food: unavailFoods[index],//snapshot.data![1][index]
                                 );
                               }
                             );
@@ -358,7 +365,27 @@ class PantryListViewState extends PantryState<PantryListView> {
                       TextButton(
                         onPressed: () async {
                           await GoogleSignInAPI.logout();
+
+                          //reset user id
                           sharedPrefs.userId = "";
+
+                          //reset current pantry owner id
+                          sharedPrefs.currentPantryOwner = "";
+
+                          //reset current pantry name
+                          sharedPrefs.currentPantryName = "";
+
+                          //remove pantries from local storage
+                          if (sharedPrefs.currentPantry != "") {
+                            sharedPrefs.removeCurrentPantry();
+                            if(sharedPrefs.currentPantry != "") {
+                              sharedPrefs.removeCurrentPantry();
+                              if (sharedPrefs.currentPantry != "") {
+                                sharedPrefs.removeCurrentPantry();
+                              }
+                            }
+                          }
+
                           Navigator.pop(context);
                           Navigator.pop(context);
 

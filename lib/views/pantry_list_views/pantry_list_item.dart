@@ -17,7 +17,6 @@ class PantryListItem extends StatefulWidget {
   });
   @override
   State<StatefulWidget> createState() => PantryListItemState();
-
 }
 
 class PantryListItemState extends State<PantryListItem> {
@@ -30,7 +29,8 @@ class PantryListItemState extends State<PantryListItem> {
   String percentLeft() {
     double percentDecimal = double.parse(pantryFood.amount);
     double percentWhole = percentDecimal * 100;
-    return "$percentWhole%";
+    String percentStr = percentWhole.toStringAsFixed(0);
+    return "$percentStr%";
   }
 
   //PantryFood CRUD Methods
@@ -145,12 +145,12 @@ class PantryListItemState extends State<PantryListItem> {
                                 child: const Padding(
                                   padding: EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
                                   child: Text(
-                                    "% Left",
+                                    "% Left:",
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
@@ -162,8 +162,8 @@ class PantryListItemState extends State<PantryListItem> {
                                 child: const Spacer(),
                               ),
                               SizedBox(
-                                height: 30,
-                                width: 50,
+                                height: 40,
+                                width: 60,
                                 child: TextFormField(
                                   enabled: true,
                                   controller: percentController,

@@ -5,6 +5,7 @@ import '../../models/app_models/database.dart';
 import '../../main.dart';
 import '../../models/data_models/user.dart';
 import '../models/app_models/google_sign_in_api.dart';
+import '../models/data_models/pantry.dart';
 
 class GoogleSignInView extends StatefulWidget {
   const GoogleSignInView({super.key});
@@ -15,7 +16,7 @@ class GoogleSignInView extends StatefulWidget {
 
 class GoogleSignInViewState extends State<GoogleSignInView> {
 
-
+  //User CRUD Methods
   Future<User> _getUser(String id, email, qualifier) async {
     return Database.getUser(id, email, qualifier);
   }
@@ -24,8 +25,15 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
     Database.createUser(email);
   }
 
+  //Pantry CRUD Methods
+  Future<List<Pantry>> _getPantries(String ownerId, String qualifier) async {
+    return Database.getAllPantries(ownerId, qualifier);
+  }
+
   Future signIn() async {
+
     await GoogleSignInAPI.logout();
+
     //login user through google API
     final googleUser = await GoogleSignInAPI.login();
     //attempt pulling user with google email to see if exists in our system
@@ -48,6 +56,23 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
 
       //set new user id in local storage
       sharedPrefs.userId = checkUser.id!;
+      print(sharedPrefs.userId);
+      //get users pantries
+      List<Pantry> pantries = await _getPantries(sharedPrefs.userId, Database.ownerQual);
+
+      //make sure pantries exist
+      if (pantries.isNotEmpty) {
+        //set current pantry name
+        sharedPrefs.currentPantryName = pantries[0].name!;
+
+        //set current pantry owner
+        sharedPrefs.currentPantryOwner = pantries[0].ownerId!;
+
+        //add pantries to local storage
+        for (var pantry in pantries) {
+          sharedPrefs.addNewPantry(pantry.id!);
+        }
+      }
     }
 
     //display main app to user
