@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/models/recipe_model/recipe_list.dart';
+import 'package:pocket_kitchen/views/cuisine_views/recipe_view.dart';
 
 
 import '../../models/app_models/shared_preferences.dart';
@@ -56,36 +57,45 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                  itemCount: recipes.length,
-                  itemBuilder: (context, index) {
-                    final RecipeList recipe = recipes[index];
-                    return  Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(5)),
-                              color: Color(0xff459657),
-
-                            ),
-                            alignment: Alignment.center,
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
-                              child: Text(recipe.title, style: const TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500
-                              ),),
-                            ),
-                          ),
-                          Padding(
-                              padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
-                              child: Image.network(recipe.imageUrl)),
-                        ],
-                      );
-
+                child: GestureDetector(
+                  onTap: (){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const RecipeView(),
+                      ),
+                    );
                   },
+                  child: ListView.builder(
+                    itemCount: recipes.length,
+                    itemBuilder: (context, index) {
+                      final RecipeList recipe = recipes[index];
+                      return  Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              decoration: const BoxDecoration(
+                                borderRadius: BorderRadius.all(Radius.circular(5)),
+                                color: Color(0xff459657),
+
+                              ),
+                              alignment: Alignment.center,
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
+                                child: Text(recipe.title, style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500
+                                ),),
+                              ),
+                            ),
+                            Padding(
+                                padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
+                                child: Image.network(recipe.imageUrl)),
+                          ],
+                        );
+
+                    },
+                  ),
                 ),
               ),
             ],
