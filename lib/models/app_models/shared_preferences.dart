@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:pocket_kitchen/models/app_models/database.dart';
 import 'package:pocket_kitchen/models/data_models/pantry_food.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +17,180 @@ class SharedPrefs {
   }
 
 
+  //sets food list
+  set foodList (List<Food> foods) {
+    List<String> foodsStrList = [];
+    for (Food food in foods) {
+      Map<String, dynamic> foodMap = jsonDecode(foodToJson(food));
+      foodsStrList.add(jsonEncode(foodMap));
+    }
+    _sharedPrefs!.setStringList("foodsList", foodsStrList);
+  }
+
+  //gets food list
+  List<Food> get foodList {
+    List<Food> foodsList = [];
+
+    List<String> foodsStrList = _sharedPrefs!.getStringList("foodsList") ?? [];
+
+    for (String food in foodsStrList) {
+      foodsList.add(Food.fromJsonLocal(jsonDecode(food)));
+    }
+
+    return foodsList;
+  }
+
+  //sets pantry food list
+  set pantryFoodList (List<PantryFood> pantryFoods) {
+    List<String> pantryFoodsStrList = [];
+    for (PantryFood pantryFood in pantryFoods) {
+      Map<String, dynamic> pantryFoodMap = jsonDecode(pantryFoodToJson(pantryFood));
+      pantryFoodsStrList.add(jsonEncode(pantryFoodMap));
+    }
+    _sharedPrefs!.setStringList("pantryFoodsList", pantryFoodsStrList);
+  }
+
+  //gets pantry food list
+  List<PantryFood> get pantryFoodList {
+    List<PantryFood> pantryFoodsList = [];
+
+    List<String> pantryFoodsStrList = _sharedPrefs!.getStringList("pantryFoodsList") ?? [];
+    for (String pantryFood in pantryFoodsStrList) {
+      pantryFoodsList.add(PantryFood.fromJsonLocal(jsonDecode(pantryFood)));
+    }
+    return pantryFoodsList;
+  }
+
+  //gets available foods
+  List<Food> get availableFoodList {
+    List<Food> availFoodsList = [];
+
+    List<Food> foodList = sharedPrefs.foodList;
+    List<PantryFood> pantryFoodList = sharedPrefs.pantryFoodList;
+
+    for (PantryFood pantryFood in pantryFoodList) {
+      if (pantryFood.amount != "0") {
+        for (Food food in foodList) {
+          if (food.id == pantryFood.foodId) {
+            availFoodsList.add(food);
+          }
+        }
+      }
+    }
+    availFoodsList.sort((a, b) {
+      return a.name!.toLowerCase().compareTo(b.name!.toLowerCase());
+    });
+    return availFoodsList;
+  }
+
+  //gets unavailable foods
+  List<Food> get unavailableFoodList {
+    List<Food> unavailFoodsList = [];
+
+    List<Food> foodList = sharedPrefs.foodList;
+    List<PantryFood> pantryFoodList = sharedPrefs.pantryFoodList;
+
+    for (PantryFood pantryFood in pantryFoodList) {
+      if (pantryFood.amount == "0") {
+        for (Food food in foodList) {
+          if (food.id == pantryFood.foodId) {
+            unavailFoodsList.add(food);
+          }
+        }
+      }
+    }
+    unavailFoodsList.sort((a, b) {
+      return a.name!.toLowerCase().compareTo(b.name!.toLowerCase());
+    });
+    return unavailFoodsList;
+  }
+
+  //gets available pantry foods
+  List<PantryFood> get availablePantryFoodList {
+    List<PantryFood> availPantryFoods = [];
+
+    List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+    List<Food> availFoodsList = sharedPrefs.availableFoodList;
+
+    for (Food food in availFoodsList) {
+      for (PantryFood pantryFood in pantryFoodsList) {
+        if (pantryFood.foodId == food.id) {
+          availPantryFoods.add(pantryFood);
+        }
+      }
+    }
+    return availPantryFoods;
+  }
+
+  //gets unavailable pantry foods
+  List<PantryFood> get unavailablePantryFoodList {
+    List<PantryFood> unavailPantryFoods = [];
+
+    List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+    List<Food> unavailFoodsList = sharedPrefs.unavailableFoodList;
+
+    for (Food food in unavailFoodsList) {
+      for (PantryFood pantryFood in pantryFoodsList) {
+        if (pantryFood.foodId == food.id) {
+          unavailPantryFoods.add(pantryFood);
+        }
+      }
+    }
+    return unavailPantryFoods;
+  }
+
+  //get available and unavailable pantry foods/ foods filtered by search
+  List<List<dynamic>> getAllListsFiltered(String search) {
+    List<PantryFood> availPantryFoodsList = sharedPrefs.availablePantryFoodList;
+    List<PantryFood> unavailPantryFoodsList = sharedPrefs.unavailablePantryFoodList;
+    List<Food> availFoodsList = sharedPrefs.availableFoodList;
+    List<Food> unavailFoodsList = sharedPrefs.unavailableFoodList;
+
+    List<PantryFood> filteredAvailPantryFoodList = [];
+    List<PantryFood> filteredUnavailPantryFoodList = [];
+    List<Food> filteredAvailFoodList = [];
+    List<Food> filteredUnavailFoodList = [];
+
+    for (Food food in availFoodsList) {
+      if (food.name!.contains(search) || food.category!.contains(search) || food.desc!.contains(search)) {
+        filteredAvailFoodList.add(food);
+      }
+    }
+
+    for (Food food in unavailFoodsList) {
+      if (food.name!.contains(search) || food.category!.contains(search) || food.desc!.contains(search)) {
+        filteredUnavailFoodList.add(food);
+      }
+    }
+
+    filteredAvailFoodList.sort((a, b) {
+      return a.name!.toLowerCase().compareTo(b.name!.toLowerCase());
+    });
+
+    filteredUnavailFoodList.sort((a, b) {
+      return a.name!.toLowerCase().compareTo(b.name!.toLowerCase());
+    });
+
+    for (Food food in filteredAvailFoodList) {
+      for (PantryFood pantryFood in availPantryFoodsList) {
+        if (food.id == pantryFood.foodId) {
+          filteredAvailPantryFoodList.add(pantryFood);
+        }
+      }
+    }
+
+    for (Food food in filteredUnavailFoodList) {
+      for (PantryFood pantryFood in unavailPantryFoodsList) {
+        if (food.id == pantryFood.foodId) {
+          filteredUnavailPantryFoodList.add(pantryFood);
+        }
+      }
+    }
+
+    return [filteredAvailPantryFoodList, filteredUnavailPantryFoodList, filteredAvailFoodList, filteredUnavailFoodList];
+  }
+
+/*
   //set current pantry food ids
   setPantryFoodIds(String pantryId) async {
     //get all pantry foods for the user's current pantry
@@ -81,40 +257,6 @@ class SharedPrefs {
     return unavailablePantryFoods;
   }
 
-  //get unavailable and available lists filtered by the search query
-  Future<List<List<PantryFood>>> getAllListsFiltered(String search) async {
-    //all pantry foods
-    List<PantryFood> pantryFoods = await getPantryFoods();
-    //all pantry food's foods
-    List<Food> foods = await getFoodsForPantryFoods(2);
-    //final available searched list
-    List<PantryFood> availPantryFoods = [];
-    //final unavailable searched list
-    List<PantryFood> unavailPantryFoods = [];
-
-    //loop over all pantryfoods
-    for (var pantryFood in pantryFoods) {
-      //available list
-      if (pantryFood.amount != "0") {
-        //get index to check if search matches PantryFood's food details
-        int index = foods.indexWhere((element) => element.id == pantryFood.foodId);
-        //check if search is contained in the food's name, category, and description
-        if (foods[index].name!.contains(search) || foods[index].category!.contains(search) || foods[index].desc!.contains(search)) {
-          availPantryFoods.add(pantryFood);
-        }
-      //unavailable list
-      } else {
-        //get index to check if search matches PantryFood's food details
-        int index = foods.indexWhere((element) => element.id == pantryFood.foodId);
-        //check if search is contained in the food's name, category, and description
-        if (foods[index].name!.contains(search) || foods[index].category!.contains(search) || foods[index].desc!.contains(search)) {
-          unavailPantryFoods.add(pantryFood);
-        }
-      }
-    }
-    return [availPantryFoods, unavailPantryFoods];
-  }
-
   //get associated foods list to specified pantry foods list (available, unavailable, all)
   Future<List<Food>> getFoodsForPantryFoods (int flag) async {
     List<PantryFood> pantryFoods = [];
@@ -135,7 +277,7 @@ class SharedPrefs {
 
     return foods;
   }
-
+*/
   //userId getter
   String get userId => _sharedPrefs!.getString("userId") ?? "";
 
@@ -221,26 +363,6 @@ class SharedPrefs {
       return false;
     } else {
       return true;
-    }
-  }
-
-  //getter for if available list is empty
-  bool get availableEmpty {
-    List<String> availableList = availPantryFoodIds;
-    if (availableList.isEmpty) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  //getter for if unavailable list is empty
-  bool get unavailableEmpty {
-    List<String> availableList = unavailPantryFoodIds;
-    if (availableList.isEmpty) {
-      return true;
-    } else {
-      return false;
     }
   }
 

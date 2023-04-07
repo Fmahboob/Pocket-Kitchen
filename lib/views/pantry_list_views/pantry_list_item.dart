@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/app_models/database.dart';
+import '../../models/app_models/shared_preferences.dart';
 import '../../models/data_models/food.dart';
 import '../../models/data_models/pantry_food.dart';
 
@@ -205,10 +206,18 @@ class PantryListItemState extends State<PantryListItem> {
                                           //convert percent and update pantry food
                                           double decimal = double.parse(decimalStr) / 100;
                                           await _updatePantryFood(pantryFood.id, decimal.toString(), pantryFood.pantryId, pantryFood.foodId);
+
+                                          List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+                                          pantryFoodsList.add(pantryFood);
+                                          sharedPrefs.pantryFoodList = pantryFoodsList;
                                         } else {
                                           //convert percent and update pantry food
                                           double decimal = double.parse(percentController.text) / 100;
                                           await _updatePantryFood(pantryFood.id, decimal.toString(), pantryFood.pantryId, pantryFood.foodId);
+
+                                          List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+                                          pantryFoodsList.add(pantryFood);
+                                          sharedPrefs.pantryFoodList = pantryFoodsList;
                                         }
                                       });
                                     },

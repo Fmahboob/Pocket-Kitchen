@@ -411,6 +411,10 @@ class NoPantryViewState extends State<NoPantryView> {
                             }
                           }
 
+                          //remove all pantry foods and foods from local storage
+                          sharedPrefs.foodList = [];
+                          sharedPrefs.pantryFoodList = [];
+
                           Navigator.pop(context);
                           Navigator.pop(context);
 

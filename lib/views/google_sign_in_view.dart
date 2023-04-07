@@ -5,7 +5,9 @@ import '../../models/app_models/database.dart';
 import '../../main.dart';
 import '../../models/data_models/user.dart';
 import '../models/app_models/google_sign_in_api.dart';
+import '../models/data_models/food.dart';
 import '../models/data_models/pantry.dart';
+import '../models/data_models/pantry_food.dart';
 
 class GoogleSignInView extends StatefulWidget {
   const GoogleSignInView({super.key});
@@ -28,6 +30,16 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
   //Pantry CRUD Methods
   Future<List<Pantry>> _getPantries(String ownerId, String qualifier) async {
     return Database.getAllPantries(ownerId, qualifier);
+  }
+
+  //Pantry_Food CRUD Methods
+  Future<List<PantryFood>> _getPantryFoods(String pantryId) {
+    return Database.getAllPantryFoods(pantryId);
+  }
+
+  //Food CRUD Methods
+  Future<Food> _getFood(String barcode, String name, String id, String weight, String qualifier) {
+    return Database.getFood(barcode, name, id, weight, qualifier);
   }
 
   Future signIn() async {
@@ -56,7 +68,7 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
 
       //set new user id in local storage
       sharedPrefs.userId = checkUser.id!;
-      print(sharedPrefs.userId);
+
       //get users pantries
       List<Pantry> pantries = await _getPantries(sharedPrefs.userId, Database.ownerQual);
 
@@ -72,6 +84,18 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
         for (var pantry in pantries) {
           sharedPrefs.addNewPantry(pantry.id!);
         }
+      }
+
+      if (sharedPrefs.currentPantry != "") {
+        List<Food> foods = [];
+        List<PantryFood> pantryFoods = await _getPantryFoods(sharedPrefs.currentPantry);
+        for (PantryFood pantryFood in pantryFoods) {
+          Food food = await _getFood("", "", pantryFood.foodId!, "", Database.idQual);
+          foods.add(food);
+        }
+
+        sharedPrefs.pantryFoodList = pantryFoods;
+        sharedPrefs.foodList = foods;
       }
     }
 

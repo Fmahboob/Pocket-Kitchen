@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/app_models/database.dart';
+import '../../models/app_models/shared_preferences.dart';
 import '../../models/data_models/food.dart';
 import '../../models/data_models/pantry_food.dart';
 
@@ -187,6 +188,10 @@ class UnavailablePantryItemState extends State<UnavailablePantryItem> {
                           setState(() async {
                             //update the availability to full (100%/1)
                             await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
+
+                            List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+                            pantryFoodsList.add(pantryFood);
+                            sharedPrefs.pantryFoodList = pantryFoodsList;
                           });
                           Navigator.pop(context);
                         },

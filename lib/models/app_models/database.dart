@@ -69,10 +69,8 @@ class Database {
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
-        print(response.body);
         userList = parseUsersToList(response.body);
         print("Got all users.");
-        print(userList.length);
         return userList;
       }
     } catch (e) {
@@ -95,9 +93,7 @@ class Database {
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
-        print(response.body);
         user = parseUsersToList(response.body)[0];
-        print("after convert");
         print("Got the user");
         return user;
       }
@@ -191,10 +187,8 @@ class Database {
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
-        print(response.body);
         pantryList = parsePantriesToList(response.body);
         print("Got all pantries.");
-        print(pantryList.length);
         return pantryList;
       }
     } catch (e) {
@@ -325,10 +319,8 @@ class Database {
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
-        print(response.body);
         foodList = parseFoodsToList(response.body);
         print("Got all foods.");
-        print(foodList.length);
         return foodList;
       }
     } catch (e) {
@@ -339,7 +331,7 @@ class Database {
   }
 
   //Get one food
-  static Future<Food> getFood(String barcode, String name, String id, String qualifier) async {
+  static Future<Food> getFood(String barcode, String name, String id, String weight, String qualifier) async {
     var food = Food();
     try {
       var bodyMap = <String, dynamic>{};
@@ -351,12 +343,11 @@ class Database {
       bodyMap["img_url"] = "";
       bodyMap["category"] = "";
       bodyMap["description"] = "";
-      bodyMap["weight"] = "";
+      bodyMap["weight"] = "$weight";
       bodyMap["own_unit"] = "";
       bodyMap["barcode"] = "$barcode";
 
       final response = await post(root, body: bodyMap);
-      print(response.body);
       if (response.statusCode == 200) {
         food = parseFoodsToList(response.body)[0];
         print("Got the food.");
@@ -463,10 +454,8 @@ class Database {
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {
-        print(response.body);
         pantryUserList = parsePantryUsersToList(response.body);
         print("Got all pantry users.");
-        print(pantryUserList.length);
         return pantryUserList;
       }
     } catch (e) {
@@ -610,7 +599,6 @@ class Database {
       bodyMap["pantry_id"] = "";
       bodyMap["food_id"] = "$foodId";
       final response = await post(root, body: bodyMap);
-      print("in get food db");
       if (response.statusCode == 200) {
         pantryFood = parsePantryFoodsToList(response.body)[0];
         print("Got pantry food.");

@@ -192,6 +192,10 @@ class GroceryListItemState extends State<GroceryListItem> {
                           setState(() async {
                             //update the availability to full (100%/1)
                             await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
+
+                            List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+                            pantryFoodsList.add(pantryFood);
+                            sharedPrefs.pantryFoodList = pantryFoodsList;
                           });
                           Navigator.pop(context);
                         },
