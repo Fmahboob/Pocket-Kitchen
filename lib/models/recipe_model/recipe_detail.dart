@@ -12,7 +12,7 @@ class RecipeDetail {
         id: json['id'],
         title: json['title'],
         imageUrl: json['image'],
-        cookTime: json['readyInMinutes'],
+        cookTime: json['readyInMinutes'].toString(),
         instructions: json['instructions']);
   }
 

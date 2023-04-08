@@ -64,12 +64,14 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
                     itemBuilder: (context, index) {
                       final RecipeList recipe = recipes[index];
                       return  GestureDetector(
-                            onTap: () async {
-                              RecipeDetail recipeDetail = await RecipeData().fetchRecipeDetail(recipe.id);
-        Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => RecipeView(recipeDetail: recipeDetail)),
-        );
+                            onTap: () {
+                              RecipeData().fetchRecipeDetail(recipe.id).then((recipeDetail) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) =>
+                                      RecipeView(recipeDetail: recipeDetail)),
+                                );
+                              });
                             },
 
                         child: Column(
