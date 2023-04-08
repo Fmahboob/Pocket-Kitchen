@@ -31,11 +31,11 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
   }
 
   Future signIn() async {
-    //await GoogleSignInAPI.logout();
+
+    await GoogleSignInAPI.logout();
 
     //login user through google API
     final googleUser = await GoogleSignInAPI.login();
-
     //attempt pulling user with google email to see if exists in our system
     final checkUser = await _getUser("", googleUser!.email, Database.emailQual);
 

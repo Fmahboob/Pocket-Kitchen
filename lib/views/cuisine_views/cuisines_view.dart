@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pocket_kitchen/views/cuisine_views/cuisine_recipes_view.dart';
+
+import '../../models/app_models/shared_preferences.dart';
 
 class CuisinesView extends StatefulWidget {
   const CuisinesView({super.key});
@@ -8,7 +11,6 @@ class CuisinesView extends StatefulWidget {
 }
 
 class CuisinesViewState extends State<CuisinesView> {
-  String pantryName = "Robbie's Home";
   List<String> categories = ["American", "Italian", "Chinese", "Middle Eastern", "Mexican", "Japanese", "Korean", "Indian", "German", "African", "British", "Eastern European", "European", "Greek", "Japanese", "Korean", "Mediterranean", "Spanish", "Thai", "Others"];
   // By default first one is selected
   int selectedIndex = 0;
@@ -21,7 +23,7 @@ class CuisinesViewState extends State<CuisinesView> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: const Color(0xff459657),
-        title: Text(pantryName),
+        title: Text(sharedPrefs.currentPantryName),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -57,8 +59,14 @@ class CuisinesViewState extends State<CuisinesView> {
   Widget cuisinesListItem(int index) {
     return GestureDetector(
       onTap: () {
-
-      },
+        String category = categories[index];
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => CuisinesRecipesView(title: 'Recipes',
+              selectedCuisine: category),
+          ),
+        );
+            },
       child: Padding(
         padding: const EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
         child: Container(
