@@ -1,10 +1,12 @@
 
 import 'package:flutter/material.dart';
+import 'package:pocket_kitchen/models/recipe_model/recipe_detail.dart';
 
 import '../../models/app_models/shared_preferences.dart';
 
 class RecipeView extends StatefulWidget {
-  const RecipeView({super.key});
+  final RecipeDetail recipeDetail;
+  const RecipeView({super.key, required this.recipeDetail});
 
   @override
   State<StatefulWidget> createState() => RecipeViewState();
