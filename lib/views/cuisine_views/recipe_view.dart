@@ -95,27 +95,35 @@ class RecipeViewState extends State<RecipeView>{
             Padding(
               padding: const EdgeInsets.all(4.0),
 
-                child: Row(
-                  children: const [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
-                      child: Text("Ingredients",
-                        style: textStyle,),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
-                      child: Text("X",
-                        style: textStyle,),
-                    ),
-                    Spacer(),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(4.0, 4.0, 8.0, 4.0),
-                      child: Text("Available",
-                        style: textStyle,),
-                    ),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: recipeDetail.extendedIngredients.length,
+                    itemBuilder: (context, index) {
+                      final ingredient = recipeDetail.extendedIngredients[index];
+                      return Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
+                            child: Text("${ingredient.name}  ${ingredient.amount}  ${ingredient.unit}"),
 
-                  ],
-                ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
+                            child: Text("X",
+                              style: textStyle,),
+                          ),
+                          Spacer(),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(4.0, 4.0, 8.0, 4.0),
+                            child: Text("Available",
+                              style: textStyle,),
+                          ),
+
+                        ],
+                      );
+                    }
+                  ),
+
               ),
 
             Padding(

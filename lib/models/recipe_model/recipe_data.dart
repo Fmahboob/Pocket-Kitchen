@@ -16,9 +16,9 @@ class RecipeData {
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       print(response.body);
-      print(jsonData);
+
       final List<dynamic> results = jsonData['results'];
-      print(results);
+
       return results.map((json) => RecipeList.fromJson(json)).toList();
     } else {
       throw Exception('Failed to fetch recipes');
@@ -31,8 +31,12 @@ class RecipeData {
 
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
-      return RecipeDetail.fromJson(json);
-
+      if (json != null) {
+        return RecipeDetail.fromJson(json);
+      }
+      else{
+        throw Exception('Failed to load recipe detail');
+      }
     }
     else {
       throw Exception('Failed to load recipe detail');
