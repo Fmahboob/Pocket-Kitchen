@@ -1,9 +1,7 @@
 import 'dart:convert';
-
-
 import 'package:http/http.dart' as http;
+import 'package:pocket_kitchen/models/recipe_model/recipe_detail.dart';
 import 'package:pocket_kitchen/models/recipe_model/recipe_list.dart';
-
 import 'api.dart';
 
 class RecipeData {
@@ -15,7 +13,6 @@ class RecipeData {
 
 
     final response = await http.get(Uri.parse(url));
-    print("here");
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       print(response.body);
@@ -27,6 +24,19 @@ class RecipeData {
       throw Exception('Failed to fetch recipes');
     }
   }
+  Future<RecipeDetail> fetchRecipeDetail(int id) async {
 
+    final response = await http.get(Uri.parse(
+        'https://api.spoonacular.com/recipes/$id/information?apiKey=${apiKey.apiKey}'));
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      return RecipeDetail.fromJson(json);
+
+    }
+    else {
+      throw Exception('Failed to load recipe detail');
+    }
+  }
 
 }
