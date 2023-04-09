@@ -397,7 +397,7 @@ class GroceryListViewState extends State<GroceryListView> {
                     border: const OutlineInputBorder(
                         borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
                     ),
-                    hintText: isChecked ? 'Food Amount' : 'Food Weight(lbs.)',
+                    hintText: isChecked ? 'Food Amount' : 'Food Weight (kg)',
                     contentPadding: const EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
                   ),
                 ),

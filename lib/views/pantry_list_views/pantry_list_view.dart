@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_item.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/unavailable_pantry_item.dart';
@@ -57,6 +60,33 @@ class PantryListViewState extends PantryState<PantryListView> {
   final nonMatchSnackBar = const SnackBar(
     content: Text("The Pantry Name and Number do not match."),
   );
+
+  Future sendEmail ({
+    required String toEmail,
+    required String body,
+    required String subject
+  }) async {
+    final serviceId = "service_q7nwxas";
+    final templateId = "template_urdi0mi";
+    final userId = "O8xDFSkMu9GTHepJo";
+    final url = Uri.parse("https://api.emailjs.com/api/v1.0/email/send");
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: json.encode({
+        "service_id": serviceId,
+        "user_id": userId,
+        "template_id": templateId,
+        "template_params" : {
+          "toEmail": toEmail,
+          "body": body,
+          "subject": subject
+        }
+      }),
+    );
+  }
 
   //Pantry CRUD methods
   _createPantry(String name, String ownerId) {
@@ -492,17 +522,10 @@ class PantryListViewState extends PantryState<PantryListView> {
                                 sharedPrefs.foodList = foods;
 
                                 //update user with email
-                                final Email sendEmail = Email(
-                                  body: "\'" + createNameController.text + "\' was successfully created. It\'s Pantry Number is " + newPantry.id! + ". Thank you for using Pocket Kitchen!",
-                                  subject: "Pantry created successfully.",
-                                  recipients: [sharedPrefs.userEmail],
-                                  cc: [],
-                                  bcc: [],
-                                  attachmentPaths: [],
-                                  isHTML: false,
-                                );
+                                String body = "\'" + createNameController.text + "\' was successfully created. It\'s Pantry Number is " + newPantry.id! + ". Thank you for using Pocket Kitchen!";
+                                String subject = "Pantry created successfully.";
 
-                                await FlutterEmailSender.send(sendEmail);
+                                sendEmail(toEmail: sharedPrefs.userEmail, body: body, subject: subject);
                               }
 
                               Navigator.pop(context);
@@ -653,17 +676,10 @@ class PantryListViewState extends PantryState<PantryListView> {
                               }
 
                               //update user with email
-                              final Email sendEmail = Email(
-                                body: "\'" + joinNameController.text + "\' was successfully joined. Thank you for using Pocket Kitchen!",
-                                subject: "Pantry joined successfully.",
-                                recipients: [sharedPrefs.userEmail],
-                                cc: [],
-                                bcc: [],
-                                attachmentPaths: [],
-                                isHTML: false,
-                              );
+                              String body = "\'" + joinNameController.text + "\' was successfully joined. Thank you for using Pocket Kitchen!";
+                              String subject = "Pantry joined successfully.";
 
-                              await FlutterEmailSender.send(sendEmail);
+                              sendEmail(toEmail: sharedPrefs.userEmail, body: body, subject: subject);
 
                               Navigator.pop(context);
                               Navigator.pop(context);
@@ -752,17 +768,10 @@ class PantryListViewState extends PantryState<PantryListView> {
                           }
 
                           //update user with email
-                          final Email sendEmail = Email(
-                            body: "A pantry was successfully deleted. This pantry is gone forever. Thank you for using Pocket Kitchen!",
-                            subject: "Pantry deleted successfully.",
-                            recipients: [sharedPrefs.userEmail],
-                            cc: [],
-                            bcc: [],
-                            attachmentPaths: [],
-                            isHTML: false,
-                          );
+                          String body = "A pantry was successfully deleted. This pantry is gone forever. Thank you for using Pocket Kitchen!";
+                          String subject = "Pantry deleted successfully.";
 
-                          await FlutterEmailSender.send(sendEmail);
+                          sendEmail(toEmail: sharedPrefs.userEmail, body: body, subject: subject);
 
                           Navigator.pop(context);
                           Navigator.pop(context);
@@ -852,17 +861,10 @@ class PantryListViewState extends PantryState<PantryListView> {
                           }
 
                           //update user with email
-                          final Email sendEmail = Email(
-                            body: "A pantry was successfully left. You can rejoin at any time with the valid Pantry Name and Number. Thank you for using Pocket Kitchen!",
-                            subject: "Pantry left successfully.",
-                            recipients: [sharedPrefs.userEmail],
-                            cc: [],
-                            bcc: [],
-                            attachmentPaths: [],
-                            isHTML: false,
-                          );
+                          String body = "A pantry was successfully left. You can rejoin at any time with the valid Pantry Name and Number. Thank you for using Pocket Kitchen!";
+                          String subject = "Pantry left successfully.";
 
-                          await FlutterEmailSender.send(sendEmail);
+                          sendEmail(toEmail: sharedPrefs.userEmail, body: body, subject: subject);
 
                           Navigator.pop(context);
                           Navigator.pop(context);

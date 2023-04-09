@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import '../../models/app_models/database.dart';
@@ -18,6 +21,33 @@ class GoogleSignInView extends StatefulWidget {
 }
 
 class GoogleSignInViewState extends State<GoogleSignInView> {
+
+  Future sendEmail ({
+    required String toEmail,
+    required String body,
+    required String subject
+  }) async {
+    final serviceId = "service_q7nwxas";
+    final templateId = "template_urdi0mi";
+    final userId = "O8xDFSkMu9GTHepJo";
+    final url = Uri.parse("https://api.emailjs.com/api/v1.0/email/send");
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: json.encode({
+        "service_id": serviceId,
+        "user_id": userId,
+        "template_id": templateId,
+        "template_params" : {
+          "toEmail": toEmail,
+          "body": body,
+          "subject": subject
+        }
+      }),
+    );
+  }
 
   //User CRUD Methods
   Future<User> _getUser(String id, email, qualifier) async {
@@ -73,17 +103,10 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
       sharedPrefs.userEmail = googleUser.email;
 
       //update user with email
-      final Email sendEmail = Email(
-        body: 'Thank you for using Pocket Kitchen, you have successfully signed up! Please feel free to reply any issues to this email address. Happy eating!',
-        subject: 'Welcome to Pocket Kitchen.',
-        recipients: [googleUser.email],
-        cc: [],
-        bcc: [],
-        attachmentPaths: [],
-        isHTML: false,
-      );
+      String body = "Thank you for using Pocket Kitchen, you have successfully signed up! Please feel free to reply any issues to this email address. Happy eating!";
+      String subject = "Welcome to Pocket Kitchen.";
 
-      await FlutterEmailSender.send(sendEmail);
+      sendEmail(toEmail: sharedPrefs.userEmail, body: body, subject: subject);
 
     //if returned email does match (account exists)
     } else {
