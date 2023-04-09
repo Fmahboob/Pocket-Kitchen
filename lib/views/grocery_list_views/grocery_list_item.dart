@@ -2,23 +2,24 @@ import 'dart:ffi';
 
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
 
+import '../../main.dart';
 import '../../models/app_models/database.dart';
 import '../../models/data_models/food.dart';
 import '../../models/data_models/pantry_food.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/data_models/user.dart';
-
 class GroceryListItem extends StatefulWidget {
   final PantryFood pantryFood;
   final VoidCallback onLongPress;
   final Food food;
+  final int index;
 
   const GroceryListItem({
     Key? key,
     required this.pantryFood,
     required this.onLongPress,
-    required this.food
+    required this.food,
+    required this.index
   }) : super(key: key);
 
   @override
@@ -28,7 +29,11 @@ class GroceryListItem extends StatefulWidget {
 class GroceryListItemState extends State<GroceryListItem> {
   get pantryFood => widget.pantryFood;
   get food => widget.food;
+  get index => widget.index;
   bool isExpanded = false;
+
+  String imgUrl = "";
+  String nameOutput = "";
 
   //PantryFood CRUD Methods
   _updatePantryFood (String id, String amount, String pantryId, String foodId) {
@@ -41,6 +46,12 @@ class GroceryListItemState extends State<GroceryListItem> {
       onTap: () {
         setState(() {
           isExpanded = !isExpanded;
+
+          if (food.imgUrl == "") {
+            imgUrl = "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930";
+          } else {
+            imgUrl = food.imgUrl;
+          }
         });
       },
       onLongPress: widget.onLongPress,
@@ -77,7 +88,7 @@ class GroceryListItemState extends State<GroceryListItem> {
                                               borderRadius: BorderRadius.all(Radius.circular(5)),
                                               color: Colors.white,
                                             ),
-                                            child: Image.network(food.imgUrl ?? "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930"),
+                                            child: Image.network(imgUrl),
                                           ),
                                         ),
                                       ),
@@ -188,16 +199,41 @@ class GroceryListItemState extends State<GroceryListItem> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextButton(
-                        onPressed: () {
-                          setState(() async {
+                        onPressed: () async {
+                          if (food.ownUnit == "0") {
                             //update the availability to full (100%/1)
                             await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
 
                             List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
-                            pantryFoodsList.add(pantryFood);
+
+                            for (PantryFood aPantryFood in pantryFoodsList) {
+                              if (aPantryFood.id == pantryFood.id) {
+                                aPantryFood.amount = "1";
+                              }
+                            }
+
                             sharedPrefs.pantryFoodList = pantryFoodsList;
-                          });
+                          } else {
+                            //update the availability to full (100% of food weight)
+                            await _updatePantryFood(pantryFood.id!, food.weight!, pantryFood.pantryId!, pantryFood.foodId!);
+
+                            List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+
+                            for (PantryFood aPantryFood in pantryFoodsList) {
+                              if (aPantryFood.id == pantryFood.id) {
+                                aPantryFood.amount = food.weight;
+                              }
+                            }
+
+                            sharedPrefs.pantryFoodList = pantryFoodsList;
+                          }
                           Navigator.pop(context);
+                          Navigator.pop(context);
+                          //push main app
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const TabBarMain(flag: 1)),
+                          );
                         },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),

@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
 import 'package:pocket_kitchen/models/go_upc_models/go_upc_item.dart';
@@ -7,7 +5,6 @@ import '../../main.dart';
 import '../../models/data_models/food.dart';
 import '../../models/data_models/pantry_food.dart';
 import 'grocery_list_item.dart';
-import 'grocery_list_listview.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:pocket_kitchen/models/app_models/database.dart';
 import 'package:http/http.dart';
@@ -33,8 +30,8 @@ class GroceryListViewState extends State<GroceryListView> {
   List<Food> unavailFoods = [Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg")];
 
   //Food CRUD methods
-  _createFood(String name, String imgUrl, String category, String desc, String weight, String ownUnit, String barcode) {
-    Database.createFood(name, imgUrl, category, desc, weight, ownUnit, barcode);
+  Future<void> _createFood(String name, String imgUrl, String category, String desc, String weight, String ownUnit, String barcode) async {
+    await Database.createFood(name, imgUrl, category, desc, weight, ownUnit, barcode);
   }
 
   Future<Food> _getFood(String barcode, String name, String id, String weight, String qualifier) {
@@ -46,8 +43,8 @@ class GroceryListViewState extends State<GroceryListView> {
     await Database.createPantryFood(amount, pantryId, foodId);
   }
 
-  _updatePantryFood(String id, String amount, String pantryId, String foodId) {
-    Database.updatePantryFood(id, amount, pantryId, foodId);
+  Future<void> _updatePantryFood(String id, String amount, String pantryId, String foodId) async {
+    await Database.updatePantryFood(id, amount, pantryId, foodId);
   }
 
   Future<PantryFood> _getPantryFood (String foodId) {
@@ -203,13 +200,13 @@ class GroceryListViewState extends State<GroceryListView> {
           await _updatePantryFood(checkPantryFood.id!, "1", checkPantryFood.pantryId!, checkPantryFood.foodId!);
 
           //update pantryFood list
-          List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
-          for (PantryFood pantryFood in pantryFoodsList) {
-            if (pantryFood.foodId == checkPantryFood.id) {
-              pantryFood.amount = "1";
-            }
-          }
-          sharedPrefs.pantryFoodList = pantryFoodsList;
+          //List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+          //for (PantryFood pantryFood in pantryFoodsList) {
+           // if (pantryFood.foodId == checkPantryFood.id) {
+           //   pantryFood.amount = "1";
+           // }
+         // }
+         // sharedPrefs.pantryFoodList = pantryFoodsList;
 
         //if the food doesn't exist in the user's pantry foods, create it
         } else {
@@ -218,13 +215,13 @@ class GroceryListViewState extends State<GroceryListView> {
           await _createPantryFood("1", sharedPrefs.currentPantry, checkFood.id!);
           PantryFood pantryFood = await _getPantryFood(checkFood.id!);
 
-          List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
-          pantryFoodsList.add(pantryFood);
-          sharedPrefs.pantryFoodList = pantryFoodsList;
+          //List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+          //pantryFoodsList.add(pantryFood);
+          //sharedPrefs.pantryFoodList = pantryFoodsList;
 
-          List<Food> foodList = sharedPrefs.foodList;
-          foodList.add(checkFood);
-          sharedPrefs.foodList = foodList;
+          //List<Food> foodList = sharedPrefs.foodList;
+          //foodList.add(checkFood);
+          //sharedPrefs.foodList = foodList;
         }
 
       //if the barcode doesn't match and the food isn't in the food's table, create a food and pantry food of it
@@ -241,13 +238,13 @@ class GroceryListViewState extends State<GroceryListView> {
 
         PantryFood pantryFood = await _getPantryFood(inputtedFood.id!);
 
-        List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
-        pantryFoodsList.add(pantryFood);
-        sharedPrefs.pantryFoodList = pantryFoodsList;
+        //List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+        //pantryFoodsList.add(pantryFood);
+        //sharedPrefs.pantryFoodList = pantryFoodsList;
 
-        List<Food> foodList = sharedPrefs.foodList;
-        foodList.add(inputtedFood);
-        sharedPrefs.foodList = foodList;
+        //List<Food> foodList = sharedPrefs.foodList;
+        //foodList.add(inputtedFood);
+        //sharedPrefs.foodList = foodList;
       }
     }
   }
@@ -322,16 +319,11 @@ class GroceryListViewState extends State<GroceryListView> {
                                               itemBuilder: (context, index) {
                                                 return GroceryListItem(
                                                   onLongPress: () {
-                                                    setState(() async {
-                                                      //get pantry food to update availability
-                                                      PantryFood pantryFood = sharedPrefs.getAllListsFiltered(searchTerm)[1][index];
-
-                                                      //update the availability to full (100%/1)
-                                                      await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
-                                                    });
+                                                    manualRestockDialog(sharedPrefs.getAllListsFiltered(searchTerm)[1][index], sharedPrefs.getAllListsFiltered(searchTerm)[3][index], index);
                                                   },
                                                   pantryFood: sharedPrefs.getAllListsFiltered(searchTerm)[1][index],
-                                                  food: sharedPrefs.getAllListsFiltered(searchTerm)[3][index]
+                                                  food: sharedPrefs.getAllListsFiltered(searchTerm)[3][index],
+                                                  index: index
                                                 );
                                               }
                                           ),
@@ -419,20 +411,33 @@ class GroceryListViewState extends State<GroceryListView> {
                         ownUnit = "0";
                       }
 
+                      String name = "";
+                      if (ownUnit == "0") {
+                        name = nameController.text + " " + amountController.text + "kg";
+                      } else {
+                        name = nameController.text;
+                      }
+
                       //check if food already exists
-                      Food checkFood = await _getFood("", nameController.text, "", amountController.text, Database.bothQual);
+                      Food checkFood = await _getFood("", name, "", amountController.text, Database.bothQual);
 
                       //if not, create it
                       if (checkFood.name == "" || checkFood.name == " " || checkFood.name == null) {
                         //create food
-                        await _createFood(nameController.text, "", "", "", amountController.text, ownUnit, "");
-
-                        //get food for name
-                        checkFood = await _getFood("", nameController.text, "", "", Database.nameQual);
+                        await _createFood(name, "", "", "", amountController.text, ownUnit, "");
+                        print(name);
+                        print(amountController.text);
+                        //get food by name
+                        checkFood = await _getFood("", name, "", "", Database.nameQual);
                       }
 
-                      //create pantry food
-                      await _createPantryFood(amountController.text, sharedPrefs.currentPantry, checkFood.id!);
+                      if (ownUnit == "0") {
+                        //create pantry food
+                        await _createPantryFood("1", sharedPrefs.currentPantry, checkFood.id!);
+                      } else {
+                        //create pantry food
+                        await _createPantryFood(amountController.text, sharedPrefs.currentPantry, checkFood.id!);
+                      }
 
                       PantryFood pantryFood = await _getPantryFood(checkFood.id!);
 
@@ -446,6 +451,12 @@ class GroceryListViewState extends State<GroceryListView> {
                       sharedPrefs.foodList = foodList;
 
                       Navigator.pop(context);
+                      Navigator.pop(context);
+                      //push main app
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const TabBarMain(flag: 1)),
+                      );
                     },
                     style: const ButtonStyle(
                       backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
@@ -466,4 +477,80 @@ class GroceryListViewState extends State<GroceryListView> {
           )
         )
       );
+
+  Future manualRestockDialog(PantryFood pantryFood, Food food, int index) => showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+          builder: (context, setState) =>
+              AlertDialog(
+                content:
+                const Text(
+                  "Are you sure you want to manually restock this item?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Color(0xff7B7777),
+                      fontWeight: FontWeight.w400
+                  ),
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+
+                          if (food.ownUnit == "0") {
+                            //update the availability to full (100%/1)
+                            await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
+
+                            List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+
+                            for (PantryFood aPantryFood in pantryFoodsList) {
+                              if (aPantryFood.id == pantryFood.id) {
+                                aPantryFood.amount = "1";
+                              }
+                            }
+
+                            sharedPrefs.pantryFoodList = pantryFoodsList;
+                          } else {
+                            //update the availability to full (100% of food weight)
+                            await _updatePantryFood(pantryFood.id!, food.weight!, pantryFood.pantryId!, pantryFood.foodId!);
+
+                            List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+
+                            for (PantryFood aPantryFood in pantryFoodsList) {
+                              if (aPantryFood.id == pantryFood.id) {
+                                aPantryFood.amount = food.weight;
+                              }
+                            }
+
+                            sharedPrefs.pantryFoodList = pantryFoodsList;
+                          }
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                          //push main app
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const TabBarMain(flag: 1)),
+                          );
+                        },
+                        style: const ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
+                        ),
+                        child:
+                        const Text(
+                          "Restock",
+                          style: TextStyle(
+                              fontSize: 32,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+      )
+  );
 }

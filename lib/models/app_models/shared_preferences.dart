@@ -19,12 +19,14 @@ class SharedPrefs {
 
   //sets food list
   set foodList (List<Food> foods) {
-    List<String> foodsStrList = [];
+    List<String> foodsStr = [];
+
     for (Food food in foods) {
       Map<String, dynamic> foodMap = jsonDecode(foodToJson(food));
-      foodsStrList.add(jsonEncode(foodMap));
+      foodsStr.add(jsonEncode(foodMap));
     }
-    _sharedPrefs!.setStringList("foodsList", foodsStrList);
+
+    _sharedPrefs!.setStringList("foodsList", foodsStr);
   }
 
   //gets food list
@@ -43,6 +45,7 @@ class SharedPrefs {
   //sets pantry food list
   set pantryFoodList (List<PantryFood> pantryFoods) {
     List<String> pantryFoodsStrList = [];
+
     for (PantryFood pantryFood in pantryFoods) {
       Map<String, dynamic> pantryFoodMap = jsonDecode(pantryFoodToJson(pantryFood));
       pantryFoodsStrList.add(jsonEncode(pantryFoodMap));
@@ -152,13 +155,13 @@ class SharedPrefs {
     List<Food> filteredUnavailFoodList = [];
 
     for (Food food in availFoodsList) {
-      if (food.name!.contains(search) || food.category!.contains(search) || food.desc!.contains(search)) {
+      if (food.name!.toLowerCase().contains(search.toLowerCase()) || food.category!.toLowerCase().contains(search.toLowerCase()) || food.desc!.toLowerCase().contains(search.toLowerCase())) {
         filteredAvailFoodList.add(food);
       }
     }
 
     for (Food food in unavailFoodsList) {
-      if (food.name!.contains(search) || food.category!.contains(search) || food.desc!.contains(search)) {
+      if (food.name!.toLowerCase().contains(search.toLowerCase()) || food.category!.toLowerCase().contains(search) || food.desc!.toLowerCase().contains(search.toLowerCase())) {
         filteredUnavailFoodList.add(food);
       }
     }
@@ -189,7 +192,6 @@ class SharedPrefs {
 
     return [filteredAvailPantryFoodList, filteredUnavailPantryFoodList, filteredAvailFoodList, filteredUnavailFoodList];
   }
-
 /*
   //set current pantry food ids
   setPantryFoodIds(String pantryId) async {

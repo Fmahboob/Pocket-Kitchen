@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
 import '../../models/app_models/database.dart';
 import '../../models/app_models/shared_preferences.dart';
 import '../../models/data_models/food.dart';
@@ -9,12 +10,14 @@ class UnavailablePantryItem extends StatefulWidget {
   final VoidCallback onLongPress;
   final PantryFood pantryFood;
   final Food food;
+  final int index;
 
   const UnavailablePantryItem({
     super.key,
     required this.onLongPress,
     required this.pantryFood,
-    required this.food
+    required this.food,
+    required this.index
   });
 
   @override
@@ -24,6 +27,9 @@ class UnavailablePantryItem extends StatefulWidget {
 class UnavailablePantryItemState extends State<UnavailablePantryItem> {
   get pantryFood => widget.pantryFood;
   get food => widget.food;
+  get index => widget.index;
+
+  String imgUrl = "";
 
   bool isExpanded = false;
 
@@ -38,9 +44,15 @@ class UnavailablePantryItemState extends State<UnavailablePantryItem> {
       onTap: () {
         setState(() {
           isExpanded = !isExpanded;
+
+          if (food.imgUrl == "") {
+            imgUrl = "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930";
+          } else {
+            imgUrl = food.imgUrl;
+          }
         });
       },
-
+      onLongPress: widget.onLongPress,
       child:
       Padding(
         padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
@@ -74,7 +86,7 @@ class UnavailablePantryItemState extends State<UnavailablePantryItem> {
                                 borderRadius: BorderRadius.all(Radius.circular(5)),
                                 color: Colors.white,
                               ),
-                              child: Image.network(food.imgUrl ?? "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930"),
+                              child: Image.network(imgUrl),
                             ),
                           ),
                         ),
@@ -184,16 +196,41 @@ class UnavailablePantryItemState extends State<UnavailablePantryItem> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextButton(
-                        onPressed: () {
-                          setState(() async {
-                            //update the availability to full (100%/1)
-                            await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
+                        onPressed: () async {
 
-                            List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
-                            pantryFoodsList.add(pantryFood);
-                            sharedPrefs.pantryFoodList = pantryFoodsList;
-                          });
-                          Navigator.pop(context);
+                            if (food.ownUnit == "0") {
+                              //update the availability to full (100%/1)
+                              await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
+
+                              List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+
+                              for (PantryFood aPantryFood in pantryFoodsList) {
+                                if (aPantryFood.id == pantryFood.id) {
+                                  aPantryFood.amount = "1";
+                                }
+                              }
+
+                              sharedPrefs.pantryFoodList = pantryFoodsList;
+                            } else {
+                              //update the availability to full (100% of food weight)
+                              await _updatePantryFood(pantryFood.id!, food.weight, pantryFood.pantryId!, pantryFood.foodId!);
+
+                              List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+
+                              for (PantryFood aPantryFood in pantryFoodsList) {
+                                if (aPantryFood.id == pantryFood.id) {
+                                  aPantryFood.amount = food.weight;
+                                }
+                              }
+
+                              sharedPrefs.pantryFoodList = pantryFoodsList;
+                            }
+                            Navigator.pop(context);
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const TabBarMain(flag: 0)),
+                            );
                         },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),

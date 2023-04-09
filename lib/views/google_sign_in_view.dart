@@ -88,7 +88,9 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
 
       if (sharedPrefs.currentPantry != "") {
         List<Food> foods = [];
+
         List<PantryFood> pantryFoods = await _getPantryFoods(sharedPrefs.currentPantry);
+
         for (PantryFood pantryFood in pantryFoods) {
           Food food = await _getFood("", "", pantryFood.foodId!, "", Database.idQual);
           foods.add(food);
@@ -103,7 +105,7 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
     Navigator.pop(context);
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const TabBarMain()),
+      MaterialPageRoute(builder: (context) => const TabBarMain(flag: 0)),
     );
   }
 

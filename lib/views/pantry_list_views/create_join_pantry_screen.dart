@@ -209,7 +209,7 @@ class NoPantryViewState extends State<NoPantryView> {
                             //push main app
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const TabBarMain()),
+                              MaterialPageRoute(builder: (context) => const TabBarMain(flag: 0)),
                             );
 
                             //reload app
@@ -336,7 +336,7 @@ class NoPantryViewState extends State<NoPantryView> {
                               //push main app
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const TabBarMain()),
+                                MaterialPageRoute(builder: (context) => const TabBarMain(flag: 0)),
                               );
 
                               //reload app
