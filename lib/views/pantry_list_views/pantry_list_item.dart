@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
 import '../../models/app_models/database.dart';
+import '../../models/app_models/shared_preferences.dart';
 import '../../models/data_models/food.dart';
 import '../../models/data_models/pantry_food.dart';
 
@@ -8,12 +10,14 @@ class PantryListItem extends StatefulWidget {
   final VoidCallback onLongPress;
   final PantryFood pantryFood;
   final Food food;
+  final int index;
 
   const PantryListItem({
     super.key,
     required this.onLongPress,
     required this.pantryFood,
-    required this.food
+    required this.food,
+    required this.index
   });
   @override
   State<StatefulWidget> createState() => PantryListItemState();
@@ -22,15 +26,25 @@ class PantryListItem extends StatefulWidget {
 class PantryListItemState extends State<PantryListItem> {
   get pantryFood => widget.pantryFood;
   get food => widget.food;
+  get index => widget.index;
   bool isExpanded = false;
+
+  String updateLabel = "";
+
+  String imgUrl = "";
+  String categoryOutput = "";
 
   final TextEditingController percentController = TextEditingController();
 
-  String percentLeft() {
-    double percentDecimal = double.parse(pantryFood.amount);
-    double percentWhole = percentDecimal * 100;
-    String percentStr = percentWhole.toStringAsFixed(0);
-    return "$percentStr%";
+  String whatsLeft() {
+    if (food.ownUnit == "0") {
+      double percentDecimal = double.parse(pantryFood.amount);
+      double percentWhole = percentDecimal * 100;
+      String percentStr = percentWhole.toStringAsFixed(0);
+      return "$percentStr%";
+    } else {
+      return pantryFood.amount.toString();
+    }
   }
 
   //PantryFood CRUD Methods
@@ -44,7 +58,24 @@ class PantryListItemState extends State<PantryListItem> {
       onTap: () {
         setState(() {
           isExpanded = !isExpanded;
+          if (food.ownUnit == "0") {
+            updateLabel = "% Left:";
+          } else {
+            updateLabel = "# Left:";
+          }
+
+          if (food.category == "" || food.category == " " || food.category == null) {
+            categoryOutput = "No category for this item.";
+          } else {
+            categoryOutput = food.category;
+          }
         });
+
+        if (food.imgUrl == "") {
+          imgUrl = "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930";
+        } else {
+          imgUrl = food.imgUrl;
+        }
       },
       onLongPress: widget.onLongPress,
       child:
@@ -80,7 +111,7 @@ class PantryListItemState extends State<PantryListItem> {
                                 borderRadius: BorderRadius.all(Radius.circular(5)),
                                 color: Colors.white,
                               ),
-                              child: Image.network(food.imgUrl ?? "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930"),
+                              child: Image.network(imgUrl),
                             ),
                           ),
                         ),
@@ -116,7 +147,7 @@ class PantryListItemState extends State<PantryListItem> {
                                 child: Padding(
                                   padding: const EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
                                   child: Text(
-                                    food.category ?? "No category.",
+                                    categoryOutput,
                                     textAlign: TextAlign.left,
                                     style: const TextStyle(
                                         fontSize: 18,
@@ -142,12 +173,12 @@ class PantryListItemState extends State<PantryListItem> {
 
                               Visibility(
                                 visible: isExpanded,
-                                child: const Padding(
-                                  padding: EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
                                   child: Text(
-                                    "% Left:",
+                                    updateLabel,
                                     textAlign: TextAlign.left,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 20,
                                       color: Colors.white,
                                       fontWeight: FontWeight.w600,
@@ -172,7 +203,7 @@ class PantryListItemState extends State<PantryListItem> {
                                     filled: true,
                                     fillColor: Colors.white,
                                     border: const OutlineInputBorder(),
-                                    hintText: percentLeft(),
+                                    hintText: whatsLeft(),
                                     contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                                   ),
                                 ),
@@ -191,26 +222,78 @@ class PantryListItemState extends State<PantryListItem> {
                                     color: Colors.white,
                                   ),
                                   child: TextButton(
-                                    onPressed: () {
-                                      setState(() async {
-                                        //check for % in input
-                                        if (percentController.text.endsWith("%")) {
-                                          //remove the %
-                                          String decimalStr = "";
-                                          for (var rune in percentController.text.runes) {
-                                            if (rune != "%") {
-                                              decimalStr = "$decimalStr$rune";
+                                    onPressed: () async {
+                                        //check to update as % or # of
+                                        if (food.ownUnit == "0") {
+                                          String amountStr = "";
+                                          //check for % in input
+                                          if (percentController.text.endsWith("%")) {
+                                            //remove the %
+                                            String decimalStr = "";
+                                            for (var rune in percentController.text.runes) {
+                                              if (rune != "%") {
+                                                decimalStr = "$decimalStr$rune";
+                                              }
+                                            }
+                                            //convert percent and update pantry food
+                                            double decimal = double.parse(decimalStr) / 100;
+                                            if (decimal == 0.0) {
+                                              amountStr = "0";
+                                            } else {
+                                              amountStr = decimal.toString();
+                                            }
+                                            await _updatePantryFood(pantryFood.id, amountStr, pantryFood.pantryId, pantryFood.foodId);
+
+                                            List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+
+                                            for (PantryFood aPantryFood in pantryFoodsList) {
+                                              if (aPantryFood.id == pantryFood.id) {
+                                                aPantryFood.amount = amountStr;
+                                              }
+                                            }
+
+                                            sharedPrefs.pantryFoodList = pantryFoodsList;
+                                          } else {
+                                            //convert percent and update pantry food
+                                            double decimal = double.parse(percentController.text) / 100;
+                                            if (decimal == 0.0) {
+                                              amountStr = "0";
+                                            } else {
+                                              amountStr = decimal.toString();
+                                            }
+                                            await _updatePantryFood(pantryFood.id, amountStr, pantryFood.pantryId, pantryFood.foodId);
+
+                                            List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+
+                                            for (PantryFood aPantryFood in pantryFoodsList) {
+                                              if (aPantryFood.id == pantryFood.id) {
+                                                aPantryFood.amount = amountStr;
+                                              }
+                                            }
+
+                                            sharedPrefs.pantryFoodList = pantryFoodsList;
+                                          }
+                                        } else {
+                                          //update pantry food
+                                          await _updatePantryFood(pantryFood.id, percentController.text, pantryFood.pantryId, pantryFood.foodId);
+
+                                          List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+
+                                          for (PantryFood aPantryFood in pantryFoodsList) {
+                                            if (aPantryFood.id == pantryFood.id) {
+                                              aPantryFood.amount = percentController.text;
                                             }
                                           }
-                                          //convert percent and update pantry food
-                                          double decimal = double.parse(decimalStr) / 100;
-                                          await _updatePantryFood(pantryFood.id, decimal.toString(), pantryFood.pantryId, pantryFood.foodId);
-                                        } else {
-                                          //convert percent and update pantry food
-                                          double decimal = double.parse(percentController.text) / 100;
-                                          await _updatePantryFood(pantryFood.id, decimal.toString(), pantryFood.pantryId, pantryFood.foodId);
+
+                                          sharedPrefs.pantryFoodList = pantryFoodsList;
                                         }
-                                      });
+
+                                        Navigator.pop(context);
+
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => const TabBarMain(flag: 0)),
+                                        );
                                     },
                                     child: Container(
                                       color: Colors.white,
