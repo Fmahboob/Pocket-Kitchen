@@ -394,6 +394,9 @@ class NoPantryViewState extends State<NoPantryView> {
                           //reset user id
                           sharedPrefs.userId = "";
 
+                          //reset user email
+                          sharedPrefs.userEmail = "";
+
                           //reset current pantry owner id
                           sharedPrefs.currentPantryOwner = "";
 

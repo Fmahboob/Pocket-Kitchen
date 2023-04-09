@@ -34,6 +34,7 @@ class GroceryListItemState extends State<GroceryListItem> {
 
   String imgUrl = "";
   String nameOutput = "";
+  String categoryOutput = "";
 
   //PantryFood CRUD Methods
   _updatePantryFood (String id, String amount, String pantryId, String foodId) {
@@ -47,10 +48,16 @@ class GroceryListItemState extends State<GroceryListItem> {
         setState(() {
           isExpanded = !isExpanded;
 
-          if (food.imgUrl == "") {
+          if (food.imgUrl == "" || food.imgUrl == " " || food.imgUrl == null) {
             imgUrl = "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930";
           } else {
             imgUrl = food.imgUrl;
+          }
+
+          if (food.category == "" || food.category == " " || food.category == null) {
+            categoryOutput = "No category for this item.";
+          } else {
+            categoryOutput = food.category;
           }
         });
       },
@@ -124,7 +131,7 @@ class GroceryListItemState extends State<GroceryListItem> {
                                               child: Padding(
                                                 padding: const EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
                                                 child: Text(
-                                                  food.category,
+                                                  categoryOutput,
                                                   textAlign: TextAlign.left,
                                                   style: const TextStyle(
                                                       fontSize: 18,

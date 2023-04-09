@@ -30,6 +30,7 @@ class UnavailablePantryItemState extends State<UnavailablePantryItem> {
   get index => widget.index;
 
   String imgUrl = "";
+  String categoryOutput = "";
 
   bool isExpanded = false;
 
@@ -49,6 +50,12 @@ class UnavailablePantryItemState extends State<UnavailablePantryItem> {
             imgUrl = "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930";
           } else {
             imgUrl = food.imgUrl;
+          }
+
+          if (food.category == "" || food.category == " " || food.category == null) {
+            categoryOutput = "No category for this item.";
+          } else {
+            categoryOutput = food.category;
           }
         });
       },
@@ -121,7 +128,7 @@ class UnavailablePantryItemState extends State<UnavailablePantryItem> {
                                 child: Padding(
                                   padding: const EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
                                   child: Text(
-                                    food.category ?? "No category.",
+                                    categoryOutput,
                                     textAlign: TextAlign.left,
                                     style: const TextStyle(
                                         fontSize: 18,

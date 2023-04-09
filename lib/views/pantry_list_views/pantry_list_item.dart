@@ -32,6 +32,7 @@ class PantryListItemState extends State<PantryListItem> {
   String updateLabel = "";
 
   String imgUrl = "";
+  String categoryOutput = "";
 
   final TextEditingController percentController = TextEditingController();
 
@@ -61,6 +62,12 @@ class PantryListItemState extends State<PantryListItem> {
             updateLabel = "% Left:";
           } else {
             updateLabel = "# Left:";
+          }
+
+          if (food.category == "" || food.category == " " || food.category == null) {
+            categoryOutput = "No category for this item.";
+          } else {
+            categoryOutput = food.category;
           }
         });
 
@@ -140,7 +147,7 @@ class PantryListItemState extends State<PantryListItem> {
                                 child: Padding(
                                   padding: const EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
                                   child: Text(
-                                    food.category ?? "No category.",
+                                    categoryOutput,
                                     textAlign: TextAlign.left,
                                     style: const TextStyle(
                                         fontSize: 18,

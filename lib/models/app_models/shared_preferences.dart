@@ -192,100 +192,22 @@ class SharedPrefs {
 
     return [filteredAvailPantryFoodList, filteredUnavailPantryFoodList, filteredAvailFoodList, filteredUnavailFoodList];
   }
-/*
-  //set current pantry food ids
-  setPantryFoodIds(String pantryId) async {
-    //get all pantry foods for the user's current pantry
-    List<PantryFood> pantryFoods = await Database.getAllPantryFoods(sharedPrefs.currentPantry);
 
-    List<String> availPantryFoodIds = [];
-    List<String> unavailPantryFoodIds = [];
-    List<String> allPantryFoodIds = [];
-    //loop through the pantry foods to extract ids
-    pantryFoods.forEach((PantryFood pantryFood) {
-      if (pantryFood.amount == 0) {
-        unavailPantryFoodIds.add(pantryFood.id!);
-      } else {
-        availPantryFoodIds.add(pantryFood.id!);
-      }
-      allPantryFoodIds.add(pantryFood.id!);
-    });
-    //save the ids to local storage
-    _sharedPrefs!.setStringList("availPantryFoods", availPantryFoodIds);
-    _sharedPrefs!.setStringList("unavailPantryFoods", unavailPantryFoodIds);
-    _sharedPrefs!.setStringList("allPantryFoods", allPantryFoodIds);
-  }
 
-  //get current pantry food ids
-  List<String> get availPantryFoodIds => _sharedPrefs!.getStringList("availPantryFoods") ?? [];
-  List<String> get unavailPantryFoodIds => _sharedPrefs!.getStringList("unavailPantryFoods") ?? [];
-  List<String> get allPantryFoodIds => _sharedPrefs!.getStringList("allPantryFoods") ?? [];
-
-  //get all current pantry foods
-  Future<List<PantryFood>> getPantryFoods() async {
-    List<PantryFood> pantryFoods = [];
-    for (var element in allPantryFoodIds) {
-      print("in get pf");
-      pantryFoods.add(await Database.getPantryFood(element));
-    }
-    print("$pantryFoods foods");
-    return pantryFoods;
-  }
-
-  //get all available pantry foods
-  Future<List<PantryFood>> getAvailablePantryFoods() async {
-    List<PantryFood> availablePantryFoods = [];
-    print("in avail");
-    List<PantryFood> pantryFoods = await getPantryFoods();
-    for (var element in pantryFoods) {
-      if (element.amount != "0") {
-        availablePantryFoods.add(element);
-      }
-    }
-    print("$availablePantryFoods available");
-    return availablePantryFoods;
-  }
-
-  //get unavailable list of pantryFoods
-  Future<List<PantryFood>> getUnavailablePantryFoods() async {
-    List<PantryFood> unavailablePantryFoods = [];
-    List<PantryFood> pantryFoods = await getPantryFoods();
-    for (var element in pantryFoods) {
-      if (element.amount == "0") {
-        unavailablePantryFoods.add(element);
-      }
-    }
-    print("$unavailablePantryFoods unavailable");
-    return unavailablePantryFoods;
-  }
-
-  //get associated foods list to specified pantry foods list (available, unavailable, all)
-  Future<List<Food>> getFoodsForPantryFoods (int flag) async {
-    List<PantryFood> pantryFoods = [];
-    List<Food> foods = [];
-
-    if (flag == 0) {
-      pantryFoods = await getAvailablePantryFoods();
-    } else if (flag == 1) {
-      pantryFoods = await getUnavailablePantryFoods();
-    } else if (flag == 2) {
-      pantryFoods = await getPantryFoods();
-    }
-
-    for (var element in pantryFoods) {
-      Food food = await Database.getFood("", "", element.foodId!, Database.idQual);
-      foods.add(food);
-    }
-
-    return foods;
-  }
-*/
   //userId getter
   String get userId => _sharedPrefs!.getString("userId") ?? "";
 
   //userId setter
   set userId(String value) {
     _sharedPrefs!.setString("userId", value);
+  }
+
+  //userEmail getter
+  String get userEmail => _sharedPrefs!.getString("userEmail") ?? "";
+
+  //userEmail setter
+  set userEmail(String value) {
+    _sharedPrefs!.setString("userEmail", value);
   }
 
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
-
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import '../../models/app_models/database.dart';
 import '../../main.dart';
 import '../../models/data_models/user.dart';
@@ -8,6 +8,7 @@ import '../models/app_models/google_sign_in_api.dart';
 import '../models/data_models/food.dart';
 import '../models/data_models/pantry.dart';
 import '../models/data_models/pantry_food.dart';
+import '../models/data_models/pantry_user.dart';
 
 class GoogleSignInView extends StatefulWidget {
   const GoogleSignInView({super.key});
@@ -28,8 +29,8 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
   }
 
   //Pantry CRUD Methods
-  Future<List<Pantry>> _getPantries(String ownerId, String qualifier) async {
-    return Database.getAllPantries(ownerId, qualifier);
+  Future<Pantry> _getPantry(String id, String name, String ownerId, String qualifier) async {
+    return Database.getPantry(id, name, ownerId, qualifier);
   }
 
   //Pantry_Food CRUD Methods
@@ -40,6 +41,11 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
   //Food CRUD Methods
   Future<Food> _getFood(String barcode, String name, String id, String weight, String qualifier) {
     return Database.getFood(barcode, name, id, weight, qualifier);
+  }
+
+  //PantryUser CRUD Methods
+  Future<List<PantryUser>> _getAllPantryUsers(String userId, String qualifier) {
+    return Database.getAllPantryUsers(userId, qualifier);
   }
 
   Future signIn() async {
@@ -63,14 +69,39 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
       //set new user id in local storage
       sharedPrefs.userId = newUser.id!;
 
+      //set new user email in local storage
+      sharedPrefs.userEmail = googleUser.email;
+
+      //update user with email
+      final Email sendEmail = Email(
+        body: 'Thank you for using Pocket Kitchen, you have successfully signed up! Please feel free to reply any issues to this email address. Happy eating!',
+        subject: 'Welcome to Pocket Kitchen.',
+        recipients: [googleUser.email],
+        cc: [],
+        bcc: [],
+        attachmentPaths: [],
+        isHTML: false,
+      );
+
+      await FlutterEmailSender.send(sendEmail);
+
     //if returned email does match (account exists)
     } else {
 
       //set new user id in local storage
       sharedPrefs.userId = checkUser.id!;
 
-      //get users pantries
-      List<Pantry> pantries = await _getPantries(sharedPrefs.userId, Database.ownerQual);
+      //set new user email in local storage
+      sharedPrefs.userEmail = googleUser.email;
+
+      //get all user pantries
+      List<PantryUser> pantryUsers = await _getAllPantryUsers(sharedPrefs.userId, Database.ownerQual);
+      List<Pantry> pantries = [];
+
+      for (PantryUser pantryUser in pantryUsers) {
+        Pantry pantry = await _getPantry(pantryUser.pantryId!, "", "", Database.idQual);
+        pantries.add(pantry);
+      }
 
       //make sure pantries exist
       if (pantries.isNotEmpty) {

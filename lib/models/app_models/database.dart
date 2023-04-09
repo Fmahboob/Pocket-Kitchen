@@ -92,6 +92,7 @@ class Database {
       bodyMap["email"] = "$email";
 
       final response = await post(root, body: bodyMap);
+      print(response.body);
       if (response.statusCode == 200) {
         user = parseUsersToList(response.body)[0];
         print("Got the user");
@@ -173,14 +174,14 @@ class Database {
   }
 
   //Get all pantries
-  static Future<List<Pantry>> getAllPantries(String ownerId, String qualifier) async {
+  static Future<List<Pantry>> getAllPantries(String ownerId, String id, String qualifier) async {
     List<Pantry> pantryList;
     try {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readAllAction";
       bodyMap["table"] = "$pantryTable";
       bodyMap["qualifier"] = "$qualifier";
-      bodyMap["pantry_id"] = "";
+      bodyMap["pantry_id"] = "$id";
       bodyMap["name"] = "";
       bodyMap["user_count"] = "";
       bodyMap["owner_id"] = "$ownerId";
@@ -441,16 +442,16 @@ class Database {
   }
 
   //Get all pantry_users
-  static Future<List<PantryUser>> getAllPantryUsers() async {
+  static Future<List<PantryUser>> getAllPantryUsers(String userId, String qualifier) async {
     List<PantryUser> pantryUserList;
     try {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readAllAction";
       bodyMap["table"] = "$pantryUserTable";
-      bodyMap["qualifier"] = "";
+      bodyMap["qualifier"] = "$qualifier";
       bodyMap["pantry_user_id"] = "";
       bodyMap["pantry_id"] = "";
-      bodyMap["user_id"] = "";
+      bodyMap["user_id"] = "$userId";
 
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {

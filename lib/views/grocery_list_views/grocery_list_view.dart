@@ -70,8 +70,8 @@ class GroceryListViewState extends State<GroceryListView> {
 
   Future _scan() async {
     //scans barcode and returns the barcode number
-    await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
-
+    //await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
+    barcodeNo = "0058891252220";
     //API call to Go-UPC with barcode number
     Response response = await get(Uri.parse('https://go-upc.com/api/v1/code/$barcodeNo'), headers: {
       'Authorization': 'Bearer 24a313ffbcb68c96a4c74cd11c17aaa60fc8f2efd7f2baeb203fe3cf97e2adab',
@@ -200,13 +200,13 @@ class GroceryListViewState extends State<GroceryListView> {
           await _updatePantryFood(checkPantryFood.id!, "1", checkPantryFood.pantryId!, checkPantryFood.foodId!);
 
           //update pantryFood list
-          //List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
-          //for (PantryFood pantryFood in pantryFoodsList) {
-           // if (pantryFood.foodId == checkPantryFood.id) {
-           //   pantryFood.amount = "1";
-           // }
-         // }
-         // sharedPrefs.pantryFoodList = pantryFoodsList;
+          List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+          for (PantryFood pantryFood in pantryFoodsList) {
+            if (pantryFood.id == checkPantryFood.id) {
+              pantryFood.amount = "1";
+            }
+          }
+          sharedPrefs.pantryFoodList = pantryFoodsList;
 
         //if the food doesn't exist in the user's pantry foods, create it
         } else {
@@ -215,20 +215,20 @@ class GroceryListViewState extends State<GroceryListView> {
           await _createPantryFood("1", sharedPrefs.currentPantry, checkFood.id!);
           PantryFood pantryFood = await _getPantryFood(checkFood.id!);
 
-          //List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
-          //pantryFoodsList.add(pantryFood);
-          //sharedPrefs.pantryFoodList = pantryFoodsList;
+          List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+          pantryFoodsList.add(pantryFood);
+          sharedPrefs.pantryFoodList = pantryFoodsList;
 
-          //List<Food> foodList = sharedPrefs.foodList;
-          //foodList.add(checkFood);
-          //sharedPrefs.foodList = foodList;
+          List<Food> foodList = sharedPrefs.foodList;
+          foodList.add(checkFood);
+          sharedPrefs.foodList = foodList;
         }
 
       //if the barcode doesn't match and the food isn't in the food's table, create a food and pantry food of it
       } else {
 
         //create food
-        await _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl!, scannedItem.product!.category!, scannedItem.product!.description!, amount, "0", barcodeNo);
+        await _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl ?? "", scannedItem.product!.category ?? "", scannedItem.product!.description ?? "", amount, "0", barcodeNo);
 
         //get food
         Food inputtedFood = await _getFood(barcodeNo, "", "", "", Database.barcodeQual);
@@ -238,15 +238,21 @@ class GroceryListViewState extends State<GroceryListView> {
 
         PantryFood pantryFood = await _getPantryFood(inputtedFood.id!);
 
-        //List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
-        //pantryFoodsList.add(pantryFood);
-        //sharedPrefs.pantryFoodList = pantryFoodsList;
+        List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+        pantryFoodsList.add(pantryFood);
+        sharedPrefs.pantryFoodList = pantryFoodsList;
 
-        //List<Food> foodList = sharedPrefs.foodList;
-        //foodList.add(inputtedFood);
-        //sharedPrefs.foodList = foodList;
+        List<Food> foodList = sharedPrefs.foodList;
+        foodList.add(inputtedFood);
+        sharedPrefs.foodList = foodList;
       }
     }
+    Navigator.pop(context);
+    //push main app
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const TabBarMain(flag: 1)),
+    );
   }
 
   @override
