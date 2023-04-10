@@ -588,16 +588,16 @@ class Database {
   }
 
   //Get one pantry_food
-  static Future<PantryFood> getPantryFood(String foodId) async {
+  static Future<PantryFood> getPantryFood(String foodId, String pantryId, String qualifier) async {
     var pantryFood = PantryFood();
     try {
       var bodyMap = <String, dynamic>{};
       bodyMap["action"] = "$readOneAction";
       bodyMap["table"] = "$pantryFoodTable";
-      bodyMap["qualifier"] = "";
+      bodyMap["qualifier"] = "$qualifier";
       bodyMap["pantry_food_id"] = "";
       bodyMap["amount"] = "";
-      bodyMap["pantry_id"] = "";
+      bodyMap["pantry_id"] = "$pantryId";
       bodyMap["food_id"] = "$foodId";
       final response = await post(root, body: bodyMap);
       if (response.statusCode == 200) {

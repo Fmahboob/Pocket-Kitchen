@@ -80,7 +80,7 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
 
   Future signIn() async {
 
-    await GoogleSignInAPI.logout();
+    //await GoogleSignInAPI.logout();
 
     //login user through google API
     final googleUser = await GoogleSignInAPI.login();

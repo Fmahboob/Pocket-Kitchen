@@ -119,10 +119,6 @@ class PantryListViewState extends PantryState<PantryListView> {
     Database.updatePantryFood(id, amount, pantryId, foodId);
   }
 
-  _getPantryFood (String foodId) {
-    Database.getPantryFood(foodId);
-  }
-
   Future<List<PantryFood>> _getPantryFoods(String pantryId) {
     return Database.getAllPantryFoods(pantryId);
   }

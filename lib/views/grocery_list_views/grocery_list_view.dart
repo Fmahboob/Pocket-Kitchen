@@ -47,8 +47,8 @@ class GroceryListViewState extends State<GroceryListView> {
     await Database.updatePantryFood(id, amount, pantryId, foodId);
   }
 
-  Future<PantryFood> _getPantryFood (String foodId) {
-    return Database.getPantryFood(foodId);
+  Future<PantryFood> _getPantryFood (String foodId, String pantryId, String qualifier) {
+    return Database.getPantryFood(foodId, pantryId, qualifier);
   }
 
   bool isNumeric(String s) {
@@ -189,13 +189,13 @@ class GroceryListViewState extends State<GroceryListView> {
 
       //if the barcode does match and the food already exists
       if (checkFood.barcode == barcodeNo) {
+        print("barcode matches");
+        //query for pantry food with the same food id and pantry id
+        PantryFood checkPantryFood = await _getPantryFood(checkFood.id!, sharedPrefs.currentPantry, Database.bothQual);
 
-        //query for pantry food with the same barcode to check if it already exists in the pantry food table
-        PantryFood checkPantryFood = await _getPantryFood(checkFood.id!);
-
-        //if the barcode matches and its pantry id is the user's current pantry id, then it exists
-        if (checkPantryFood.foodId == checkFood.id && checkPantryFood.pantryId == sharedPrefs.currentPantry) {
-
+        //check that a pantry food was returned and exists in the current pantry
+        if (checkPantryFood.id != "" || checkPantryFood.id != " " || checkPantryFood.id != null) {
+          print("food and pfood matches");
           //Therefore, the user is refilling the item's stock. Update the amount to full (equal to it's food's weight)
           await _updatePantryFood(checkPantryFood.id!, "1", checkPantryFood.pantryId!, checkPantryFood.foodId!);
 
@@ -210,10 +210,10 @@ class GroceryListViewState extends State<GroceryListView> {
 
         //if the food doesn't exist in the user's pantry foods, create it
         } else {
-
+          print("food and pfood dont match");
           //create pantry food
           await _createPantryFood("1", sharedPrefs.currentPantry, checkFood.id!);
-          PantryFood pantryFood = await _getPantryFood(checkFood.id!);
+          PantryFood pantryFood = await _getPantryFood(checkFood.id!, sharedPrefs.currentPantry, Database.bothQual);
 
           List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
           pantryFoodsList.add(pantryFood);
@@ -226,7 +226,7 @@ class GroceryListViewState extends State<GroceryListView> {
 
       //if the barcode doesn't match and the food isn't in the food's table, create a food and pantry food of it
       } else {
-
+        print("barcode doesnt match");
         //create food
         await _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl ?? "", scannedItem.product!.category ?? "", scannedItem.product!.description ?? "", amount, "0", barcodeNo);
 
@@ -236,7 +236,7 @@ class GroceryListViewState extends State<GroceryListView> {
         //create pantry food
         await _createPantryFood("1", sharedPrefs.currentPantry, inputtedFood.id!);
 
-        PantryFood pantryFood = await _getPantryFood(inputtedFood.id!);
+        PantryFood pantryFood = await _getPantryFood(inputtedFood.id!, sharedPrefs.currentPantry, Database.bothQual);
 
         List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
         pantryFoodsList.add(pantryFood);
@@ -445,7 +445,7 @@ class GroceryListViewState extends State<GroceryListView> {
                         await _createPantryFood(amountController.text, sharedPrefs.currentPantry, checkFood.id!);
                       }
 
-                      PantryFood pantryFood = await _getPantryFood(checkFood.id!);
+                      PantryFood pantryFood = await _getPantryFood(checkFood.id!, sharedPrefs.currentPantry, Database.bothQual);
 
                       //update local lists
                       List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
