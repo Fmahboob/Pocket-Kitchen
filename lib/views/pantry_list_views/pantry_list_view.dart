@@ -1,6 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
-import 'package:pocket_kitchen/views/pantry_list_views/create_join_pantry_screen.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_item.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/unavailable_pantry_item.dart';
 import 'package:pocket_kitchen/views/google_sign_in_view.dart';
@@ -15,8 +17,6 @@ import '../../models/data_models/pantry_food.dart';
 abstract class PantryState<T extends StatefulWidget> extends State {
   @override
   void initState() {
-    sharedPrefs.setPantryFoodIds(sharedPrefs.currentPantry);
-    print(sharedPrefs.allPantryFoodIds);
     super.initState();
   }
 }
@@ -34,6 +34,8 @@ class PantryListViewState extends PantryState<PantryListView> {
   final TextEditingController joinIdController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
+  String searchTerm = "";
 
   String pantryId = sharedPrefs.currentPantry;
   String pantryName = sharedPrefs.currentPantryName;
@@ -54,17 +56,37 @@ class PantryListViewState extends PantryState<PantryListView> {
   static const drawerGreenStyle = TextStyle(fontSize: 20, color: Color(0xff459657));
   static const drawerGreyStyle = TextStyle(fontSize: 20, color: Color(0xff7B7777));
 
-  List<PantryFood> availPantryFoods = [PantryFood(amount: "1", pantryId: "3", foodId: "4"), PantryFood(amount: "1", pantryId: "3", foodId: "4"), PantryFood(amount: "1", pantryId: "3", foodId: "4")];
-  List<PantryFood> unavailPantryFoods = [PantryFood(amount: "1", pantryId: "3", foodId: "4"), PantryFood(amount: "1", pantryId: "3", foodId: "4"), PantryFood(amount: "1", pantryId: "3", foodId: "4")];
-
-  List<Food> availFoods = [Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg")];
-  List<Food> unavailFoods = [Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg")];
-
-
   //Non-matching retrieved name to inputted name on pantry joining snackbar
   final nonMatchSnackBar = const SnackBar(
     content: Text("The Pantry Name and Number do not match."),
   );
+
+  Future sendEmail ({
+    required String toEmail,
+    required String body,
+    required String subject
+  }) async {
+    final serviceId = "service_q7nwxas";
+    final templateId = "template_urdi0mi";
+    final userId = "O8xDFSkMu9GTHepJo";
+    final url = Uri.parse("https://api.emailjs.com/api/v1.0/email/send");
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: json.encode({
+        "service_id": serviceId,
+        "user_id": userId,
+        "template_id": templateId,
+        "template_params" : {
+          "toEmail": toEmail,
+          "body": body,
+          "subject": subject
+        }
+      }),
+    );
+  }
 
   //Pantry CRUD methods
   _createPantry(String name, String ownerId) {
@@ -97,8 +119,13 @@ class PantryListViewState extends PantryState<PantryListView> {
     Database.updatePantryFood(id, amount, pantryId, foodId);
   }
 
-  _getPantryFood (String foodId) {
-    Database.getPantryFood(foodId);
+  Future<List<PantryFood>> _getPantryFoods(String pantryId) {
+    return Database.getAllPantryFoods(pantryId);
+  }
+
+  //Food CRUD Methods
+  Future<Food> _getFood(String barcode, String name, String id, String weight, String qualifier) {
+    return Database.getFood(barcode, name, id, weight, qualifier);
   }
 
   @override
@@ -131,7 +158,7 @@ class PantryListViewState extends PantryState<PantryListView> {
                          enabled: true,
                          onChanged: (String search) {
                            setState(() {
-                             sharedPrefs.getAllListsFiltered(search);
+                             searchTerm = search;
                            });
                          },
                          decoration: const InputDecoration(
@@ -153,27 +180,20 @@ class PantryListViewState extends PantryState<PantryListView> {
                             fontWeight: FontWeight.w600
                         ),),
                       ),
-                         FutureBuilder(
-                           future: Future.wait([
-                             sharedPrefs.getAvailablePantryFoods(),
-                             sharedPrefs.getFoodsForPantryFoods(0)
-                           ]),
-                           builder: (context, AsyncSnapshot<List<List<dynamic>>> snapshot) {
-                             return ListView.builder(
+                         ListView.builder(
                                shrinkWrap: true,
                                physics: const NeverScrollableScrollPhysics(),
-                               itemCount: availPantryFoods.length,//sharedPrefs.pantryFoodIds.length,
+                               itemCount: sharedPrefs.getAllListsFiltered(searchTerm)[0].length,
                                itemBuilder: (context, index) {
                                  return PantryListItem(
-                                     pantryFood: availPantryFoods[index],//snapshot.data![0][index],
-                                     food: availFoods[index],//snapshot.data![1][index],
+                                     pantryFood: sharedPrefs.getAllListsFiltered(searchTerm)[0][index],
+                                     food: sharedPrefs.getAllListsFiltered(searchTerm)[2][index],
+                                     index: index,
                                      onLongPress: () {
-                                      manualEmptyDialog(snapshot.data![0][index]);
+                                      manualEmptyDialog(sharedPrefs.getAllListsFiltered(searchTerm)[0][index], sharedPrefs.getAllListsFiltered(searchTerm)[2][index], index);
                                      });
                                },
-                             );
-                           }
-                         ),
+                             ),
 
                       const Padding(
                         padding: EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 0.0),
@@ -183,35 +203,21 @@ class PantryListViewState extends PantryState<PantryListView> {
                             fontWeight: FontWeight.w600
                         ),),
                       ),
-
-                      FutureBuilder(
-                          future: Future.wait([
-                            sharedPrefs.getAvailablePantryFoods(),
-                            sharedPrefs.getFoodsForPantryFoods(1)
-                          ]),
-                          builder: (context, AsyncSnapshot<List<List<dynamic>>> snapshot) {
-                            return ListView.builder(
+                        ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: unavailPantryFoods.length,//sharedPrefs.pantryFoodIds.length,
+                              itemCount: sharedPrefs.getAllListsFiltered(searchTerm)[1].length,
                               itemBuilder: (context, index) {
                                 return UnavailablePantryItem(
+                                    pantryFood: sharedPrefs.getAllListsFiltered(searchTerm)[1][index],
+                                    food: sharedPrefs.getAllListsFiltered(searchTerm)[3][index],
+                                    index: index,
                                     onLongPress: () {
-                                      setState(() async {
-                                        //get pantry food to update availability
-                                        PantryFood pantryFood = await _getPantryFood(snapshot.data![0][index]);
-
-                                        //update the availability to full (100%/1)
-                                        await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
-                                      });
+                                      manualRestockDialog(sharedPrefs.getAllListsFiltered(searchTerm)[1][index], sharedPrefs.getAllListsFiltered(searchTerm)[3][index], index);
                                     },
-                                    pantryFood: unavailPantryFoods[index],//snapshot.data![0][index],
-                                    food: unavailFoods[index],//snapshot.data![1][index]
                                 );
                               }
-                            );
-                          }
-                      ),
+                            ),
                     ],
                   ),
           ),
@@ -369,6 +375,9 @@ class PantryListViewState extends PantryState<PantryListView> {
                           //reset user id
                           sharedPrefs.userId = "";
 
+                          //reset user email
+                          sharedPrefs.userEmail = "";
+
                           //reset current pantry owner id
                           sharedPrefs.currentPantryOwner = "";
 
@@ -385,6 +394,10 @@ class PantryListViewState extends PantryState<PantryListView> {
                               }
                             }
                           }
+
+                          //remove all pantry foods and foods from local storage
+                          sharedPrefs.foodList = [];
+                          sharedPrefs.pantryFoodList = [];
 
                           Navigator.pop(context);
                           Navigator.pop(context);
@@ -487,12 +500,36 @@ class PantryListViewState extends PantryState<PantryListView> {
                               sharedPrefs.currentPantryName = newPantry.name!;
                               sharedPrefs.currentPantryOwner = newPantry.ownerId!;
 
+                              //update pantry foods
+                              sharedPrefs.pantryFoodList = [];
+                              sharedPrefs.foodList = [];
+
+                              if (sharedPrefs.currentPantry != "") {
+                                List<Food> foods = [];
+
+                                List<PantryFood> pantryFoods = await _getPantryFoods(sharedPrefs.currentPantry);
+
+                                for (PantryFood pantryFood in pantryFoods) {
+                                  Food food = await _getFood("", "", pantryFood.foodId!, "", Database.idQual);
+                                  foods.add(food);
+                                }
+
+                                sharedPrefs.pantryFoodList = pantryFoods;
+                                sharedPrefs.foodList = foods;
+
+                                //update user with email
+                                String body = "\'" + createNameController.text + "\' was successfully created. It\'s Pantry Number is " + newPantry.id! + ". Thank you for using Pocket Kitchen!";
+                                String subject = "Pantry created successfully.";
+
+                                sendEmail(toEmail: sharedPrefs.userEmail, body: body, subject: subject);
+                              }
+
                               Navigator.pop(context);
                               Navigator.pop(context);
                               //push main app
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const TabBarMain()),
+                                MaterialPageRoute(builder: (context) => const TabBarMain(flag: 0)),
                               );
                             } else {
                               createNameController.text = "";
@@ -616,12 +653,36 @@ class PantryListViewState extends PantryState<PantryListView> {
                               sharedPrefs.currentPantryName = joiningPantry.name!;
                               sharedPrefs.currentPantryOwner = joiningPantry.ownerId!;
 
+                              //update pantry foods
+                              sharedPrefs.pantryFoodList = [];
+                              sharedPrefs.foodList = [];
+
+                              if (sharedPrefs.currentPantry != "") {
+                                List<Food> foods = [];
+
+                                List<PantryFood> pantryFoods = await _getPantryFoods(sharedPrefs.currentPantry);
+
+                                for (PantryFood pantryFood in pantryFoods) {
+                                  Food food = await _getFood("", "", pantryFood.foodId!, "", Database.idQual);
+                                  foods.add(food);
+                                }
+
+                                sharedPrefs.pantryFoodList = pantryFoods;
+                                sharedPrefs.foodList = foods;
+                              }
+
+                              //update user with email
+                              String body = "\'" + joinNameController.text + "\' was successfully joined. Thank you for using Pocket Kitchen!";
+                              String subject = "Pantry joined successfully.";
+
+                              sendEmail(toEmail: sharedPrefs.userEmail, body: body, subject: subject);
+
                               Navigator.pop(context);
                               Navigator.pop(context);
                               //push main app
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const TabBarMain()),
+                                MaterialPageRoute(builder: (context) => const TabBarMain(flag: 0)),
                               );
 
                               //reload app
@@ -684,13 +745,37 @@ class PantryListViewState extends PantryState<PantryListView> {
                           sharedPrefs.currentPantryName = pantry2Name;
                           sharedPrefs.currentPantryOwner = pantry2OwnerId;
 
+                          //update pantry foods
+                          sharedPrefs.pantryFoodList = [];
+                          sharedPrefs.foodList = [];
+
+                          if (sharedPrefs.currentPantry != "") {
+                            List<Food> foods = [];
+
+                            List<PantryFood> pantryFoods = await _getPantryFoods(sharedPrefs.currentPantry);
+
+                            for (PantryFood pantryFood in pantryFoods) {
+                              Food food = await _getFood("", "", pantryFood.foodId!, "", Database.idQual);
+                              foods.add(food);
+                            }
+
+                            sharedPrefs.pantryFoodList = pantryFoods;
+                            sharedPrefs.foodList = foods;
+                          }
+
+                          //update user with email
+                          String body = "A pantry was successfully deleted. This pantry is gone forever. Thank you for using Pocket Kitchen!";
+                          String subject = "Pantry deleted successfully.";
+
+                          sendEmail(toEmail: sharedPrefs.userEmail, body: body, subject: subject);
+
                           Navigator.pop(context);
                           Navigator.pop(context);
 
                           //repush main app
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const TabBarMain()),
+                            MaterialPageRoute(builder: (context) => const TabBarMain(flag: 0)),
                           );
                           //restart app
                           //RestartWidget.restartApp(context);
@@ -753,6 +838,30 @@ class PantryListViewState extends PantryState<PantryListView> {
                           sharedPrefs.currentPantryName = pantry2Name;
                           sharedPrefs.currentPantryOwner = pantry2OwnerId;
 
+                          //update pantry foods
+                          sharedPrefs.pantryFoodList = [];
+                          sharedPrefs.foodList = [];
+
+                          if (sharedPrefs.currentPantry != "") {
+                            List<Food> foods = [];
+
+                            List<PantryFood> pantryFoods = await _getPantryFoods(sharedPrefs.currentPantry);
+
+                            for (PantryFood pantryFood in pantryFoods) {
+                              Food food = await _getFood("", "", pantryFood.foodId!, "", Database.idQual);
+                              foods.add(food);
+                            }
+
+                            sharedPrefs.pantryFoodList = pantryFoods;
+                            sharedPrefs.foodList = foods;
+                          }
+
+                          //update user with email
+                          String body = "A pantry was successfully left. You can rejoin at any time with the valid Pantry Name and Number. Thank you for using Pocket Kitchen!";
+                          String subject = "Pantry left successfully.";
+
+                          sendEmail(toEmail: sharedPrefs.userEmail, body: body, subject: subject);
+
                           Navigator.pop(context);
                           Navigator.pop(context);
 
@@ -809,12 +918,30 @@ class PantryListViewState extends PantryState<PantryListView> {
                             visible: sharedPrefs.secondPantryExists,
                             child:
                             TextButton(
-                              onPressed: () {
+                              onPressed: () async {
 
                                 //update current pantry (2 means 2nd pantry was selected as new current)
                                 sharedPrefs.switchCurrentPantry(2);
                                 sharedPrefs.currentPantryName = pantry2Name;
                                 sharedPrefs.currentPantryOwner = pantry2OwnerId;
+
+                                //update pantry foods
+                                sharedPrefs.pantryFoodList = [];
+                                sharedPrefs.foodList = [];
+
+                                if (sharedPrefs.currentPantry != "") {
+                                  List<Food> foods = [];
+
+                                  List<PantryFood> pantryFoods = await _getPantryFoods(sharedPrefs.currentPantry);
+
+                                  for (PantryFood pantryFood in pantryFoods) {
+                                    Food food = await _getFood("", "", pantryFood.foodId!, "", Database.idQual);
+                                    foods.add(food);
+                                  }
+
+                                  sharedPrefs.pantryFoodList = pantryFoods;
+                                  sharedPrefs.foodList = foods;
+                                }
 
                                 Navigator.pop(context);
                                 Navigator.pop(context);
@@ -822,7 +949,7 @@ class PantryListViewState extends PantryState<PantryListView> {
                                 //repush main app
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => const TabBarMain()),
+                                  MaterialPageRoute(builder: (context) => const TabBarMain(flag: 0)),
                                 );
 
                                 //restart app
@@ -849,12 +976,30 @@ class PantryListViewState extends PantryState<PantryListView> {
                               padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
                               child:
                               TextButton(
-                                onPressed: () {
+                                onPressed: () async {
 
                                   //update current pantry (3 means 3rd pantry was selected as new current)
                                   sharedPrefs.switchCurrentPantry(3);
                                   sharedPrefs.currentPantryName = pantry3Name;
                                   sharedPrefs.currentPantryOwner = pantry3OwnerId;
+
+                                  //update pantry foods
+                                  sharedPrefs.pantryFoodList = [];
+                                  sharedPrefs.foodList = [];
+
+                                  if (sharedPrefs.currentPantry != "") {
+                                    List<Food> foods = [];
+
+                                    List<PantryFood> pantryFoods = await _getPantryFoods(sharedPrefs.currentPantry);
+
+                                    for (PantryFood pantryFood in pantryFoods) {
+                                      Food food = await _getFood("", "", pantryFood.foodId!, "", Database.idQual);
+                                      foods.add(food);
+                                    }
+
+                                    sharedPrefs.pantryFoodList = pantryFoods;
+                                    sharedPrefs.foodList = foods;
+                                  }
 
                                   Navigator.pop(context);
                                   Navigator.pop(context);
@@ -862,7 +1007,7 @@ class PantryListViewState extends PantryState<PantryListView> {
                                   //repush main app
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => const TabBarMain()),
+                                    MaterialPageRoute(builder: (context) => const TabBarMain(flag: 0)),
                                   );
 
                                   //restart app
@@ -934,7 +1079,7 @@ class PantryListViewState extends PantryState<PantryListView> {
       )
   );
 
-  Future manualEmptyDialog(PantryFood pantryFood) => showDialog(
+  Future manualEmptyDialog(PantryFood pantryFood, Food food, int index) => showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
           builder: (context, setState) =>
@@ -954,11 +1099,24 @@ class PantryListViewState extends PantryState<PantryListView> {
                     children: [
                       TextButton(
                         onPressed: () async {
-                          setState(() {
-                            //update the availability to empty (0%/0)
-                            _updatePantryFood(pantryFood.id!, "0", pantryFood.pantryId!, pantryFood.foodId!);
-                          });
+                          _updatePantryFood(pantryFood.id!, "0", pantryFood.pantryId!, pantryFood.foodId!);
+
+                          List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+
+                          for (PantryFood aPantryFood in pantryFoodsList) {
+                            if (aPantryFood.id == pantryFood.id) {
+                              aPantryFood.amount = "0";
+                            }
+                          }
+
+                          sharedPrefs.pantryFoodList = pantryFoodsList;
+
                           Navigator.pop(context);
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const TabBarMain(flag: 0)),
+                          );
                         },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
@@ -966,6 +1124,81 @@ class PantryListViewState extends PantryState<PantryListView> {
                         child:
                         const Text(
                           "Out of Stock",
+                          style: TextStyle(
+                              fontSize: 32,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+      )
+  );
+
+  Future manualRestockDialog(PantryFood pantryFood, Food food, int index) => showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+          builder: (context, setState) =>
+              AlertDialog(
+                content:
+                const Text(
+                  "Are you sure you want to manually restock this item?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Color(0xff7B7777),
+                      fontWeight: FontWeight.w400
+                  ),
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+
+                          if (food.ownUnit == "0") {
+                            //update the availability to full (100%/1)
+                            await _updatePantryFood(pantryFood.id!, "1", pantryFood.pantryId!, pantryFood.foodId!);
+
+                            List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+
+                            for (PantryFood aPantryFood in pantryFoodsList) {
+                              if (aPantryFood.id == pantryFood.id) {
+                                aPantryFood.amount = "1";
+                              }
+                            }
+
+                            sharedPrefs.pantryFoodList = pantryFoodsList;
+                          } else {
+                            //update the availability to full (100% of food weight)
+                            await _updatePantryFood(pantryFood.id!, food.weight!, pantryFood.pantryId!, pantryFood.foodId!);
+
+                            List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
+
+                            for (PantryFood aPantryFood in pantryFoodsList) {
+                              if (aPantryFood.id == pantryFood.id) {
+                                aPantryFood.amount = food.weight;
+                              }
+                            }
+                            sharedPrefs.pantryFoodList = pantryFoodsList;
+                          }
+
+                          Navigator.pop(context);
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const TabBarMain(flag: 0)),
+                          );
+                        },
+                        style: const ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
+                        ),
+                        child:
+                        const Text(
+                          "Restock",
                           style: TextStyle(
                               fontSize: 32,
                               color: Colors.white,

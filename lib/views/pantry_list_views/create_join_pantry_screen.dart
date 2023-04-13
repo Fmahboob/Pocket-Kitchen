@@ -209,7 +209,7 @@ class NoPantryViewState extends State<NoPantryView> {
                             //push main app
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const TabBarMain()),
+                              MaterialPageRoute(builder: (context) => const TabBarMain(flag: 0)),
                             );
 
                             //reload app
@@ -336,7 +336,7 @@ class NoPantryViewState extends State<NoPantryView> {
                               //push main app
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const TabBarMain()),
+                                MaterialPageRoute(builder: (context) => const TabBarMain(flag: 0)),
                               );
 
                               //reload app
@@ -394,6 +394,9 @@ class NoPantryViewState extends State<NoPantryView> {
                           //reset user id
                           sharedPrefs.userId = "";
 
+                          //reset user email
+                          sharedPrefs.userEmail = "";
+
                           //reset current pantry owner id
                           sharedPrefs.currentPantryOwner = "";
 
@@ -410,6 +413,10 @@ class NoPantryViewState extends State<NoPantryView> {
                               }
                             }
                           }
+
+                          //remove all pantry foods and foods from local storage
+                          sharedPrefs.foodList = [];
+                          sharedPrefs.pantryFoodList = [];
 
                           Navigator.pop(context);
                           Navigator.pop(context);

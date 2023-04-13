@@ -66,7 +66,12 @@ class PocketKitchen extends StatelessWidget {
 
 //main app
 class TabBarMain extends StatelessWidget {
-  const TabBarMain({super.key});
+  final int flag;
+
+  const TabBarMain({
+    super.key,
+    required this.flag
+  });
 
   // This widget is the root of your application.
   @override
@@ -74,6 +79,7 @@ class TabBarMain extends StatelessWidget {
     return MaterialApp(
       home: !sharedPrefs.hasPantries ? const NoPantryView() : DefaultTabController(
           length: 3,
+          initialIndex: flag,
           child: Scaffold(
               bottomNavigationBar: tabBarMenu(),
               body: const TabBarView(
