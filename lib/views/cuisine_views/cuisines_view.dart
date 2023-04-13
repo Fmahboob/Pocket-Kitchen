@@ -11,7 +11,7 @@ class CuisinesView extends StatefulWidget {
 }
 
 class CuisinesViewState extends State<CuisinesView> {
-  List<String> categories = ["American", "Italian", "Chinese", "Middle Eastern", "Mexican", "Japanese", "Korean", "Indian", "German", "African", "British", "Eastern European", "European", "Greek", "Japanese", "Korean", "Mediterranean", "Spanish", "Thai", "Others"];
+  List<String> categories = [  "African", "American", "British", "Chinese", "Eastern European", "European", "German", "Greek", "Indian", "Italian", "Japanese", "Korean", "Mediterranean", "Mexican", "Middle Eastern", "Spanish", "Thai"];
   // By default first one is selected
   int selectedIndex = 0;
 
@@ -29,7 +29,7 @@ class CuisinesViewState extends State<CuisinesView> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Padding(
-            padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+            padding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 0.0),
             child: Text(
                 "Cuisines",
                 textAlign: TextAlign.left,
@@ -70,7 +70,7 @@ class CuisinesViewState extends State<CuisinesView> {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
         child: Container(
-            height: 50,
+            height: 35,
             decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(5)),
               color: Color(0xff459657),
@@ -78,7 +78,7 @@ class CuisinesViewState extends State<CuisinesView> {
             ),
             alignment: Alignment.centerLeft,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
+              padding: const EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
               child: Text(categories[index],
                 style: const TextStyle(
                     fontSize: 18,

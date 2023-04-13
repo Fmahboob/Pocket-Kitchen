@@ -41,12 +41,13 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
       future: futureRecipes,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          print(snapshot.data);
+
           final List<RecipeList> recipes = snapshot.data!;
           return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Padding(
-                padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+                padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
                 child: Text(
                     "Recipes",
                     textAlign: TextAlign.left,
@@ -63,41 +64,44 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
                     itemCount: recipes.length,
                     itemBuilder: (context, index) {
                       final RecipeList recipe = recipes[index];
-                      return  GestureDetector(
-                            onTap: () {
-                              RecipeData().fetchRecipeDetail(recipe.id).then((recipeDetail) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) =>
-                                      RecipeView(recipeDetail: recipeDetail)),
-                                );
-                              });
-                            },
+                      return  Padding(
+                        padding: EdgeInsets.all(4.0),
+                        child: GestureDetector(
+                              onTap: () {
+                                RecipeData().fetchRecipeDetail(recipe.id).then((recipeDetail) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) =>
+                                        RecipeView(recipeDetail: recipeDetail)),
+                                  );
+                                });
+                              },
 
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                                  color: Color(0xff459657),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                                    color: Color(0xff459657),
 
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
+                                    child: Text(recipe.title, style: const TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500
+                                    ),),
+                                  ),
                                 ),
-                                alignment: Alignment.center,
-                                child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
-                                  child: Text(recipe.title, style: const TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500
-                                  ),),
-                                ),
-                              ),
-                              Padding(
-                                  padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
-                                  child: Image.network(recipe.imageUrl)),
-                            ],
-                          ),
+                                Padding(
+                                    padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
+                                    child: Image.network(recipe.imageUrl)),
+                              ],
+                            ),
+                        ),
                       );
 
                     },
