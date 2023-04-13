@@ -102,10 +102,12 @@ class RecipeViewState extends State<RecipeView>{
                       final ingredient = recipeDetail.extendedIngredients[index];
                       return Row(
                         children: [
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
-                            child: Text("${ingredient.name}  ${ingredient.amount}  ${ingredient.unit}"),
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
+                              child: Text("${ingredient.name}  ${ingredient.amount}  ${ingredient.unit}"),
 
+                            ),
                           ),
                           Padding(
                             padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),

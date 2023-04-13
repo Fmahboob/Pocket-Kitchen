@@ -106,10 +106,20 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
             ],
           );
         }
-        else {
+        else if (snapshot.hasError) {
           return Center(
             child: Text('${snapshot.error}'),
           );
+        }
+          else {
+        return const Center(
+        child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(
+            Color(0xff459657),
+            ),
+        ),
+
+        );
         }
       },
     ),
