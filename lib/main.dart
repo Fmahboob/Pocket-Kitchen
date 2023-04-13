@@ -59,6 +59,7 @@ class PocketKitchen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: sharedPrefs.signedIn ? const TabBarMain(flag: 0) : const GoogleSignInView()
+
     );
   }
 }

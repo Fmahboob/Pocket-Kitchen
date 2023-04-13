@@ -6,7 +6,7 @@ import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_item.dart';
 import 'package:pocket_kitchen/views/pantry_list_views/unavailable_pantry_item.dart';
 import 'package:pocket_kitchen/views/google_sign_in_view.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
+
 import '../../main.dart';
 import '../../models/app_models/database.dart';
 import '../../models/app_models/google_sign_in_api.dart';

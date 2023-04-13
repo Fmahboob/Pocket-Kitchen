@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
 import '../../models/app_models/database.dart';
 import '../../main.dart';
 import '../../models/data_models/user.dart';
