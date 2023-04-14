@@ -164,7 +164,7 @@ class RecipeViewState extends State<RecipeView>{
             Row(
               children:[
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 0.0),
+                  padding: const EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
                   child: Text("Cook Time: ${recipeDetail.cookTime} mins.",
                     style: textStyle,),
                 ),

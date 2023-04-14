@@ -58,6 +58,7 @@ class PocketKitchen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: sharedPrefs.signedIn ? const TabBarMain(flag: 0) : const GoogleSignInView()
 
     );
@@ -77,6 +78,7 @@ class TabBarMain extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: !sharedPrefs.hasPantries ? const NoPantryView() : DefaultTabController(
           length: 3,
           initialIndex: flag,
