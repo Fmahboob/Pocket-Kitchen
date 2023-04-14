@@ -34,7 +34,7 @@ dependencies:
   http: ^0.13.5
   mysql1: ^0.17.1
   outline_search_bar: ^2.3.0
-  flutter_barcode_scanner: any
+  flutter_barcode_scanner: ^2.0.0
   email_validator: ^1.0.0
   google_sign_in: ^5.0.3
 
