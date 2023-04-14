@@ -143,57 +143,51 @@ class RecipeViewState extends State<RecipeView>{
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(4.0, 8.0, 4.0, 8.0),
+              padding: const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
               child: Container(
+                height: 40,
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                   color: Color(0xff459657),
-
                 ),
-                alignment: Alignment.center,
+                alignment: Alignment.centerLeft,
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
                   child: Text(recipeDetail.title, style: headingStyle
                   ),
                   ),
                 ),
               ),
             Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
+                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
                 child: Image.network(recipeDetail.imageUrl)),
             Row(
               children:[
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
-                  child: Text("Cook Time:",
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 0.0),
+                  child: Text("Cook Time: ${recipeDetail.cookTime} mins.",
                     style: textStyle,),
                 ),
-
-              Padding(
-                padding: const EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
-                child: Text("${recipeDetail.cookTime} mins.",
-                  style: textStyle,),
-              ),
               ],
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(4.0, 8.0, 4.0, 8.0),
+              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
               child: Container(
-    decoration: const BoxDecoration(
-    borderRadius: BorderRadius.all(Radius.circular(5)),
-    color: Color(0xff459657),
-
-    ),
+                height: 40,
+                  decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                  color: Color(0xff459657),
+                ),
                 child: Row(
                   children: const [
                    Padding(
-                          padding: EdgeInsets.all(8.0),
+                          padding: EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
                           child: Text("Ingredients",
                             style: headingStyle,),
                         ),
                     Spacer(),
                     Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
                       child: Text("Availability",
                         style: headingStyle,),
                     ),
@@ -203,7 +197,7 @@ class RecipeViewState extends State<RecipeView>{
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(4.0),
+              padding: const EdgeInsets.all(8.0),
 
                   child: ListView.builder(
                     shrinkWrap: true,
@@ -227,7 +221,7 @@ class RecipeViewState extends State<RecipeView>{
                         children: [
                           Expanded(
                             child: Padding(
-                              padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
+                              padding: EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
                               child: Text(
                                 "${ingredient.name}  ${ingredient.amount}  ${ingredient.unit}",
                                 style: TextStyle(
@@ -237,7 +231,7 @@ class RecipeViewState extends State<RecipeView>{
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
+                            padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
                             child: Text(availabilityChar,
                               style: TextStyle(
                                   fontSize: 20,
@@ -247,7 +241,7 @@ class RecipeViewState extends State<RecipeView>{
                           ),
                           const Spacer(),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(4.0, 4.0, 8.0, 4.0),
+                            padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
                             child: Text(availabilityStr,
                               style: TextStyle(
                                   fontSize: 20,
@@ -264,8 +258,9 @@ class RecipeViewState extends State<RecipeView>{
               ),
 
             Padding(
-              padding: const EdgeInsets.fromLTRB(4.0, 8.0, 4.0, 8.0),
+              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
               child: Container(
+                height: 40,
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                   color: Color(0xff459657),
@@ -273,14 +268,14 @@ class RecipeViewState extends State<RecipeView>{
                 ),
                 alignment: Alignment.centerLeft,
                 child: const Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
                   child: Text("Instructions", style: headingStyle
                   ),
                 ),
               ),
             ),
             Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
+                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
                 child: Text(instructions,
                   style: textStyle,
                 ),

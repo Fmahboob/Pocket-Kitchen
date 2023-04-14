@@ -29,7 +29,7 @@ class CuisinesViewState extends State<CuisinesView> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Padding(
-            padding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 0.0),
+            padding: EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
             child: Text(
                 "Cuisines",
                 textAlign: TextAlign.left,
@@ -46,8 +46,7 @@ class CuisinesViewState extends State<CuisinesView> {
                 itemCount: categories.length,
                 itemBuilder: (context, index) {
                  return cuisinesListItem(index);
-    },
-
+                },
             ),
              ),
         ],
@@ -62,29 +61,29 @@ class CuisinesViewState extends State<CuisinesView> {
         String category = categories[index];
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => CuisinesRecipesView(title: 'Recipes',
+          MaterialPageRoute(builder: (context) => CuisinesRecipesView(title: category,
               selectedCuisine: category),
           ),
         );
             },
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
+        padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
         child: Container(
-            height: 35,
+            height: 40,
             decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(5)),
               color: Color(0xff459657),
-
             ),
             alignment: Alignment.centerLeft,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
+              padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
               child: Text(categories[index],
                 style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500
-                ),),
+                  fontSize: 20,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             )
         ),
       ),

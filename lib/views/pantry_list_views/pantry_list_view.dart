@@ -174,11 +174,13 @@ class PantryListViewState extends PantryState<PantryListView> {
 
                       const Padding(
                         padding: EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 0.0),
-                        child: Text("Available", style: TextStyle(
+                        child: Text("Available",
+                          style: TextStyle(
                             fontSize: 17,
                             color: Color(0xff459657),
                             fontWeight: FontWeight.w600
-                        ),),
+                        ),
+                        ),
                       ),
                          ListView.builder(
                                shrinkWrap: true,
