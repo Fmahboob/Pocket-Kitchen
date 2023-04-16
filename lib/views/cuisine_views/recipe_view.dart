@@ -24,7 +24,7 @@ class RecipeViewState extends State<RecipeView>{
   late Color ingredientColor;
   String availabilityChar = "";
 
-  int ingredientInPantry(ExtendedIngredients ingredient) {
+  List<dynamic> ingredientInPantry(ExtendedIngredients ingredient) {
     for (PantryFood pantryFood in sharedPrefs.pantryFoodList) {
       for (Food food in sharedPrefs.foodList) {
         if (pantryFood.foodId == food.id) {
@@ -34,15 +34,42 @@ class RecipeViewState extends State<RecipeView>{
               double percent = double.parse(pantryFood.amount!);
               double currAmount = weight * percent;
 
-              return convertUnitsFromKg(currAmount, ingredient.unit, ingredient.amount);
+              if (food.weight == "1000") {
+                return [3, pantryFood];
+              }
+              return [convertUnitsFromKg(currAmount, ingredient.unit, ingredient.amount)];
             } else {
-              return convertUnitsFromCups(double.parse(pantryFood.amount!), ingredient.unit, ingredient.amount);
+              return [convertUnitsFromCups(double.parse(pantryFood.amount!), ingredient.unit, ingredient.amount)];
+            }
+          } else {
+            List<String> listOfWordsInIngredient = ingredient.name.split("\\s+");
+            List<String> listOfWordsInFood = food.name!.split("\\s+");
+            int counter = 0;
+
+            for (String ingWord in listOfWordsInIngredient) {
+              for (String foodWord in listOfWordsInFood) {
+                if (foodWord.contains(ingWord)) {
+                  counter += 1;
+
+                  if (counter == listOfWordsInIngredient.length) {
+                    double weight = double.parse(food.weight!);
+                    double percent = double.parse(pantryFood.amount!);
+                    double currAmount = weight * percent;
+
+                    if (food.weight == "1000") {
+                      return [3, pantryFood];
+                    }
+
+                    return [convertUnitsFromKg(currAmount, ingredient.unit, ingredient.amount)];
+                  }
+                }
+              }
             }
           }
         }
       }
     }
-    return 1;
+    return [1];
   }
 
   int convertUnitsFromKg(double currAmount, String unit, double recipeAmount) {
@@ -204,16 +231,25 @@ class RecipeViewState extends State<RecipeView>{
                     itemCount: recipeDetail.extendedIngredients.length,
                     itemBuilder: (context, index) {
                       final ingredient = recipeDetail.extendedIngredients[index];
-                      if (ingredientInPantry(ingredient) == 0) {
+                      List <dynamic> inPantryFlag = ingredientInPantry(ingredient);
+                      if (inPantryFlag[0] == 0) {
                         availabilityStr = "Available";
                         availabilityChar = "\u2713";
                         ingredientColor = const Color(0xff459657);
-                      } else if (ingredientInPantry(ingredient) == 1) {
+                      } else if (inPantryFlag[0] == 1) {
                         availabilityStr = "Unavailable";
                         availabilityChar = "X";
                         ingredientColor = const Color(0xff9E4848);
-                      } else if (ingredientInPantry(ingredient) == 2) {
+                      } else if (inPantryFlag[0] == 2) {
                         availabilityStr = "Unknown Unit";
+                        availabilityChar = "?";
+                        ingredientColor = const Color(0xfff5d16e);
+                      } else if (inPantryFlag[0] == 3) {
+                        double percentDecimal = double.parse(inPantryFlag[1].amount);
+                        double percentWhole = percentDecimal * 100;
+                        String percentStr = "${percentWhole.toStringAsFixed(0)}%";
+
+                        availabilityStr = "Unsure, $percentStr in pantry";
                         availabilityChar = "?";
                         ingredientColor = const Color(0xfff5d16e);
                       }
