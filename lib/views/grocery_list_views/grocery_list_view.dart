@@ -427,7 +427,7 @@ class GroceryListViewState extends State<GroceryListView> {
                         },
                       ),
                     )
-                      
+
                   ),
 
                 ),
