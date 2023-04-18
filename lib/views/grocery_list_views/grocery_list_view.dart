@@ -1,3 +1,5 @@
+import 'package:dropdown_search/dropdown_search.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
 import 'package:pocket_kitchen/models/go_upc_models/go_upc_item.dart';
@@ -22,6 +24,8 @@ class GroceryListView extends StatefulWidget {
 class GroceryListViewState extends State<GroceryListView> {
   String searchTerm = "";
   bool isChecked = false;
+
+  List<String> spoonacularIngredients = [];
 
   late GoUPCItem scannedItem;
   String barcodeNo = "";
@@ -105,6 +109,109 @@ class GroceryListViewState extends State<GroceryListView> {
     }
   }
 
+  String isolateWeightFromName (String name, String unit) {
+    var amountStr = "";
+    var amountCharLength = 0;
+
+    //get amount out of name string
+    //loop over product.name string
+    for (var rune in name.runes) {
+      //add each character to temp var amountStr
+      amountStr = amountStr + String.fromCharCode(rune).toLowerCase();
+      //check that amountStr ends with kg or lb (ready to retrieve measurement)
+      if (amountStr.endsWith(unit)) {
+        //cut off string besides last 8 characters (8 characters is the maximum, for a 5 digit weight that has a space between kg ex. 23.45 KG)
+        amountStr = amountStr.substring(amountStr.length - 8);
+        //check if string has space between measurement and 'kg' or not
+        if (amountStr[amountStr.length - 3] == " ") {
+          //checks that the current character is a number or decimal (when it isn't, we have our string)
+          if (isNumeric(amountStr[amountStr.length - 4]) || isPeriod(amountStr[amountStr.length - 4])) {
+            //checks that the current character is a number or decimal (when it isn't, we have our string)
+            if (isNumeric(amountStr[amountStr.length - 5]) || isPeriod(amountStr[amountStr.length - 5])) {
+              //checks that the current character is a number or decimal (when it isn't, we have our string)
+              if (isNumeric(amountStr[amountStr.length - 6]) || isPeriod(amountStr[amountStr.length - 6])) {
+                //checks that the current character is a number or decimal (when it isn't, we have our string)
+                if (isNumeric(amountStr[amountStr.length - 7]) || isPeriod(amountStr[amountStr.length - 7])) {
+                  //checks that the current character is a number or decimal (when it isn't, we have our string)
+                  if (isNumeric(amountStr[amountStr.length - 8])) {
+                    //cuts off 'kg'
+                    amountStr = amountStr.substring(0, 5);
+                    //sets expected length of amount for substring
+                    amountCharLength = 5;
+                  } else {
+                    //cuts off 'kg'
+                    amountStr = amountStr.substring(1, 5);
+                    //sets expected length of amount for substring
+                    amountCharLength = 4;
+                  }
+                } else {
+                  //cuts off 'kg'
+                  amountStr = amountStr.substring(2, 5);
+                  //sets expected length of amount for substring
+                  amountCharLength = 3;
+                }
+              } else {
+                //cuts off 'kg'
+                amountStr = amountStr.substring(3, 5);
+                //sets expected length of amount for substring
+                amountCharLength = 2;
+              }
+            } else {
+              //cuts off 'kg'
+              amountStr = amountStr.substring(4, 5);
+              //sets expected length of amount for substring
+              amountCharLength = 1;
+            }
+          }
+          //if there isn't a space between measurement and 'kg'
+        } else {
+          //checks that the current character is a number or decimal (when it isn't, we have our string)
+          if (isNumeric(amountStr[amountStr.length - 3]) || isPeriod(amountStr[amountStr.length - 3])) {
+            //checks that the current character is a number or decimal (when it isn't, we have our string)
+            if (isNumeric(amountStr[amountStr.length - 4]) || isPeriod(amountStr[amountStr.length - 4])) {
+              //checks that the current character is a number or decimal (when it isn't, we have our string)
+              if (isNumeric(amountStr[amountStr.length - 5]) || isPeriod(amountStr[amountStr.length - 5])) {
+                //checks that the current character is a number or decimal (when it isn't, we have our string)
+                if (isNumeric(amountStr[amountStr.length - 6]) || isPeriod(amountStr[amountStr.length - 6])) {
+                  //checks that the current character is a number or decimal (when it isn't, we have our string)
+                  if (isNumeric(amountStr[amountStr.length - 7])) {
+                    //cuts off 'kg'
+                    amountStr = amountStr.substring(1, 6);
+                    //sets expected length of amount for substring
+                    amountCharLength = 5;
+                  } else {
+                    //cuts off 'kg'
+                    amountStr = amountStr.substring(2, 6);
+                    //sets expected length of amount for substring
+                    amountCharLength = 4;
+                  }
+                } else {
+                  //cuts off 'kg'
+                  amountStr = amountStr.substring(3, 6);
+                  //sets expected length of amount for substring
+                  amountCharLength = 3;
+                }
+              } else {
+                //cuts off 'kg'
+                amountStr = amountStr.substring(4, 6);
+                //sets expected length of amount for substring
+                amountCharLength = 2;
+              }
+            } else {
+              //cuts off 'kg'
+              amountStr = amountStr.substring(5, 6);
+              //sets expected length of amount for substring
+              amountCharLength = 1;
+            }
+          }
+        }
+      }
+    }
+
+    //sub string the temp var from the first index to the length it should be (amountCharLength)
+    return amountStr.substring(0, amountCharLength);
+  }
+
   Future _scan() async {
     //scans barcode and returns the barcode number
     await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
@@ -118,108 +225,6 @@ class GroceryListViewState extends State<GroceryListView> {
     if (response.statusCode == 200) {
       //store returned item values
       scannedItem = GoUPCItem.fromJson(jsonDecode(response.body));
-
-      var amountStr = "";
-      var amount = "";
-      var amountCharLength = 0;
-
-      //get amount out of name string
-      //loop over product.name string
-      for (var rune in scannedItem.product!.name!.runes) {
-        //add each character to temp var amountStr
-        amountStr = amountStr + String.fromCharCode(rune).toLowerCase();
-        //check that amountStr ends with kg (ready to retrieve measurement)
-        if (amountStr.endsWith("kg")) {
-          //cut off string besides last 8 characters (8 characters is the maximum, for a 5 digit weight that has a space between kg ex. 23.45 KG)
-          amountStr = amountStr.substring(amountStr.length - 8);
-          //check if string has space between measurement and 'kg' or not
-          if (amountStr[amountStr.length - 3] == " ") {
-            //checks that the current character is a number or decimal (when it isn't, we have our string)
-            if (isNumeric(amountStr[amountStr.length - 4]) || isPeriod(amountStr[amountStr.length - 4])) {
-              //checks that the current character is a number or decimal (when it isn't, we have our string)
-              if (isNumeric(amountStr[amountStr.length - 5]) || isPeriod(amountStr[amountStr.length - 5])) {
-                //checks that the current character is a number or decimal (when it isn't, we have our string)
-                if (isNumeric(amountStr[amountStr.length - 6]) || isPeriod(amountStr[amountStr.length - 6])) {
-                  //checks that the current character is a number or decimal (when it isn't, we have our string)
-                  if (isNumeric(amountStr[amountStr.length - 7]) || isPeriod(amountStr[amountStr.length - 7])) {
-                    //checks that the current character is a number or decimal (when it isn't, we have our string)
-                    if (isNumeric(amountStr[amountStr.length - 8])) {
-                      //cuts off 'kg'
-                      amountStr = amountStr.substring(0, 5);
-                      //sets expected length of amount for substring
-                      amountCharLength = 5;
-                    } else {
-                      //cuts off 'kg'
-                      amountStr = amountStr.substring(1, 5);
-                      //sets expected length of amount for substring
-                      amountCharLength = 4;
-                    }
-                  } else {
-                    //cuts off 'kg'
-                    amountStr = amountStr.substring(2, 5);
-                    //sets expected length of amount for substring
-                    amountCharLength = 3;
-                  }
-                } else {
-                  //cuts off 'kg'
-                  amountStr = amountStr.substring(3, 5);
-                  //sets expected length of amount for substring
-                  amountCharLength = 2;
-                }
-              } else {
-                //cuts off 'kg'
-                amountStr = amountStr.substring(4, 5);
-                //sets expected length of amount for substring
-                amountCharLength = 1;
-              }
-            }
-          //if there isn't a space between measurement and 'kg'
-          } else {
-            //checks that the current character is a number or decimal (when it isn't, we have our string)
-            if (isNumeric(amountStr[amountStr.length - 3]) || isPeriod(amountStr[amountStr.length - 3])) {
-              //checks that the current character is a number or decimal (when it isn't, we have our string)
-              if (isNumeric(amountStr[amountStr.length - 4]) || isPeriod(amountStr[amountStr.length - 4])) {
-                //checks that the current character is a number or decimal (when it isn't, we have our string)
-                if (isNumeric(amountStr[amountStr.length - 5]) || isPeriod(amountStr[amountStr.length - 5])) {
-                  //checks that the current character is a number or decimal (when it isn't, we have our string)
-                  if (isNumeric(amountStr[amountStr.length - 6]) || isPeriod(amountStr[amountStr.length - 6])) {
-                    //checks that the current character is a number or decimal (when it isn't, we have our string)
-                    if (isNumeric(amountStr[amountStr.length - 7])) {
-                      //cuts off 'kg'
-                      amountStr = amountStr.substring(1, 6);
-                      //sets expected length of amount for substring
-                      amountCharLength = 5;
-                    } else {
-                      //cuts off 'kg'
-                      amountStr = amountStr.substring(2, 6);
-                      //sets expected length of amount for substring
-                      amountCharLength = 4;
-                    }
-                  } else {
-                    //cuts off 'kg'
-                    amountStr = amountStr.substring(3, 6);
-                    //sets expected length of amount for substring
-                    amountCharLength = 3;
-                  }
-                } else {
-                  //cuts off 'kg'
-                  amountStr = amountStr.substring(4, 6);
-                  //sets expected length of amount for substring
-                  amountCharLength = 2;
-                }
-              } else {
-                //cuts off 'kg'
-                amountStr = amountStr.substring(5, 6);
-                //sets expected length of amount for substring
-                amountCharLength = 1;
-              }
-            }
-          }
-        }
-      }
-
-      //sub string the temp var from the first index to the length it should be (amountCharLength)
-      amount = amountStr.substring(0, amountCharLength);
 
       //query for food with same barcode to check if it already exists in the food table
       Food checkFood = await _getFood(barcodeNo, "", "", "", Database.barcodeQual);
@@ -264,8 +269,27 @@ class GroceryListViewState extends State<GroceryListView> {
       //if the barcode doesn't match and the food isn't in the food's table, create a food and pantry food of it
       } else {
         print("barcode doesnt match");
+
+        String weight = "";
+
+        //try getting weight as kgs
+        try {
+          weight = isolateWeightFromName(scannedItem.product!.name!, "kg");
+          double.parse(weight);
+        } catch (e) {
+          try {
+            weight = isolateWeightFromName(scannedItem.product!.name!, "lb");
+            double weightKgConv = double.parse(weight);
+            weightKgConv = weightKgConv / 2.21;
+            weight = weightKgConv.toString();
+          } catch (e) {
+            //product doesn't have a weight, set to 1000 as identifier for calculating ingredient amounts
+            weight = "1000";
+          }
+        }
+
         //create food
-        await _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl ?? "", scannedItem.product!.category ?? "", scannedItem.product!.description ?? "", amount, "0", barcodeNo);
+        await _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl ?? "", scannedItem.product!.category ?? "", scannedItem.product!.description ?? "", weight, "0", barcodeNo);
 
         //get food
         Food inputtedFood = await _getFood(barcodeNo, "", "", "", Database.barcodeQual);

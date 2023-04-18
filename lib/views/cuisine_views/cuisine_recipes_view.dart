@@ -84,7 +84,6 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
                                   padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
                                   child:
                                   Container(
-                                    height: 40,
                                     decoration: const BoxDecoration(
                                       borderRadius: BorderRadius.all(Radius.circular(5)),
                                       color: Color(0xff459657),
