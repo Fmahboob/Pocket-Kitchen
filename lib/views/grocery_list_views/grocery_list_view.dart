@@ -1,4 +1,3 @@
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
@@ -25,18 +24,11 @@ class GroceryListViewState extends State<GroceryListView> {
   String searchTerm = "";
   bool isChecked = false;
 
-  List<String> spoonacularIngredients = [];
-
   late GoUPCItem scannedItem;
   String barcodeNo = "";
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
-  List<SearchIngredient> suggestions = [];
-
-
-  List<PantryFood> unavailPantryFoods = [PantryFood(amount: "1", pantryId: "3", foodId: "4"), PantryFood(amount: "1", pantryId: "3", foodId: "4"), PantryFood(amount: "1", pantryId: "3", foodId: "4")];
-  List<Food> unavailFoods = [Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg")];
 
   //Food CRUD methods
   Future<void> _createFood(String name, String imgUrl, String category, String desc, String weight, String ownUnit, String barcode) async {
@@ -60,35 +52,10 @@ class GroceryListViewState extends State<GroceryListView> {
     return Database.getPantryFood(foodId, pantryId, qualifier);
   }
 
-  Future<void> _fetchSuggestions(String query) async {
-    final String apiUrl = 'https://api.spoonacular.com/food/ingredients/autocomplete?query=$query&apiKey=${API().apiKey}';
-    final response = await http.get(Uri.parse(apiUrl));
-
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonList = json.decode(response.body);
-      setState(() {
-        suggestions = jsonList.map((json) => SearchIngredient.fromJson(json)).toList();
-
-      });
-    } else {
-      throw Exception('Failed to fetch suggestions from API');
-    }
-  }
-
-  void _onTextChanged(String text) {
-    _fetchSuggestions(text);
-  }
-
-  void _onSuggestionSelected(SearchIngredient suggestion) {
-    setState(() {
-      nameController.text = suggestion.name;
-      suggestions = [];
-    });
-  }
-
   @override
   void dispose() {
     nameController.dispose();
+    amountController.dispose();
     super.dispose();
   }
 
@@ -421,66 +388,49 @@ class GroceryListViewState extends State<GroceryListView> {
                     )
                 ),
               ],
-            ),
-            content: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameController,
-                  enabled: true,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
-                    ),
-                    hintText: "Food Name",
-                    contentPadding: EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
-                    suffix: Container(
-                      height: 200,
-
-                      child: ListView.builder(
-                        itemCount: suggestions.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return ListTile(
-                            title: Text(suggestions[index].name),
-                            onTap: () {
-                              _onSuggestionSelected(suggestions[index]);
-                            },
-                          );
-
-                        },
+            ), 
+            content:
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameController,
+                    enabled: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
                       ),
-                    )
-
-                  ),
-
-                ),
-                CheckboxListTile(
-                  controlAffinity: ListTileControlAffinity.leading,
-                  title: const Text (
-                    'Doesn\'t require units (ex. apples)',
-                    style: TextStyle(
-                        color: Color(0xff7B7777),
-                        fontWeight: FontWeight.w400
+                      hintText: 'Food Name',
+                      contentPadding: EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
                     ),
                   ),
-                  value: isChecked,
-                  onChanged: (isChecked) =>
-                      setState(() => this.isChecked = isChecked!),
-                ),
-                TextField(
-                  enabled: true,
-                  controller: amountController,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(
-                        borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
+                  CheckboxListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: const Text (
+                      'Doesn\'t require units (ex. apples)',
+                      style: TextStyle(
+                          color: Color(0xff7B7777),
+                          fontWeight: FontWeight.w400
+                      ),
                     ),
-                    hintText: isChecked ? 'Food Amount' : 'Food Weight (kg)',
-                    contentPadding: const EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
+                    value: isChecked,
+                    onChanged: (isChecked) =>
+                        setState(() => this.isChecked = isChecked!),
                   ),
-                ),
-              ],
-            ),
+                  TextField(
+                    enabled: true,
+                    controller: amountController,
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(
+                          borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
+                      ),
+                      hintText: isChecked ? 'Food Amount' : 'Food Weight (kg)',
+                      contentPadding: const EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
+                    ),
+                  ),
+                ],
+              ),
             actions: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -509,8 +459,6 @@ class GroceryListViewState extends State<GroceryListView> {
                       if (checkFood.name == "" || checkFood.name == " " || checkFood.name == null) {
                         //create food
                         await _createFood(name, "", "", "", amountController.text, ownUnit, "");
-                        print(name);
-                        print(amountController.text);
                         //get food by name
                         checkFood = await _getFood("", name, "", "", Database.nameQual);
                       }
