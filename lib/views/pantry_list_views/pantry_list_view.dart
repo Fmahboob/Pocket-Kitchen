@@ -428,7 +428,7 @@ class PantryListViewState extends PantryState<PantryListView> {
       )
   );
 
-
+//create pantry dialog
   Future createPantryDialog() => showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -559,7 +559,7 @@ class PantryListViewState extends PantryState<PantryListView> {
               )
       )
   );
-
+//join pantry dialog
   Future joinPantryDialog() => showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -714,7 +714,7 @@ class PantryListViewState extends PantryState<PantryListView> {
               )
       )
   );
-
+  //delete pantry dialog
   Future deletePantryDialog() => showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -799,7 +799,7 @@ class PantryListViewState extends PantryState<PantryListView> {
               )
       )
   );
-
+  // leave pantry dialog
   Future leavePantryDialog() => showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -892,7 +892,7 @@ class PantryListViewState extends PantryState<PantryListView> {
               )
       )
   );
-
+  //switch pantry dialog
   Future switchPantryDialog() => showDialog(
       context: context,
       builder: (context) => StatefulBuilder(

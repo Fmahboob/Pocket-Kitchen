@@ -104,18 +104,18 @@ class RecipeViewState extends State<RecipeView>{
                         children: [
                           Expanded(
                             child: Padding(
-                              padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
+                              padding: const EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
                               child: Text("${ingredient.name}  ${ingredient.amount}  ${ingredient.unit}"),
 
                             ),
                           ),
-                          Padding(
+                          const Padding(
                             padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
                             child: Text("X",
                               style: textStyle,),
                           ),
-                          Spacer(),
-                          Padding(
+                          const Spacer(),
+                          const Padding(
                             padding: EdgeInsets.fromLTRB(4.0, 4.0, 8.0, 4.0),
                             child: Text("Available",
                               style: textStyle,),
