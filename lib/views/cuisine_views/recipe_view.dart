@@ -221,6 +221,7 @@ class RecipeViewState extends State<RecipeView>{
                         children: [
                           Expanded(
                             child: Padding(
+
                               padding: EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 0.0),
                               child: Text(
                                 "${ingredient.name}  ${ingredient.amount}  ${ingredient.unit}",
@@ -248,6 +249,7 @@ class RecipeViewState extends State<RecipeView>{
                                   color: ingredientColor,
                                   fontWeight: FontWeight.w500
                               )),
+
                           ),
 
                         ],

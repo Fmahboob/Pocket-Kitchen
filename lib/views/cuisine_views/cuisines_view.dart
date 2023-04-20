@@ -11,6 +11,7 @@ class CuisinesView extends StatefulWidget {
 }
 
 class CuisinesViewState extends State<CuisinesView> {
+  // All static cuisines
   List<String> categories = [  "African", "American", "British", "Chinese", "Eastern European", "European", "German", "Greek", "Indian", "Italian", "Japanese", "Korean", "Mediterranean", "Mexican", "Middle Eastern", "Spanish", "Thai"];
   // By default first one is selected
   int selectedIndex = 0;
@@ -59,6 +60,7 @@ class CuisinesViewState extends State<CuisinesView> {
     return GestureDetector(
       onTap: () {
         String category = categories[index];
+        //Go to cuisines page
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => CuisinesRecipesView(title: category,
