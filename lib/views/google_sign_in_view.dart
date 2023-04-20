@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
 import '../../models/app_models/database.dart';
 import '../../main.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 import '../../models/data_models/user.dart';
 import '../models/app_models/google_sign_in_api.dart';
 import '../models/data_models/food.dart';
@@ -177,7 +178,7 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
-                            "Link Pocket Kitchen with your Google account.",
+                            "Welcome to Pocket Kitchen! Sign in to get started.",
                             maxLines: 4,
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -189,20 +190,9 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0.0, 72.0, 0.0, 64.0),
                           child:
-                          TextButton(
+                          SignInButton(
+                            Buttons.GoogleDark,
                             onPressed: signIn,
-                            style: const ButtonStyle(
-                              backgroundColor: MaterialStatePropertyAll(Color(0xff459657)),
-                            ),
-                            child:
-                            const Text(
-                              "Google Sign In",
-                              style: TextStyle(
-                                  fontSize: 28,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500
-                              ),
-                            ),
                           ),
                         ),
                       ],

@@ -1,14 +1,18 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
 import 'package:pocket_kitchen/models/go_upc_models/go_upc_item.dart';
 import '../../main.dart';
 import '../../models/data_models/food.dart';
 import '../../models/data_models/pantry_food.dart';
+import '../../models/recipe_model/api_key.dart';
+import '../../models/recipe_model/search_ingredient.dart';
 import 'grocery_list_item.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:pocket_kitchen/models/app_models/database.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class GroceryListView extends StatefulWidget {
   const GroceryListView({super.key});
@@ -25,9 +29,6 @@ class GroceryListViewState extends State<GroceryListView> {
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
-
-  List<PantryFood> unavailPantryFoods = [PantryFood(amount: "1", pantryId: "3", foodId: "4"), PantryFood(amount: "1", pantryId: "3", foodId: "4"), PantryFood(amount: "1", pantryId: "3", foodId: "4")];
-  List<Food> unavailFoods = [Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg"), Food(id: "3", name: "Corn", category: "Veggies", desc: "Yummy.", imgUrl: "https://s30386.pcdn.co/wp-content/uploads/2019/08/FreshCorn_HNL1309_ts135846041.jpg.optimal.jpg")];
 
   //Food CRUD methods
   Future<void> _createFood(String name, String imgUrl, String category, String desc, String weight, String ownUnit, String barcode) async {
@@ -51,6 +52,13 @@ class GroceryListViewState extends State<GroceryListView> {
     return Database.getPantryFood(foodId, pantryId, qualifier);
   }
 
+  @override
+  void dispose() {
+    nameController.dispose();
+    amountController.dispose();
+    super.dispose();
+  }
+
   bool isNumeric(String s) {
     try {
       int.parse(s);
@@ -68,6 +76,109 @@ class GroceryListViewState extends State<GroceryListView> {
     }
   }
 
+  String isolateWeightFromName (String name, String unit) {
+    var amountStr = "";
+    var amountCharLength = 0;
+
+    //get amount out of name string
+    //loop over product.name string
+    for (var rune in name.runes) {
+      //add each character to temp var amountStr
+      amountStr = amountStr + String.fromCharCode(rune).toLowerCase();
+      //check that amountStr ends with kg or lb (ready to retrieve measurement)
+      if (amountStr.endsWith(unit)) {
+        //cut off string besides last 8 characters (8 characters is the maximum, for a 5 digit weight that has a space between kg ex. 23.45 KG)
+        amountStr = amountStr.substring(amountStr.length - 8);
+        //check if string has space between measurement and 'kg' or not
+        if (amountStr[amountStr.length - 3] == " ") {
+          //checks that the current character is a number or decimal (when it isn't, we have our string)
+          if (isNumeric(amountStr[amountStr.length - 4]) || isPeriod(amountStr[amountStr.length - 4])) {
+            //checks that the current character is a number or decimal (when it isn't, we have our string)
+            if (isNumeric(amountStr[amountStr.length - 5]) || isPeriod(amountStr[amountStr.length - 5])) {
+              //checks that the current character is a number or decimal (when it isn't, we have our string)
+              if (isNumeric(amountStr[amountStr.length - 6]) || isPeriod(amountStr[amountStr.length - 6])) {
+                //checks that the current character is a number or decimal (when it isn't, we have our string)
+                if (isNumeric(amountStr[amountStr.length - 7]) || isPeriod(amountStr[amountStr.length - 7])) {
+                  //checks that the current character is a number or decimal (when it isn't, we have our string)
+                  if (isNumeric(amountStr[amountStr.length - 8])) {
+                    //cuts off 'kg'
+                    amountStr = amountStr.substring(0, 5);
+                    //sets expected length of amount for substring
+                    amountCharLength = 5;
+                  } else {
+                    //cuts off 'kg'
+                    amountStr = amountStr.substring(1, 5);
+                    //sets expected length of amount for substring
+                    amountCharLength = 4;
+                  }
+                } else {
+                  //cuts off 'kg'
+                  amountStr = amountStr.substring(2, 5);
+                  //sets expected length of amount for substring
+                  amountCharLength = 3;
+                }
+              } else {
+                //cuts off 'kg'
+                amountStr = amountStr.substring(3, 5);
+                //sets expected length of amount for substring
+                amountCharLength = 2;
+              }
+            } else {
+              //cuts off 'kg'
+              amountStr = amountStr.substring(4, 5);
+              //sets expected length of amount for substring
+              amountCharLength = 1;
+            }
+          }
+          //if there isn't a space between measurement and 'kg'
+        } else {
+          //checks that the current character is a number or decimal (when it isn't, we have our string)
+          if (isNumeric(amountStr[amountStr.length - 3]) || isPeriod(amountStr[amountStr.length - 3])) {
+            //checks that the current character is a number or decimal (when it isn't, we have our string)
+            if (isNumeric(amountStr[amountStr.length - 4]) || isPeriod(amountStr[amountStr.length - 4])) {
+              //checks that the current character is a number or decimal (when it isn't, we have our string)
+              if (isNumeric(amountStr[amountStr.length - 5]) || isPeriod(amountStr[amountStr.length - 5])) {
+                //checks that the current character is a number or decimal (when it isn't, we have our string)
+                if (isNumeric(amountStr[amountStr.length - 6]) || isPeriod(amountStr[amountStr.length - 6])) {
+                  //checks that the current character is a number or decimal (when it isn't, we have our string)
+                  if (isNumeric(amountStr[amountStr.length - 7])) {
+                    //cuts off 'kg'
+                    amountStr = amountStr.substring(1, 6);
+                    //sets expected length of amount for substring
+                    amountCharLength = 5;
+                  } else {
+                    //cuts off 'kg'
+                    amountStr = amountStr.substring(2, 6);
+                    //sets expected length of amount for substring
+                    amountCharLength = 4;
+                  }
+                } else {
+                  //cuts off 'kg'
+                  amountStr = amountStr.substring(3, 6);
+                  //sets expected length of amount for substring
+                  amountCharLength = 3;
+                }
+              } else {
+                //cuts off 'kg'
+                amountStr = amountStr.substring(4, 6);
+                //sets expected length of amount for substring
+                amountCharLength = 2;
+              }
+            } else {
+              //cuts off 'kg'
+              amountStr = amountStr.substring(5, 6);
+              //sets expected length of amount for substring
+              amountCharLength = 1;
+            }
+          }
+        }
+      }
+    }
+
+    //sub string the temp var from the first index to the length it should be (amountCharLength)
+    return amountStr.substring(0, amountCharLength);
+  }
+
   Future _scan() async {
     //scans barcode and returns the barcode number
     await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
@@ -82,108 +193,6 @@ class GroceryListViewState extends State<GroceryListView> {
       //store returned item values
       scannedItem = GoUPCItem.fromJson(jsonDecode(response.body));
 
-      var amountStr = "";
-      var amount = "";
-      var amountCharLength = 0;
-
-      //get amount out of name string
-      //loop over product.name string
-      for (var rune in scannedItem.product!.name!.runes) {
-        //add each character to temp var amountStr
-        amountStr = amountStr + String.fromCharCode(rune).toLowerCase();
-        //check that amountStr ends with kg (ready to retrieve measurement)
-        if (amountStr.endsWith("kg")) {
-          //cut off string besides last 8 characters (8 characters is the maximum, for a 5 digit weight that has a space between kg ex. 23.45 KG)
-          amountStr = amountStr.substring(amountStr.length - 8);
-          //check if string has space between measurement and 'kg' or not
-          if (amountStr[amountStr.length - 3] == " ") {
-            //checks that the current character is a number or decimal (when it isn't, we have our string)
-            if (isNumeric(amountStr[amountStr.length - 4]) || isPeriod(amountStr[amountStr.length - 4])) {
-              //checks that the current character is a number or decimal (when it isn't, we have our string)
-              if (isNumeric(amountStr[amountStr.length - 5]) || isPeriod(amountStr[amountStr.length - 5])) {
-                //checks that the current character is a number or decimal (when it isn't, we have our string)
-                if (isNumeric(amountStr[amountStr.length - 6]) || isPeriod(amountStr[amountStr.length - 6])) {
-                  //checks that the current character is a number or decimal (when it isn't, we have our string)
-                  if (isNumeric(amountStr[amountStr.length - 7]) || isPeriod(amountStr[amountStr.length - 7])) {
-                    //checks that the current character is a number or decimal (when it isn't, we have our string)
-                    if (isNumeric(amountStr[amountStr.length - 8])) {
-                      //cuts off 'kg'
-                      amountStr = amountStr.substring(0, 5);
-                      //sets expected length of amount for substring
-                      amountCharLength = 5;
-                    } else {
-                      //cuts off 'kg'
-                      amountStr = amountStr.substring(1, 5);
-                      //sets expected length of amount for substring
-                      amountCharLength = 4;
-                    }
-                  } else {
-                    //cuts off 'kg'
-                    amountStr = amountStr.substring(2, 5);
-                    //sets expected length of amount for substring
-                    amountCharLength = 3;
-                  }
-                } else {
-                  //cuts off 'kg'
-                  amountStr = amountStr.substring(3, 5);
-                  //sets expected length of amount for substring
-                  amountCharLength = 2;
-                }
-              } else {
-                //cuts off 'kg'
-                amountStr = amountStr.substring(4, 5);
-                //sets expected length of amount for substring
-                amountCharLength = 1;
-              }
-            }
-          //if there isn't a space between measurement and 'kg'
-          } else {
-            //checks that the current character is a number or decimal (when it isn't, we have our string)
-            if (isNumeric(amountStr[amountStr.length - 3]) || isPeriod(amountStr[amountStr.length - 3])) {
-              //checks that the current character is a number or decimal (when it isn't, we have our string)
-              if (isNumeric(amountStr[amountStr.length - 4]) || isPeriod(amountStr[amountStr.length - 4])) {
-                //checks that the current character is a number or decimal (when it isn't, we have our string)
-                if (isNumeric(amountStr[amountStr.length - 5]) || isPeriod(amountStr[amountStr.length - 5])) {
-                  //checks that the current character is a number or decimal (when it isn't, we have our string)
-                  if (isNumeric(amountStr[amountStr.length - 6]) || isPeriod(amountStr[amountStr.length - 6])) {
-                    //checks that the current character is a number or decimal (when it isn't, we have our string)
-                    if (isNumeric(amountStr[amountStr.length - 7])) {
-                      //cuts off 'kg'
-                      amountStr = amountStr.substring(1, 6);
-                      //sets expected length of amount for substring
-                      amountCharLength = 5;
-                    } else {
-                      //cuts off 'kg'
-                      amountStr = amountStr.substring(2, 6);
-                      //sets expected length of amount for substring
-                      amountCharLength = 4;
-                    }
-                  } else {
-                    //cuts off 'kg'
-                    amountStr = amountStr.substring(3, 6);
-                    //sets expected length of amount for substring
-                    amountCharLength = 3;
-                  }
-                } else {
-                  //cuts off 'kg'
-                  amountStr = amountStr.substring(4, 6);
-                  //sets expected length of amount for substring
-                  amountCharLength = 2;
-                }
-              } else {
-                //cuts off 'kg'
-                amountStr = amountStr.substring(5, 6);
-                //sets expected length of amount for substring
-                amountCharLength = 1;
-              }
-            }
-          }
-        }
-      }
-
-      //sub string the temp var from the first index to the length it should be (amountCharLength)
-      amount = amountStr.substring(0, amountCharLength);
-
       //query for food with same barcode to check if it already exists in the food table
       Food checkFood = await _getFood(barcodeNo, "", "", "", Database.barcodeQual);
 
@@ -194,7 +203,7 @@ class GroceryListViewState extends State<GroceryListView> {
         PantryFood checkPantryFood = await _getPantryFood(checkFood.id!, sharedPrefs.currentPantry, Database.bothQual);
 
         //check that a pantry food was returned and exists in the current pantry
-        if (checkPantryFood.id != "" || checkPantryFood.id != " " || checkPantryFood.id != null) {
+        if (checkPantryFood.id != "" && checkPantryFood.id != " " && checkPantryFood.id != null) {
           print("food and pfood matches");
           //Therefore, the user is refilling the item's stock. Update the amount to full (equal to it's food's weight)
           await _updatePantryFood(checkPantryFood.id!, "1", checkPantryFood.pantryId!, checkPantryFood.foodId!);
@@ -227,8 +236,27 @@ class GroceryListViewState extends State<GroceryListView> {
       //if the barcode doesn't match and the food isn't in the food's table, create a food and pantry food of it
       } else {
         print("barcode doesnt match");
+
+        String weight = "";
+
+        //try getting weight as kgs
+        try {
+          weight = isolateWeightFromName(scannedItem.product!.name!, "kg");
+          double.parse(weight);
+        } catch (e) {
+          try {
+            weight = isolateWeightFromName(scannedItem.product!.name!, "lb");
+            double weightKgConv = double.parse(weight);
+            weightKgConv = weightKgConv / 2.21;
+            weight = weightKgConv.toString();
+          } catch (e) {
+            //product doesn't have a weight, set to 1000 as identifier for calculating ingredient amounts
+            weight = "1000";
+          }
+        }
+
         //create food
-        await _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl ?? "", scannedItem.product!.category ?? "", scannedItem.product!.description ?? "", amount, "0", barcodeNo);
+        await _createFood(scannedItem.product!.name!, scannedItem.product!.imageUrl ?? "", scannedItem.product!.category ?? "", scannedItem.product!.description ?? "", weight, "0", barcodeNo);
 
         //get food
         Food inputtedFood = await _getFood(barcodeNo, "", "", "", Database.barcodeQual);
@@ -297,11 +325,11 @@ class GroceryListViewState extends State<GroceryListView> {
                             },
                             decoration: const InputDecoration(
                                 border: OutlineInputBorder(
-                                  borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
+                                    borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
                                 ),
                                 hintText: "Search",
-                              contentPadding: EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
-                              prefixIcon: Icon(Icons.search)
+                                contentPadding: EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
+                                prefixIcon: Icon(Icons.search)
                             ),
                           ),
                           const Padding(
@@ -360,49 +388,49 @@ class GroceryListViewState extends State<GroceryListView> {
                     )
                 ),
               ],
-            ),
+            ), 
             content:
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameController,
-                  enabled: true,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
-                    ),
-                    hintText: "Food Name",
-                    contentPadding: EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
-                  ),
-                ),
-                CheckboxListTile(
-                  controlAffinity: ListTileControlAffinity.leading,
-                  title: const Text (
-                    'Doesn\'t require units (ex. apples)',
-                    style: TextStyle(
-                        color: Color(0xff7B7777),
-                        fontWeight: FontWeight.w400
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameController,
+                    enabled: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
+                      ),
+                      hintText: 'Food Name',
+                      contentPadding: EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
                     ),
                   ),
-                  value: isChecked,
-                  onChanged: (isChecked) =>
-                      setState(() => this.isChecked = isChecked!),
-                ),
-                TextField(
-                  enabled: true,
-                  controller: amountController,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(
-                        borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
+                  CheckboxListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: const Text (
+                      'Doesn\'t require units (ex. apples)',
+                      style: TextStyle(
+                          color: Color(0xff7B7777),
+                          fontWeight: FontWeight.w400
+                      ),
                     ),
-                    hintText: isChecked ? 'Food Amount' : 'Food Weight (kg)',
-                    contentPadding: const EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
+                    value: isChecked,
+                    onChanged: (isChecked) =>
+                        setState(() => this.isChecked = isChecked!),
                   ),
-                ),
-              ],
-            ),
+                  TextField(
+                    enabled: true,
+                    controller: amountController,
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(
+                          borderSide: BorderSide(width: 3, color: Color(0xff7B7777))
+                      ),
+                      hintText: isChecked ? 'Food Amount' : 'Food Weight (kg)',
+                      contentPadding: const EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
+                    ),
+                  ),
+                ],
+              ),
             actions: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -431,8 +459,6 @@ class GroceryListViewState extends State<GroceryListView> {
                       if (checkFood.name == "" || checkFood.name == " " || checkFood.name == null) {
                         //create food
                         await _createFood(name, "", "", "", amountController.text, ownUnit, "");
-                        print(name);
-                        print(amountController.text);
                         //get food by name
                         checkFood = await _getFood("", name, "", "", Database.nameQual);
                       }

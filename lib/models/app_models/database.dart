@@ -9,7 +9,7 @@ import '../data_models/user.dart';
 
 class Database {
   //Database interface API url
-  static Uri root = Uri.parse('http://24.57.171.252/pkCrudOps.php');
+  static Uri root = Uri.parse('http://192.168.0.13/pkCrudOps.php');
 
   //Action constants
   static const createAction = 'CREATE';
