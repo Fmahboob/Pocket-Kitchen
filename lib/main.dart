@@ -1,115 +1,121 @@
 import 'package:flutter/material.dart';
+import 'package:pocket_kitchen/models/app_models/shared_preferences.dart';
+import 'package:pocket_kitchen/views/cuisine_views/cuisine_recipes_view.dart';
+import 'package:pocket_kitchen/views/cuisine_views/cuisines_view.dart';
+import 'package:pocket_kitchen/views/cuisine_views/recipe_view.dart';
+import 'package:pocket_kitchen/views/google_sign_in_view.dart';
+import 'package:pocket_kitchen/views/grocery_list_views/grocery_list_view.dart';
+import 'package:pocket_kitchen/views/pantry_list_views/create_join_pantry_screen.dart';
+import 'package:pocket_kitchen/views/pantry_list_views/pantry_list_view.dart';
 
-void main() {
-  runApp(const MyApp());
+//main app run
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await sharedPrefs.init();
+  runApp(
+    const RestartWidget(
+        child: PocketKitchen()
+    )
+  );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+//wrapping widget to allow state restarting
+class RestartWidget extends StatefulWidget {
+  const RestartWidget({super.key, required this.child});
 
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+  final Widget child;
+
+  static void restartApp(BuildContext context) {
+    context.findAncestorStateOfType<_RestartWidgetState>()?.restartApp();
   }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _RestartWidgetState createState() => _RestartWidgetState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _RestartWidgetState extends State<RestartWidget> {
+  Key key = UniqueKey();
 
-  void _incrementCounter() {
+  void restartApp() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      key = UniqueKey();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    return KeyedSubtree(
+      key: key,
+      child: widget.child,
     );
   }
+}
+
+//main app load up webbing logic
+class PocketKitchen extends StatelessWidget {
+  const PocketKitchen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: sharedPrefs.signedIn ? const TabBarMain(flag: 0) : const GoogleSignInView()
+
+    );
+  }
+}
+
+//main app
+class TabBarMain extends StatelessWidget {
+  final int flag;
+
+  const TabBarMain({
+    super.key,
+    required this.flag
+  });
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: !sharedPrefs.hasPantries ? const NoPantryView() : DefaultTabController(
+          length: 3,
+          initialIndex: flag,
+          child: Scaffold(
+              bottomNavigationBar: tabBarMenu(),
+              body: const TabBarView(
+                children: [
+                  PantryListView(),
+                  GroceryListView(),
+                  CuisinesView()
+                ],
+              )
+          )
+        )
+    );
+  }
+}
+
+//app tab bar
+Widget tabBarMenu() {
+  return const TabBar(
+    unselectedLabelColor: Color(0xff7B7777),
+    labelColor: Color(0xff459657),
+    indicatorColor: Color(0xff459657),
+    tabs: [
+      Tab(
+        text: "Pantry",
+        icon: Icon(Icons.inventory_2_outlined),
+      ),
+      Tab(
+        text: "Grocery List",
+        icon: Icon(Icons.sticky_note_2_outlined),
+      ),
+      Tab(
+        text: "Recipes",
+        icon: Icon(Icons.book_outlined)
+      ),
+    ],
+  );
 }
