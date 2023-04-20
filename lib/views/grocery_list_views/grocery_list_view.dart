@@ -21,7 +21,7 @@ class GroceryListViewState extends State<GroceryListView> {
   bool isChecked = false;
 
   late GoUPCItem scannedItem;
-  String barcodeNo = "0058891252220";
+  String barcodeNo = "";
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
@@ -70,8 +70,8 @@ class GroceryListViewState extends State<GroceryListView> {
 
   Future _scan() async {
     //scans barcode and returns the barcode number
-    //await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
-    barcodeNo = "0058891252220";
+    await FlutterBarcodeScanner.scanBarcode("#000000", "Cancel", true, ScanMode.BARCODE).then((value) => setState(()=> barcodeNo = value));
+
     //API call to Go-UPC with barcode number
     Response response = await get(Uri.parse('https://go-upc.com/api/v1/code/$barcodeNo'), headers: {
       'Authorization': 'Bearer 24a313ffbcb68c96a4c74cd11c17aaa60fc8f2efd7f2baeb203fe3cf97e2adab',

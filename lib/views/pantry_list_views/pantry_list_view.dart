@@ -174,11 +174,13 @@ class PantryListViewState extends PantryState<PantryListView> {
 
                       const Padding(
                         padding: EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 0.0),
-                        child: Text("Available", style: TextStyle(
+                        child: Text("Available",
+                          style: TextStyle(
                             fontSize: 17,
                             color: Color(0xff459657),
                             fontWeight: FontWeight.w600
-                        ),),
+                        ),
+                        ),
                       ),
                          ListView.builder(
                                shrinkWrap: true,
@@ -634,7 +636,7 @@ class PantryListViewState extends PantryState<PantryListView> {
                         onPressed: () async {
                           if(_formKey.currentState!.validate()) {
                             //retrieve desired pantry
-                            Pantry joiningPantry = await _getPantry(joinIdController.text, joinNameController.text, "", Database.idQual);
+                            Pantry joiningPantry = await _getPantry(joinIdController.text, "", "", Database.idQual);
 
                             //check that name matches inputted name
                             if (joiningPantry.name == joinNameController.text) {
@@ -642,7 +644,7 @@ class PantryListViewState extends PantryState<PantryListView> {
                               //update user count for pantry
                               int userCount = int.parse(joiningPantry.userCount!) + 1;
 
-                              //update pantry
+                              //update pantry user count
                               _updatePantry(joiningPantry.id!, joiningPantry.name!, userCount.toString(), joiningPantry.ownerId!);
 
                               //create new pantry_user
@@ -684,10 +686,6 @@ class PantryListViewState extends PantryState<PantryListView> {
                                 context,
                                 MaterialPageRoute(builder: (context) => const TabBarMain(flag: 0)),
                               );
-
-                              //reload app
-                              //RestartWidget.restartApp(context);
-
                               //if name doesn't match id, inform user with snackbar
                             } else {
                               nonMatchSnackBar;

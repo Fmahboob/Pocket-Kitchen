@@ -47,7 +47,7 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Padding(
-                padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
+                padding: EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
                 child: Text(
                     "Recipes",
                     textAlign: TextAlign.left,
@@ -65,7 +65,7 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
                     itemBuilder: (context, index) {
                       final RecipeList recipe = recipes[index];
                       return  Padding(
-                        padding: EdgeInsets.all(4.0),
+                        padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
                         child: GestureDetector(
                               onTap: () {
                                 RecipeData().fetchRecipeDetail(recipe.id).then((recipeDetail) {
@@ -80,24 +80,31 @@ class CuisinesRecipesViewState extends State<CuisinesRecipesView>{
                           child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Container(
-                                  decoration: const BoxDecoration(
-                                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                                    color: Color(0xff459657),
-
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Padding(
-                                    padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
-                                    child: Text(recipe.title, style: const TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500
-                                    ),),
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
+                                  child:
+                                  Container(
+                                    height: 40,
+                                    decoration: const BoxDecoration(
+                                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                                      color: Color(0xff459657),
+                                    ),
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+                                      child: Text(
+                                        recipe.title,
+                                        textAlign: TextAlign.left,
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                      ),),
+                                    ),
                                   ),
                                 ),
                                 Padding(
-                                    padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
+                                    padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
                                     child: Image.network(recipe.imageUrl)),
                               ],
                             ),
