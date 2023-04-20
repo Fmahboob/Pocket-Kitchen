@@ -203,7 +203,7 @@ class GroceryListViewState extends State<GroceryListView> {
         PantryFood checkPantryFood = await _getPantryFood(checkFood.id!, sharedPrefs.currentPantry, Database.bothQual);
 
         //check that a pantry food was returned and exists in the current pantry
-        if (checkPantryFood.id != "" || checkPantryFood.id != " " || checkPantryFood.id != null) {
+        if (checkPantryFood.id != "" && checkPantryFood.id != " " && checkPantryFood.id != null) {
           print("food and pfood matches");
           //Therefore, the user is refilling the item's stock. Update the amount to full (equal to it's food's weight)
           await _updatePantryFood(checkPantryFood.id!, "1", checkPantryFood.pantryId!, checkPantryFood.foodId!);

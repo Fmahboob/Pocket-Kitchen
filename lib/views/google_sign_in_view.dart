@@ -192,7 +192,7 @@ class GoogleSignInViewState extends State<GoogleSignInView> {
                           padding: const EdgeInsets.fromLTRB(0.0, 72.0, 0.0, 64.0),
                           child:
                           SignInButton(
-                            Buttons.Google,
+                            Buttons.GoogleDark,
                             onPressed: signIn,
                           ),
                         ),
