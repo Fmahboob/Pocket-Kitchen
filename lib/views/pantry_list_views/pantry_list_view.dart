@@ -1097,7 +1097,7 @@ class PantryListViewState extends PantryState<PantryListView> {
                     children: [
                       TextButton(
                         onPressed: () async {
-                          _updatePantryFood(pantryFood.id!, "0", pantryFood.pantryId!, pantryFood.foodId!);
+                          await _updatePantryFood(pantryFood.id!, "0", pantryFood.pantryId!, pantryFood.foodId!);
 
                           List<PantryFood> pantryFoodsList = sharedPrefs.pantryFoodList;
 
